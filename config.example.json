@@ -1,0 +1,22 @@
+{
+  "appareils": [
+    {
+      "id": "tv",
+      "nom": "TV LG du salon",
+      "type": "tv",
+      "marque": "lg",
+      "adresse": "192.168.1.30",
+      "mac": "AA:BB:CC:DD:EE:FF"
+    },
+    {
+      "id": "iphone",
+      "nom": "Mon iPhone",
+      "type": "iphone",
+      "sujet_ntfy": "maison-kkg-remplacez-par-un-nom-secret"
+    }
+  ],
+  "serveur": {
+    "port": 8765,
+    "autoriser_actions_sensibles": false
+  }
+}
