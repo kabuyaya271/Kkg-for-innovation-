@@ -218,6 +218,11 @@ class LGTV(TVBackend):
         from pywebostv.controls import ApplicationControl, InputControl, MediaControl, SourceControl, SystemControl, TvControl
 
         if self._client is None:
+            port = 3001 if self.secure else 3000
+            try:  # vérification rapide : évite d'attendre longtemps si la TV est éteinte
+                socket.create_connection((self.host, port), timeout=4).close()
+            except OSError:
+                raise DeviceError(f"{self.name} injoignable (éteinte ou hors du Wi-Fi ?).") from None
             store = json.loads(self.key_file.read_text()) if self.key_file.exists() else {}
             client = WebOSClient(self.host, secure=self.secure)
             client.connect()
@@ -232,10 +237,17 @@ class LGTV(TVBackend):
             "tv": TvControl(c), "source": SourceControl(c), "input": InputControl(c),
         }
 
+    @staticmethod
+    def _volume_info(payload: Any) -> tuple[Any, bool]:
+        """Volume et sourdine ; le format change selon la version de webOS."""
+        if not isinstance(payload, dict):
+            return payload, False
+        st = payload.get("volumeStatus", payload)
+        return st.get("volume"), bool(st.get("muteStatus", st.get("muted", False)))
+
     def _status(self) -> dict[str, Any]:
-        ctl = self._controls()
-        vol = ctl["media"].get_volume()
-        return {"joignable": True, "volume": vol.get("volume") if isinstance(vol, dict) else vol}
+        vol, muted = self._volume_info(self._controls()["media"].get_volume())
+        return {"joignable": True, "volume": vol, "muet": muted}
 
     def _press(self, action: str) -> None:
         ctl = self._controls()
@@ -244,14 +256,13 @@ class LGTV(TVBackend):
             "volume_bas": ctl["media"].volume_down, "chaine_suivante": ctl["tv"].channel_up,
             "chaine_precedente": ctl["tv"].channel_down, "lecture": ctl["media"].play, "pause": ctl["media"].pause,
         }
-        if action == "eteindre":
-            self._client = None
         if action in simple:
             simple[action]()
+            if action == "eteindre":
+                self._client = None  # la connexion sera rouverte au prochain ordre
             return
         if action == "couper_son":
-            vol = ctl["media"].get_volume()
-            muted = vol.get("muted", False) if isinstance(vol, dict) else False
+            _, muted = self._volume_info(ctl["media"].get_volume())
             ctl["media"].mute(not muted)
             return
         pointer = {"accueil": "home", "retour": "back", "haut": "up", "bas": "down",

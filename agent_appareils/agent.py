@@ -32,7 +32,10 @@ Si une action échoue, dis-le simplement.
 Paramètres de control_device : regarde le champ « parametres » renvoyé par list_devices pour chaque appareil. \
 Pour les touches répétables (volume_haut, volume_bas...), utilise le paramètre « fois » plutôt que plusieurs appels. \
 Appareils "ha:..." (Home Assistant) : champs du service, ex. brightness_pct, temperature, volume_level (0.0-1.0).
-Si un appareil n'est pas joignable (éteint, hors Wi-Fi), dis-le à l'utilisateur."""
+Si un appareil n'est pas joignable (éteint, hors Wi-Fi), dis-le à l'utilisateur. \
+Un iPhone ne peut recevoir que des notifications : si on te demande autre chose sur l'iPhone \
+(ouvrir une appli, régler son volume...), explique simplement qu'Apple ne le permet pas.
+Tes réponses peuvent être lues à voix haute par Siri : pas d'emoji, pas de mise en forme, pas de liste."""
 
 TOOLS: list[dict[str, Any]] = [
     {

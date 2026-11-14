@@ -1,4 +1,4 @@
-"""Lancement : python -m agent_appareils [--voix] [--sans-pc] [--simulation] [--config config.json]"""
+"""Lancement : python -m agent_appareils [--voix | --serveur] [--sans-pc] [--simulation] [--config config.json]"""
 
 from __future__ import annotations
 
@@ -14,11 +14,20 @@ from .agent import DeviceAgent
 from .backends import Backend, DeviceError
 from .backends.android import AndroidBackend
 from .backends.computer import ComputerBackend
+from .backends.iphone import IPhoneBackend
 from .backends.simulated import SimulatedBackend
 from .backends.tv import LGTV, RokuTV, SamsungTV
 
 
+# En mode serveur (ordres venant de l'iPhone), personne n'est devant l'ordinateur pour confirmer.
+REMOTE = {"actif": False, "autoriser_actions_sensibles": False}
+
+
 def confirm(question: str) -> bool:
+    if REMOTE["actif"]:
+        allowed = REMOTE["autoriser_actions_sensibles"]
+        print(f"  ⚠️  {question} — {'autorisé' if allowed else 'refusé'} (ordre à distance)")
+        return allowed
     try:
         return input(f"  ⚠️  {question} — confirmer ? (o/N) ").strip().lower() in {"o", "oui", "y", "yes"}
     except EOFError:
@@ -70,6 +79,8 @@ def backend_from_config(dev: dict) -> Backend:
     kind, addr, mac = dev.get("type", ""), dev.get("adresse", ""), dev.get("mac", "")
     if kind in {"android", "telephone"}:
         return AndroidBackend(dev_id, name, addr, kind="telephone", confirm=confirm)
+    if kind == "iphone":
+        return IPhoneBackend(dev_id, name, dev.get("sujet_ntfy", ""), dev.get("serveur_ntfy", "https://ntfy.sh"))
     if kind == "tv":
         brand = dev.get("marque", "").lower()
         if brand in {"android", "google", "googletv", "androidtv"}:
@@ -81,12 +92,11 @@ def backend_from_config(dev: dict) -> Backend:
         if brand == "roku":
             return RokuTV(dev_id, name, addr, mac)
         raise DeviceError(f"marque de TV « {brand} » inconnue (samsung, lg, roku, android)")
-    raise DeviceError(f"type « {kind} » inconnu (android, tv)")
+    raise DeviceError(f"type « {kind} » inconnu (android, iphone, tv)")
 
 
-def build_backends(args: argparse.Namespace) -> list[Backend]:
+def build_backends(args: argparse.Namespace, config: dict) -> list[Backend]:
     backends: list[Backend] = []
-    config = load_config(Path(args.config))
 
     for dev in config.get("appareils", []):
         try:
@@ -119,26 +129,41 @@ def build_backends(args: argparse.Namespace) -> list[Backend]:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Agent IA qui pilote vos appareils.")
     parser.add_argument("--voix", action="store_true", help="parler au lieu d'écrire (micro)")
+    parser.add_argument("--serveur", action="store_true", help="recevoir les ordres depuis l'iPhone / Siri")
     parser.add_argument("--sans-pc", action="store_true", help="ne pas piloter cet ordinateur")
     parser.add_argument("--simulation", action="store_true", help="ajouter les appareils simulés (démo)")
     parser.add_argument("--config", default=os.environ.get("AGENT_CONFIG", "config.json"), help="fichier de configuration")
     parser.add_argument("commande", nargs="*", help="une commande unique, ex. « allume la lampe du salon »")
     args = parser.parse_args()
 
-    backends = build_backends(args)
+    config = load_config(Path(args.config))
+    backends = build_backends(args, config)
     if not backends:
         sys.exit("Aucun appareil configuré.")
     agent = DeviceAgent(backends, confirm=confirm, on_tool=show_tool)
 
-    def run(text: str) -> None:
+    def answer(text: str) -> str:
         try:
-            print(f"🤖 {agent.ask(text)}\n")
+            return agent.ask(text)
         except anthropic.AuthenticationError:
-            sys.exit("Clé API invalide : définissez ANTHROPIC_API_KEY.")
+            return "Clé API Claude invalide : vérifiez ANTHROPIC_API_KEY sur l'ordinateur."
         except anthropic.APIConnectionError:
-            print("🤖 Connexion à Claude impossible, réessayez.\n")
+            return "Connexion à Claude impossible, réessayez."
         except anthropic.APIStatusError as e:
-            print(f"🤖 Erreur de l'API ({e.status_code}), réessayez.\n")
+            return f"Erreur de l'API Claude ({e.status_code}), réessayez."
+
+    def run(text: str) -> None:
+        print(f"🤖 {answer(text)}\n")
+
+    if args.serveur:
+        from .server import load_or_create_key, serve
+
+        conf = config.get("serveur", {})
+        REMOTE["actif"] = True
+        REMOTE["autoriser_actions_sensibles"] = bool(conf.get("autoriser_actions_sensibles", False))
+        key = os.environ.get("AGENT_CLE") or conf.get("cle") or load_or_create_key(Path(".cle_serveur"))
+        serve(answer, agent.reset, key, int(conf.get("port", 8765)))
+        return
 
     if args.commande:
         run(" ".join(args.commande))

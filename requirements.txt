@@ -1,9 +1,10 @@
 anthropic>=2.8.0
 httpx>=0.27
+pywebostv>=0.8.9   # TV LG
+ws4py>=0.6.0       # utilisé par pywebostv (version compatible Python récent)
 
-# Selon votre TV (facultatif) :
+# Autres marques de TV (facultatif) :
 # samsungtvws      # TV Samsung
-# pywebostv        # TV LG
-# Mode voix (facultatif) :
+# Mode micro sur l'ordinateur (facultatif) :
 # SpeechRecognition
 # pyaudio
