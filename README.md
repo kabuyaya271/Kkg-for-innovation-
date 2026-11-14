@@ -36,9 +36,14 @@ de la conversation (« et sur la télé aussi ? » fonctionne).
 Pour votre sécurité, **appeler, envoyer un SMS, éteindre/redémarrer le téléphone ou l'ordinateur et exécuter
 une commande demandent toujours votre confirmation** (o/N).
 
-> **iPhone :** Apple n'autorise aucun programme extérieur à piloter un iPhone (ouvrir une appli, régler son
-> volume, appeler...). En revanche, l'iPhone peut **servir de télécommande vocale** (« Dis Siri, Maison »)
-> et **recevoir des notifications** de l'agent, ou **sonner** pour le retrouver. Voir le guide ci-dessous.
+> ## 📱 Piloter votre iPhone lui-même
+> Un agent tourne **directement dans l'iPhone** (app Raccourcis) : « Dis Siri, Agent » → *« son à 30, lampe
+> torche et écris à Maman que j'arrive »*. Il ouvre des apps, appelle, prépare des messages, règle volume,
+> luminosité, Wi-Fi, Bluetooth, minuteur, alarme, rappels, musique... **sans ordinateur.**
+> 👉 **[Guide pas à pas : GUIDE_IPHONE.md](GUIDE_IPHONE.md)**
+>
+> L'iPhone peut aussi servir de **télécommande vocale pour la TV et l'ordinateur** et recevoir des
+> notifications de l'agent : voir le guide rapide ci-dessous.
 
 ## 🚀 Guide rapide : iPhone + TV LG
 
