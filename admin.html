@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Espace concepteur — KKG Innovation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <header data-header></header>
+
+  <main class="wrap">
+    <form class="connexion encart" id="connexion">
+      <h2>Espace concepteur</h2>
+      <p class="muted">Gérez vos projets, vos prix et vos commandes.</p>
+      <input class="champ" type="password" id="mdp" placeholder="Mot de passe" autocomplete="current-password" style="margin-bottom:1rem">
+      <button class="btn bloc">Entrer</button>
+    </form>
+
+    <div id="espace" hidden>
+      <div class="onglets" style="margin-top:24px">
+        <button class="actif" data-onglet="projets">Projets</button>
+        <button data-onglet="commandes">Commandes</button>
+        <button data-onglet="publier">Publier en ligne</button>
+      </div>
+
+      <!-- ================= PROJETS ================= -->
+      <div data-panneau="projets">
+        <div class="alerte" id="alerteLocale" hidden>
+          Vos modifications sont enregistrées <b>dans ce navigateur uniquement</b>. Pour les rendre visibles à tous les visiteurs, allez dans l'onglet <b>« Publier en ligne »</b>.
+        </div>
+        <div class="admin">
+          <div class="admin-liste">
+            <button class="btn bloc" id="nouveau" style="margin-bottom:.6rem">+ Nouveau projet</button>
+            <div id="liste"></div>
+          </div>
+
+          <div>
+            <div class="barre-admin">
+              <button class="btn" id="enregistrer">Enregistrer</button>
+              <a class="btn discret" id="voir" target="_blank">Voir la fiche ↗</a>
+              <button class="btn discret" id="dupliquer">Dupliquer</button>
+              <button class="btn danger" id="supprimer">Supprimer</button>
+            </div>
+
+            <div class="admin-edition">
+              <form id="formProjet">
+                <fieldset>
+                  <legend>Informations</legend>
+                  <div class="form-grille">
+                    <div class="plein"><label class="etiquette">Titre *</label><input class="champ" name="titre" required></div>
+                    <div><label class="etiquette">Identifiant (URL)</label><input class="champ" name="id" pattern="[a-z0-9\-]+" title="minuscules, chiffres et tirets"></div>
+                    <div><label class="etiquette">Catégorie</label><input class="champ" name="categorie" list="categories"></div>
+                    <div><label class="etiquette">Style architectural</label><input class="champ" name="style"></div>
+                    <div><label class="etiquette">Prix de base (<span data-devise></span>, licence Essentiel)</label><input class="champ" name="prix" type="number" min="0" step="1" required></div>
+                    <div class="plein"><label class="etiquette">Résumé (1 ligne)</label><input class="champ" name="resume"></div>
+                    <div class="plein"><label class="etiquette">Description détaillée</label><textarea class="champ" name="description" rows="5"></textarea></div>
+                    <label class="case"><input type="checkbox" name="vedette"> À la une (page d'accueil)</label>
+                    <label class="case"><input type="checkbox" name="nouveau"> Badge « Nouveau »</label>
+                  </div>
+                  <datalist id="categories"><option>Résidentiel</option><option>Immeuble</option><option>Commercial</option><option>Équipement public</option></datalist>
+                </fieldset>
+
+                <fieldset>
+                  <legend>Données techniques</legend>
+                  <div class="form-grille">
+                    <div><label class="etiquette">Surface (m²)</label><input class="champ" name="surface" type="number" min="0"></div>
+                    <div><label class="etiquette">Chambres</label><input class="champ" name="chambres" type="number" min="0"></div>
+                    <div><label class="etiquette">Salles de bain</label><input class="champ" name="sallesDeBain" type="number" min="0"></div>
+                    <div><label class="etiquette">Dimensions / emprise</label><input class="champ" name="dimensions" placeholder="14 × 10 m"></div>
+                    <div><label class="etiquette">Terrain minimum</label><input class="champ" name="terrain" placeholder="20 × 30 m"></div>
+                    <div><label class="etiquette">Budget de construction estimé</label><input class="champ" name="budgetEstime"></div>
+                    <div><label class="etiquette">Durée du chantier</label><input class="champ" name="delaiConstruction"></div>
+                    <div class="plein"><label class="etiquette">Caractéristiques (une par ligne)</label><textarea class="champ" name="caracteristiques" rows="4"></textarea></div>
+                    <div class="plein"><label class="etiquette">Pièces : « Nom : surface » (une par ligne)</label><textarea class="champ" name="pieces" rows="5" placeholder="Séjour : 40&#10;Cuisine : 14"></textarea></div>
+                    <div class="plein"><label class="etiquette">Contenu du dossier vendu (une ligne par élément)</label><textarea class="champ" name="inclus" rows="4"></textarea></div>
+                  </div>
+                </fieldset>
+
+                <fieldset>
+                  <legend>Maquette 3D</legend>
+                  <div class="form-grille">
+                    <div><label class="etiquette">Type</label>
+                      <select class="champ" name="m.type"><option value="villa">Villa</option><option value="maison">Maison</option><option value="duplex">Duplex</option><option value="immeuble">Immeuble</option><option value="commercial">Commercial (vitré)</option></select></div>
+                    <div><label class="etiquette">Toiture</label>
+                      <select class="champ" name="m.toit"><option value="plat">Toit plat / terrasse</option><option value="deux-pans">Deux pans</option><option value="quatre-pans">Quatre pans</option></select></div>
+                    <div><label class="etiquette">Nombre de niveaux</label><input class="champ" name="m.etages" type="number" min="1" max="30"></div>
+                    <div><label class="etiquette">Hauteur d'étage (m)</label><input class="champ" name="m.hauteurEtage" type="number" min="2.5" max="6" step="0.1"></div>
+                    <div><label class="etiquette">Largeur façade (m)</label><input class="champ" name="m.largeur" type="number" min="4" max="80" step="0.5"></div>
+                    <div><label class="etiquette">Profondeur (m)</label><input class="champ" name="m.profondeur" type="number" min="4" max="80" step="0.5"></div>
+                    <div><label class="etiquette">Porte-à-faux étages (m)</label><input class="champ" name="m.decalage" type="number" min="0" max="6" step="0.5"></div>
+                    <div></div>
+                    <div><label class="etiquette">Couleur des murs</label><input class="champ" name="m.couleurMur" type="color"></div>
+                    <div><label class="etiquette">Couleur de toiture</label><input class="champ" name="m.couleurToit" type="color"></div>
+                    <div><label class="etiquette">Couleur d'accent</label><input class="champ" name="m.couleurAccent" type="color"></div>
+                    <div></div>
+                    <label class="case"><input type="checkbox" name="m.piscine"> Piscine</label>
+                    <label class="case"><input type="checkbox" name="m.garage"> Garage</label>
+                    <label class="case"><input type="checkbox" name="m.balcons"> Balcons</label>
+                    <label class="case"><input type="checkbox" name="m.arbres"> Végétation</label>
+                    <div class="plein">
+                      <label class="etiquette">Ou votre propre modèle 3D (.glb) — chemin dans le dossier <code>modeles/</code></label>
+                      <input class="champ" name="modeleGLB" placeholder="modeles/villa-horizon.glb">
+                      <p class="muted" style="font-size:.8rem;margin:.4rem 0 0">Exportez en glTF/GLB depuis SketchUp, Revit, ArchiCAD, Blender… Nommez les calques « niveau-0 », « niveau-1 »… pour activer la vue éclatée.
+                        <label class="btn discret" style="padding:.3em .9em;margin-top:.4rem;cursor:pointer">Tester un fichier .glb <input type="file" accept=".glb,.gltf" id="testGLB" hidden></label></p>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset>
+                  <legend>Images &amp; vente</legend>
+                  <label class="etiquette">Photos, rendus, plans 2D (JPG/PNG — la 1re sert de vignette)</label>
+                  <input type="file" id="ajoutImages" accept="image/*" multiple class="champ">
+                  <div class="galerie-admin" id="galerie"></div>
+                  <label class="etiquette" style="margin-top:1rem">Lien de paiement Stripe propre à ce projet (facultatif)</label>
+                  <input class="champ" name="lienPaiement" placeholder="https://buy.stripe.com/...">
+                </fieldset>
+              </form>
+
+              <div class="admin-apercu">
+                <div class="scene"><div class="scene-cible" id="apercu3d"></div></div>
+                <div style="display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap">
+                  <button class="btn discret" id="apEclate">Vue éclatée</button>
+                  <button class="btn discret" id="apNuit">Nuit</button>
+                  <button class="btn discret" id="apRecentrer">Recentrer</button>
+                  <button class="btn discret" id="apCapture" title="Ajoute l'image actuelle à la galerie">📷 Ajouter comme image</button>
+                </div>
+                <p class="muted" style="font-size:.85rem;margin-top:.8rem" id="apPrix"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= COMMANDES ================= -->
+      <div data-panneau="commandes" hidden>
+        <div class="alerte">Ce tableau liste les commandes passées <b>depuis ce navigateur</b> (utile pour tester). Pour recevoir les commandes de tous vos clients par e-mail, renseignez <code>formspree</code> dans <code>js/config.js</code>.</div>
+        <div class="barre-admin"><button class="btn discret" id="exportCSV">Exporter en CSV</button></div>
+        <div class="defile-x"><table class="tab" id="tabCommandes"></table></div>
+      </div>
+
+      <!-- ================= PUBLIER ================= -->
+      <div data-panneau="publier" hidden>
+        <div class="encart" style="max-width:820px">
+          <h2>Publier vos projets</h2>
+          <p class="muted">Le site est statique : la liste des projets se trouve dans le fichier <code>data/projets.json</code>. Pour mettre en ligne vos modifications :</p>
+          <ol class="muted">
+            <li>Cliquez sur <b>Télécharger projets.json</b>.</li>
+            <li>Remplacez le fichier <code>data/projets.json</code> de votre dépôt GitHub par celui-ci (bouton « Add file → Upload files »).</li>
+            <li>Si vous utilisez des modèles .glb, déposez-les dans le dossier <code>modeles/</code>.</li>
+            <li>Le site se met à jour automatiquement (GitHub Pages / Netlify) en 1 à 2 minutes.</li>
+          </ol>
+          <div class="barre-admin" style="margin-top:1.5rem">
+            <button class="btn" id="exporter">Télécharger projets.json</button>
+            <label class="btn discret" style="cursor:pointer">Importer un fichier JSON<input type="file" id="importer" accept=".json" hidden></label>
+            <button class="btn danger" id="reinitialiser">Annuler mes modifications locales</button>
+          </div>
+          <p class="muted" style="font-size:.85rem">Astuce : les images ajoutées ici sont intégrées dans le JSON. Pour un site plus rapide, placez plutôt vos images dans le dossier <code>images/</code> et indiquez leur chemin.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer data-footer></footer>
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panier et paiement — KKG Innovation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <header data-header></header>
+  <main class="wrap">
+    <div id="vueCommande">
+      <div class="fil"><a href="index.html">Accueil</a> / Panier</div>
+      <div class="commande">
+        <div>
+          <h1 style="font-size:2.6rem">Votre panier</h1>
+          <div id="lignes"></div>
+
+          <form id="formCommande" style="margin-top:2.5rem">
+            <h2 style="font-size:1.9rem">Vos coordonnées</h2>
+            <p class="muted">Les fichiers seront envoyés à cette adresse e-mail.</p>
+            <div class="form-grille">
+              <div><label class="etiquette" for="nom">Nom complet *</label><input class="champ" id="nom" required autocomplete="name"></div>
+              <div><label class="etiquette" for="email">E-mail *</label><input class="champ" id="email" type="email" required autocomplete="email"></div>
+              <div><label class="etiquette" for="tel">Téléphone / WhatsApp *</label><input class="champ" id="tel" required autocomplete="tel"></div>
+              <div><label class="etiquette" for="pays">Pays / ville</label><input class="champ" id="pays" autocomplete="country-name"></div>
+              <div class="plein"><label class="etiquette" for="note">Remarques (adaptations souhaitées, terrain…)</label><textarea class="champ" id="note" rows="3"></textarea></div>
+            </div>
+          </form>
+        </div>
+
+        <aside class="recap encart">
+          <h4>Récapitulatif</h4>
+          <div id="recapLignes"></div>
+          <div class="total"><span>Total</span><b id="total">–</b></div>
+          <h4 style="margin-top:1.6rem">Mode de paiement</h4>
+          <div class="methodes" id="methodes"></div>
+          <label class="case" style="margin-bottom:1rem"><input type="checkbox" id="cgv" form="formCommande" required> <span>J'accepte que les plans soient destinés à l'usage prévu par ma licence.</span></label>
+          <button class="btn bloc" id="valider" type="submit" form="formCommande">Valider la commande</button>
+          <p class="muted" style="font-size:.8rem;margin-top:.9rem">Les fichiers sont envoyés après confirmation du paiement.</p>
+        </aside>
+      </div>
+    </div>
+
+    <div id="vueConfirmation" hidden style="max-width:720px;margin:60px auto 100px"></div>
+  </main>
+  <footer data-footer></footer>
+  <script type="module" src="js/panier.js"></script>
+</body>
+</html>

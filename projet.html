@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projet — KKG Innovation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <header data-header></header>
+
+  <main class="wrap" id="contenu">
+    <div class="fil"><a href="index.html">Accueil</a> / <a href="index.html#catalogue">Catalogue</a> / <span id="filTitre">…</span></div>
+
+    <div class="projet-haut">
+      <div>
+        <div class="scene" id="scene">
+          <div class="scene-cible" id="cible3d"></div>
+          <div class="chargement" id="chargement">Chargement de la maquette 3D…</div>
+          <div class="visionneuse-image" id="visionneuseImage" hidden></div>
+          <span class="aide-3d">Glisser : tourner · Molette : zoom · Clic droit : déplacer</span>
+          <div class="barre-3d">
+            <button data-action="rotation" title="Rotation automatique">↻ Rotation</button>
+            <button data-action="nuit" title="Ambiance de nuit">☾ Nuit</button>
+            <button data-action="dessus" title="Vue de dessus">⬒ Dessus</button>
+            <button data-action="facade" title="Vue de façade">▭ Façade</button>
+            <button data-action="filaire" title="Mode filaire">◇ Filaire</button>
+            <label title="Séparer les niveaux">Vue éclatée <input type="range" min="0" max="1" step="0.01" value="0" id="eclatement"></label>
+            <button data-action="reinit" title="Recentrer">⟲</button>
+            <button data-action="capture" title="Enregistrer une image">⤓ Image</button>
+            <button data-action="plein" title="Plein écran">⛶</button>
+          </div>
+        </div>
+        <div class="miniatures" id="miniatures"></div>
+      </div>
+
+      <aside class="achat" id="achat"></aside>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="details-grille">
+      <div>
+        <h2>Description</h2>
+        <p id="description" class="muted" style="font-size:1.05rem"></p>
+        <h3 style="margin-top:2rem">Caractéristiques</h3>
+        <ul class="liste-coche" id="caracteristiques"></ul>
+        <h3 style="margin-top:2.5rem">Tableau des surfaces</h3>
+        <table class="tab" id="pieces"></table>
+      </div>
+      <div>
+        <div class="encart">
+          <h4>Contenu du dossier de plans</h4>
+          <ul class="liste-coche" id="inclus"></ul>
+        </div>
+        <div class="encart">
+          <h4>Questions fréquentes</h4>
+          <details class="faq"><summary>Comment vais-je recevoir les plans ?</summary><p>Par e-mail (lien de téléchargement) dans les 24 h suivant la confirmation de votre paiement.</p></details>
+          <details class="faq"><summary>Puis-je faire modifier le plan ?</summary><p>Oui. Nous adaptons le plan à votre terrain (dimensions, orientation, nombre de pièces) sur devis.</p></details>
+          <details class="faq"><summary>Le budget estimé est-il garanti ?</summary><p>Non, il s'agit d'une estimation indicative : le coût réel dépend du pays, des matériaux et de la main-d'œuvre.</p></details>
+          <details class="faq"><summary>Puis-je obtenir un permis de construire avec ces plans ?</summary><p>Les plans servent de base au dossier ; selon votre commune, la signature d'un architecte local agréé peut être exigée.</p></details>
+        </div>
+      </div>
+    </div>
+
+    <section style="padding-top:70px">
+      <h2>Projets similaires</h2>
+      <div class="grille" id="similaires"></div>
+    </section>
+  </main>
+
+  <footer data-footer></footer>
+  <script type="module" src="js/projet.js"></script>
+</body>
+</html>

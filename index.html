@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KKG Innovation — Plans de construction en 3D</title>
+  <meta name="description" content="Achetez des plans de maisons, villas, immeubles et bâtiments commerciaux. Visitez chaque projet en 3D avant d'acheter.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <header data-header></header>
+
+  <section class="heros">
+    <div class="heros-3d" id="heros3d"></div>
+    <div class="wrap">
+      <div class="heros-texte">
+        <span class="surtitre">Plans d'architecte · Visite 3D</span>
+        <h1>Construisez le projet que vous avez déjà visité.</h1>
+        <p>Explorez chaque maison, villa ou immeuble en 3D interactive, découvrez tous les détails techniques, puis achetez le dossier de plans complet en quelques clics.</p>
+        <div class="heros-actions">
+          <a href="#catalogue" class="btn">Voir le catalogue</a>
+          <a href="#processus" class="btn contour">Comment ça marche</a>
+        </div>
+        <div class="heros-chiffres">
+          <div><b id="nbProjets">–</b><span>projets disponibles</span></div>
+          <div><b>3D</b><span>visite interactive</span></div>
+          <div><b>24 h</b><span>livraison des fichiers</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="heros-legende" id="herosLegende" hidden>
+      <small>Projet à la une — faites glisser pour tourner</small>
+      <a href="#" id="herosLien"></a>
+    </div>
+  </section>
+
+  <section id="catalogue">
+    <div class="wrap">
+      <div class="entete-section">
+        <div>
+          <span class="surtitre">Catalogue</span>
+          <h2>Nos plans de construction</h2>
+        </div>
+        <div class="filtres">
+          <input type="search" class="champ" id="recherche" placeholder="Rechercher…" aria-label="Rechercher un projet">
+          <select class="champ" id="tri" aria-label="Trier">
+            <option value="vedette">À la une</option>
+            <option value="prix-asc">Prix croissant</option>
+            <option value="prix-desc">Prix décroissant</option>
+            <option value="surface-desc">Surface</option>
+          </select>
+        </div>
+      </div>
+      <div class="filtres" id="filtresType" style="margin-bottom:1.6rem"></div>
+      <div class="grille" id="grille"><div class="vide">Chargement des projets…</div></div>
+    </div>
+  </section>
+
+  <section id="licences" class="bande">
+    <div class="wrap">
+      <span class="surtitre">Licences</span>
+      <h2>Choisissez le dossier adapté à votre projet</h2>
+      <p class="muted" style="max-width:640px">Chaque plan est vendu avec une licence d'utilisation. Le prix final dépend de la licence choisie sur la fiche du projet.</p>
+      <div class="trois" id="blocsLicences" style="margin-top:2rem"></div>
+    </div>
+  </section>
+
+  <section id="processus">
+    <div class="wrap">
+      <span class="surtitre">Comment acheter</span>
+      <h2>De la visite 3D au chantier</h2>
+      <div class="trois" style="margin-top:2rem">
+        <div class="bloc-info"><div class="num">01</div><h3>Explorez en 3D</h3><p class="muted">Tournez autour du bâtiment, passez en vue de nuit, séparez les niveaux avec la vue éclatée.</p></div>
+        <div class="bloc-info"><div class="num">02</div><h3>Choisissez votre licence</h3><p class="muted">PDF essentiel, pack complet avec fichiers DWG et maquette 3D, ou exclusivité totale.</p></div>
+        <div class="bloc-info"><div class="num">03</div><h3>Payez en toute simplicité</h3><p class="muted">Carte bancaire, Mobile Money, virement ou commande directe par WhatsApp.</p></div>
+        <div class="bloc-info"><div class="num">04</div><h3>Recevez vos fichiers</h3><p class="muted">Le dossier complet est envoyé par e-mail dans les 24 h suivant la confirmation du paiement.</p></div>
+        <div class="bloc-info"><div class="num">05</div><h3>Besoin d'adaptation ?</h3><p class="muted">Nous modifions le plan selon votre terrain et vos besoins, sur devis.</p></div>
+        <div class="bloc-info"><div class="num">06</div><h3>Suivi de chantier</h3><p class="muted">Assistance technique disponible pendant toute la durée de la construction.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="bande">
+    <div class="wrap contact-grille">
+      <div>
+        <span class="surtitre">Contact</span>
+        <h2>Un projet sur mesure ?</h2>
+        <p class="muted">Vous ne trouvez pas exactement ce que vous cherchez ? Décrivez votre terrain et votre budget : nous concevons un plan personnalisé.</p>
+        <p id="contactInfos"></p>
+      </div>
+      <form class="form-grille" id="formContact">
+        <div><label class="etiquette" for="cNom">Nom</label><input class="champ" id="cNom" required></div>
+        <div><label class="etiquette" for="cTel">Téléphone</label><input class="champ" id="cTel"></div>
+        <div class="plein"><label class="etiquette" for="cEmail">E-mail</label><input class="champ" id="cEmail" type="email" required></div>
+        <div class="plein"><label class="etiquette" for="cMsg">Votre projet</label><textarea class="champ" id="cMsg" rows="5" required placeholder="Type de bâtiment, dimensions du terrain, nombre de chambres, budget…"></textarea></div>
+        <div class="plein"><button class="btn">Envoyer la demande</button></div>
+      </form>
+    </div>
+  </section>
+
+  <footer data-footer></footer>
+  <script type="module" src="js/accueil.js"></script>
+</body>
+</html>
