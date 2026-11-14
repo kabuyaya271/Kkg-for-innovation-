@@ -3,3 +3,7 @@ __pycache__/
 .pytest_cache/
 devices.json
 .env
+config.json
+.token_*
+.cle_*
+captures/

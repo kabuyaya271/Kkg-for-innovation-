@@ -16,7 +16,7 @@ MODEL = os.environ.get("AGENT_MODEL", "claude-opus-5-5")
 EFFORT = os.environ.get("AGENT_EFFORT", "low")
 
 SYSTEM_PROMPT = """Tu es l'assistant domotique personnel de l'utilisateur. Tu pilotes ses appareils \
-(lumières, TV, chauffage, volets, enceintes, prises, serrures, ordinateur...) à partir de ce qu'il te dit, \
+(téléphone, Smart TV, ordinateur, et maison connectée : lumières, chauffage, volets...) à partir de ce qu'il te dit, \
 en français, à l'écrit ou à la voix.
 
 Façon de travailler :
@@ -29,11 +29,10 @@ puis appelle control_device avec une action de sa liste « actions_possibles ».
 Si une action échoue, dis-le simplement.
 - Réponds en une ou deux phrases courtes : ce qui a été fait, ou ce qui bloque.
 
-Paramètres usuels de control_device :
-- appareils "sim:..." : luminosite (0-100), couleur, volume (0-100), chaine, temperature (°C), position (0-100).
-- appareils "ha:..." (Home Assistant) : les champs du service, ex. brightness_pct, color_name, temperature, \
-volume_level (0.0-1.0), position, source, hvac_mode.
-- "pc:ordinateur" : url, application, volume (0-100), commande (shell)."""
+Paramètres de control_device : regarde le champ « parametres » renvoyé par list_devices pour chaque appareil. \
+Pour les touches répétables (volume_haut, volume_bas...), utilise le paramètre « fois » plutôt que plusieurs appels. \
+Appareils "ha:..." (Home Assistant) : champs du service, ex. brightness_pct, temperature, volume_level (0.0-1.0).
+Si un appareil n'est pas joignable (éteint, hors Wi-Fi), dis-le à l'utilisateur."""
 
 TOOLS: list[dict[str, Any]] = [
     {

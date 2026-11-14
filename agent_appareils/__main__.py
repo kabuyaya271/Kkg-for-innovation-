@@ -1,8 +1,9 @@
-"""Lancement : python -m agent_appareils [--voix] [--sans-pc] [--sans-simulation]"""
+"""Lancement : python -m agent_appareils [--voix] [--sans-pc] [--simulation] [--config config.json]"""
 
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 from pathlib import Path
@@ -10,9 +11,11 @@ from pathlib import Path
 import anthropic
 
 from .agent import DeviceAgent
-from .backends import Backend
+from .backends import Backend, DeviceError
+from .backends.android import AndroidBackend
 from .backends.computer import ComputerBackend
 from .backends.simulated import SimulatedBackend
+from .backends.tv import LGTV, RokuTV, SamsungTV
 
 
 def confirm(question: str) -> bool:
@@ -52,20 +55,64 @@ def listen_voice():
     return listen
 
 
+def load_config(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        sys.exit(f"{path} n'est pas un JSON valide : {e}")
+
+
+def backend_from_config(dev: dict) -> Backend:
+    """Crée le backend d'un appareil déclaré dans config.json."""
+    dev_id, name = dev["id"], dev.get("nom", dev["id"])
+    kind, addr, mac = dev.get("type", ""), dev.get("adresse", ""), dev.get("mac", "")
+    if kind in {"android", "telephone"}:
+        return AndroidBackend(dev_id, name, addr, kind="telephone", confirm=confirm)
+    if kind == "tv":
+        brand = dev.get("marque", "").lower()
+        if brand in {"android", "google", "googletv", "androidtv"}:
+            return AndroidBackend(dev_id, name, addr, kind="tv", confirm=confirm, mac=mac)
+        if brand == "samsung":
+            return SamsungTV(dev_id, name, addr, mac)
+        if brand == "lg":
+            return LGTV(dev_id, name, addr, mac, secure=dev.get("securise", True))
+        if brand == "roku":
+            return RokuTV(dev_id, name, addr, mac)
+        raise DeviceError(f"marque de TV « {brand} » inconnue (samsung, lg, roku, android)")
+    raise DeviceError(f"type « {kind} » inconnu (android, tv)")
+
+
 def build_backends(args: argparse.Namespace) -> list[Backend]:
     backends: list[Backend] = []
-    if os.environ.get("HA_URL") and os.environ.get("HA_TOKEN"):
+    config = load_config(Path(args.config))
+
+    for dev in config.get("appareils", []):
+        try:
+            backends.append(backend_from_config(dev))
+            print(f"✓ {dev.get('nom', dev.get('id'))}")
+        except (DeviceError, KeyError) as e:
+            print(f"✗ {dev.get('nom', dev.get('id', '?'))} ignoré : {e}")
+
+    ha = config.get("home_assistant", {})
+    ha_url, ha_token = os.environ.get("HA_URL") or ha.get("url"), os.environ.get("HA_TOKEN") or ha.get("token")
+    if ha_url and ha_token:
         from .backends.home_assistant import HomeAssistantBackend
 
-        backends.append(HomeAssistantBackend(os.environ["HA_URL"], os.environ["HA_TOKEN"]))
-        print("✓ Home Assistant connecté :", os.environ["HA_URL"])
-    if not args.sans_simulation:
-        path = Path(os.environ.get("SIM_DEVICES_FILE", "devices.json"))
-        backends.append(SimulatedBackend(path))
-        print(f"✓ Appareils simulés : {path}")
+        backends.append(HomeAssistantBackend(ha_url, ha_token))
+        print("✓ Home Assistant :", ha_url)
+
+    nothing_configured = not backends
     if not args.sans_pc:
         backends.append(ComputerBackend(confirm))
-        print("✓ Contrôle de cet ordinateur activé")
+        print("✓ Cet ordinateur")
+
+    # Appareils simulés : pour essayer, quand ni téléphone ni TV ne sont configurés.
+    if args.simulation or nothing_configured:
+        path = Path(os.environ.get("SIM_DEVICES_FILE", "devices.json"))
+        backends.append(SimulatedBackend(path))
+        print(f"✓ Appareils simulés (démo) : {path}")
     return backends
 
 
@@ -73,7 +120,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Agent IA qui pilote vos appareils.")
     parser.add_argument("--voix", action="store_true", help="parler au lieu d'écrire (micro)")
     parser.add_argument("--sans-pc", action="store_true", help="ne pas piloter cet ordinateur")
-    parser.add_argument("--sans-simulation", action="store_true", help="désactiver les appareils simulés")
+    parser.add_argument("--simulation", action="store_true", help="ajouter les appareils simulés (démo)")
+    parser.add_argument("--config", default=os.environ.get("AGENT_CONFIG", "config.json"), help="fichier de configuration")
     parser.add_argument("commande", nargs="*", help="une commande unique, ex. « allume la lampe du salon »")
     args = parser.parse_args()
 

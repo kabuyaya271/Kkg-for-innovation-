@@ -23,6 +23,12 @@ ACTIONS: dict[str, list[str]] = {
     "serrure": ["verrouiller", "deverrouiller"],
 }
 
+PARAMS_HELP = {
+    "regler_luminosite": "luminosite: 0-100", "regler_couleur": "couleur: nom de couleur",
+    "regler_volume": "volume: 0-100", "changer_chaine": "chaine: numéro",
+    "regler_temperature": "temperature: 5-30 °C", "regler_position": "position: 0 (fermé) - 100 (ouvert)",
+}
+
 DEFAULT_DEVICES = [
     {"id": "lampe_salon", "nom": "Lampe du salon", "type": "lumiere", "etat": {"allume": False, "luminosite": 100}},
     {"id": "lampe_chambre", "nom": "Lampe de la chambre", "type": "lumiere", "etat": {"allume": False, "luminosite": 100}},
@@ -67,6 +73,7 @@ class SimulatedBackend(Backend):
                 type=d["type"],
                 state=d.get("etat", {}),
                 actions=ACTIONS.get(d["type"], []),
+                params_help=PARAMS_HELP,
             )
             for d in self.devices
         ]

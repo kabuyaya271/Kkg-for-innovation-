@@ -48,6 +48,12 @@ class ComputerBackend(Backend):
                 type="ordinateur",
                 state={"systeme": SYSTEM, "machine": platform.node()},
                 actions=self.ACTIONS,
+                params_help={
+                    "ouvrir_url": "url: lien http(s)",
+                    "ouvrir_application": "application: nom de l'application (ex. 'firefox', 'Spotify')",
+                    "regler_volume": "volume: 0-100",
+                    "executer_commande": "commande: commande shell",
+                },
             )
         ]
 

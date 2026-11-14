@@ -16,15 +16,20 @@ class Device:
     type: str
     state: dict[str, Any] = field(default_factory=dict)
     actions: list[str] = field(default_factory=list)
+    #: aide sur les paramètres, ex. {"regler_volume": "volume: 0-100"}
+    params_help: dict[str, str] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        d = {
             "id": self.id,
             "nom": self.name,
             "type": self.type,
             "etat": self.state,
             "actions_possibles": self.actions,
         }
+        if self.params_help:
+            d["parametres"] = self.params_help
+        return d
 
 
 class DeviceError(Exception):
@@ -49,3 +54,18 @@ class Backend(ABC):
 
     def local_id(self, full_id: str) -> str:
         return full_id.split(":", 1)[1]
+
+
+class SingleDeviceBackend(Backend):
+    """Backend qui représente un seul appareil (téléphone, TV...), identifié par son id de config."""
+
+    def __init__(self, device_id: str, name: str):
+        self.device_id = device_id
+        self.name = name
+        self.prefix = device_id
+
+    def owns(self, full_id: str) -> bool:
+        return full_id == self.device_id
+
+    def local_id(self, full_id: str) -> str:
+        return full_id
