@@ -32,6 +32,7 @@
         <button class="actif" data-onglet="projets">Projets</button>
         <button data-onglet="requetes">Requêtes</button>
         <button data-onglet="commandes">Commandes (cet appareil)</button>
+        <button data-onglet="postes">Postes de l'équipe</button>
         <button data-onglet="historique">Historique</button>
         <button data-onglet="publier">Publier en ligne</button>
       </div>
@@ -180,6 +181,23 @@
         <div class="alerte">Ce tableau liste les commandes passées <b>depuis ce navigateur</b> (utile pour tester). Pour recevoir les commandes de tous vos clients par e-mail, renseignez <code>formspree</code> dans <code>js/config.js</code>.</div>
         <div class="barre-admin"><button class="btn discret" id="exportCSV">Exporter en CSV</button></div>
         <div class="defile-x"><table class="tab" id="tabCommandes"></table></div>
+      </div>
+
+      <!-- ================= POSTES ================= -->
+      <div data-panneau="postes" hidden>
+        <div class="alerte">
+          <b>Postes de travail.</b> Chaque architecte, ingénieur ou dessinateur reçoit un <b>code d'accès personnel</b>. Ce code lui ouvre l'<a href="studio.html" target="_blank" style="color:var(--or)">atelier de conception</a> : dessin, 3D, métré, agents IA et études partagées. Les connexions et les enregistrements sont inscrits dans l'historique.<br>
+          <span class="muted">Le code n'est affiché qu'une fois, à la création : transmettez-le en main propre ou par message privé. Désactivez le poste d'un collaborateur qui quitte l'équipe.</span>
+        </div>
+        <form id="formPoste" class="form-grille" style="max-width:820px;margin-bottom:1.2rem">
+          <div><label class="etiquette">Nom du collaborateur</label><input class="champ" id="posteNom" required placeholder="ex. Arch. Grace M."></div>
+          <div><label class="etiquette">Rôle</label><select class="champ" id="posteRole"><option value="architecte">Architecte</option><option value="ingenieur">Ingénieur</option><option value="dessinateur">Dessinateur</option><option value="metreur">Métreur</option></select></div>
+          <div class="plein"><label class="etiquette">Spécialité (facultatif)</label><input class="champ" id="posteSpecialite" placeholder="ex. structure béton armé, bâtiments scolaires…"></div>
+          <div><button class="btn">+ Créer le poste</button></div>
+        </form>
+        <div id="nouveauCode"></div>
+        <div class="defile-x"><table class="tab" id="tabPostes"></table></div>
+        <p style="margin-top:1rem"><a class="btn contour" href="studio.html" target="_blank">Ouvrir l'atelier de conception ↗</a></p>
       </div>
 
       <!-- ================= HISTORIQUE ================= -->

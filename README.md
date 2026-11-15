@@ -76,6 +76,46 @@ La **documentation détaillée** reste privée : description architecturale, emp
 
 À ne jamais mettre en ligne : plans cotés, coupes, ou modèle 3D avec aménagement intérieur. Tout fichier publié peut être copié.
 
+## Atelier de conception (`studio.html`) — postes de l'équipe
+
+L'atelier est le poste de travail des architectes, ingénieurs et dessinateurs.
+
+**Dessin 2D :**
+- murs, rectangles de murs, portes, fenêtres, baies, pièces, cotes et textes ;
+- mode **ORTHO** (F8), **accrochage** aux extrémités, aux murs et à la grille (F9) ;
+- **longueur tapée au clavier** (ex. `4.5` Entrée, ou `12x9` pour un rectangle) ;
+- poignées d'édition, annuler/rétablir illimité, raccourcis façon AutoCAD ;
+- **calque de fond** : un plan scanné ou un croquis à redessiner.
+
+**Niveaux :** plusieurs étages, avec le niveau inférieur affiché en transparence.
+
+**3D en direct** du plan : murs percés aux ouvertures, dalles, toiture, vue éclatée par niveau, mode nuit.
+
+**Métré automatique :** surfaces, linéaires, maçonnerie, nombre de blocs, ouvertures et **estimation chiffrée** (prix unitaires modifiables).
+
+**5 agents IA spécialisés**, qui lisent le plan en cours :
+- **Architecte concepteur** : il propose des plans complets, appliqués d'un clic puis retouchables à la main ;
+- **Ingénieur structure** : pré-dimensionnement indicatif et dispositions parasismiques ;
+- **Métreur-économiste** : devis par lot ;
+- **Conformité & climat** : revue critique du plan ;
+- **Rédacteur** : textes catalogue et description réservée.
+
+**Exports :**
+- **DXF** (calques MURS / OUVERTURES / PIÈCES / COTES…, accents compatibles AutoCAD) ;
+- **planche PDF** avec cartouche ;
+- SVG, image 3D, étude JSON ;
+- **maquette .glb** publique (extérieur seul) ou complète ;
+- **« Envoyer au catalogue »** : la fiche du plan est créée dans l'espace concepteur, avec les détails réservés déjà remplis.
+
+**Équipe :** dans `admin.html`, onglet **Postes de l'équipe**, le directeur crée un poste par collaborateur.
+- Chaque poste reçoit un code d'accès personnel, révocable.
+- Les études sont **partagées** et versionnées : si deux personnes modifient la même étude, la seconde est avertie au lieu d'écraser le travail de la première.
+- Connexions et enregistrements sont inscrits dans l'historique.
+
+Sans le serveur `agent-ia/`, l'atelier fonctionne **hors ligne** sur un seul ordinateur, sans agents ni partage.
+
+> L'atelier ne remplace pas AutoCAD pour le dessin d'exécution détaillé. Il sert à concevoir vite, chiffrer, visualiser et publier. Pour finaliser dans AutoCAD, exportez en DXF.
+
 ## Historique des opérations (contrôles et enquêtes)
 
 L'onglet **Historique** de `admin.html` est un journal horodaté de toutes les opérations :

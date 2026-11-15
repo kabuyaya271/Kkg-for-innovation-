@@ -10,6 +10,7 @@
 // =====================================================================
 import Anthropic from '@anthropic-ai/sdk';
 import { ENTREPRISE } from './connaissances.js';
+import { routerStudio, ErreurStudio } from './studio.js';
 
 const MODELE = 'claude-opus-5-5';
 const TYPES_REQUETE = ['sur-mesure', 'adaptation', 'question', 'reclamation', 'commande'];
@@ -56,10 +57,13 @@ export default {
         if (typeof e?.evenement !== 'string') throw new ErreurClient('Événement manquant');
         return repondre(await journaliser(env, { ...e, origine: 'concepteur' }), 201);
       }
+      if (url.pathname.startsWith('/studio/')) {
+        return repondre(await routerStudio(request, env, url, { lireJson, journaliser, limiteAtteinte }));
+      }
       if (url.pathname === '/' ) return repondre({ service: 'KKG for Innovation — agent IA', ok: true });
       return repondre({ erreur: 'Introuvable' }, 404);
     } catch (e) {
-      if (e instanceof ErreurClient) return repondre({ erreur: e.message }, e.status);
+      if (e instanceof ErreurClient || e instanceof ErreurStudio) return repondre({ erreur: e.message }, e.status);
       console.error(e);
       return repondre({ erreur: 'Erreur interne' }, 500);
     }
@@ -79,7 +83,7 @@ function enTetesCors(request, env) {
   const ok = autorisees.includes('*') || autorisees.includes(origine) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origine);
   return {
     'Access-Control-Allow-Origin': ok ? (origine || '*') : autorisees[0],
-    'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     Vary: 'Origin',
   };

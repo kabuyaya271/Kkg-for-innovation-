@@ -71,6 +71,7 @@ document.querySelector('.onglets').addEventListener('click', (e) => {
   document.querySelectorAll('[data-panneau]').forEach((p) => { p.hidden = p.dataset.panneau !== b.dataset.onglet; });
   if (b.dataset.onglet === 'commandes') rendreCommandes();
   if (b.dataset.onglet === 'requetes') rendreRequetes();
+  if (b.dataset.onglet === 'postes') rendrePostes();
 });
 
 // ---------------- Liste ----------------
@@ -561,3 +562,58 @@ function numeroInternational(tel) {
   else if (n.startsWith('0')) n = `243${n.slice(1)}`; // numéro local RDC
   return n;
 }
+
+// ---------------- Postes de l'équipe (atelier de conception) ----------------
+const ROLES_POSTE = { architecte: 'Architecte', ingenieur: 'Ingénieur', dessinateur: 'Dessinateur', metreur: 'Métreur' };
+
+async function apiPostes(chemin = '', options = {}) {
+  if (!URL_AGENT) throw new Error("Serveur de l'atelier non configuré (champ agentIA de js/config.js).");
+  if (!sessionStorage.getItem(CLE_JETON)) {
+    const j = prompt("Jeton d'accès (ADMIN_TOKEN) :") || '';
+    if (!j) throw new Error('Jeton non fourni.');
+    sessionStorage.setItem(CLE_JETON, j);
+  }
+  const r = await fetch(`${URL_AGENT}/studio/postes${chemin}`, {
+    ...options, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionStorage.getItem(CLE_JETON)}` },
+  });
+  const d = await r.json().catch(() => ({}));
+  if (r.status === 401) sessionStorage.removeItem(CLE_JETON);
+  if (!r.ok) throw new Error(d.erreur || `Erreur ${r.status}`);
+  return d;
+}
+
+async function rendrePostes() {
+  const t = document.getElementById('tabPostes');
+  try {
+    const postes = await apiPostes();
+    t.innerHTML = postes.length ? `<tr><th>Collaborateur</th><th>Rôle</th><th>Spécialité</th><th>Créé le</th><th>État</th><th></th></tr>` + postes
+      .sort((a, b) => String(a.creeLe).localeCompare(String(b.creeLe)))
+      .map((p) => `<tr><td><b>${esc(p.nom)}</b></td><td>${esc(ROLES_POSTE[p.role] || p.role)}</td><td>${esc(p.specialite || '')}</td>
+        <td>${new Date(p.creeLe).toLocaleDateString('fr-FR')}</td><td><span class="statut ${p.actif ? 'payee' : ''}">${p.actif ? 'actif' : 'désactivé'}</span></td>
+        <td style="white-space:nowrap"><button class="btn discret" data-basculer="${esc(p.id)}" data-actif="${p.actif}">${p.actif ? 'Désactiver' : 'Réactiver'}</button>
+        <button class="btn discret" data-code="${esc(p.id)}">Nouveau code</button></td></tr>`).join('')
+      : '<tr><td class="muted">Aucun poste. Créez le premier ci-dessus.</td></tr>';
+  } catch (e) { t.innerHTML = `<tr><td class="muted">${esc(e.message)}</td></tr>`; }
+}
+
+function montrerCode(p) {
+  document.getElementById('nouveauCode').innerHTML = `<div class="alerte" style="border-color:var(--ok)">Code d'accès de <b>${esc(p.nom)}</b> : <span class="ref" style="font-size:1.1rem">${esc(p.code)}</span>
+    <button class="btn discret" id="copierCode" type="button">Copier</button><br><span class="muted">Notez-le maintenant : il ne sera plus jamais affiché.</span></div>`;
+  document.getElementById('copierCode').addEventListener('click', () => { navigator.clipboard?.writeText(p.code); toast('Code copié.'); });
+}
+
+document.getElementById('formPoste').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  try {
+    const p = await apiPostes('', { method: 'POST', body: JSON.stringify({ nom: document.getElementById('posteNom').value, role: document.getElementById('posteRole').value, specialite: document.getElementById('posteSpecialite').value }) });
+    montrerCode(p); e.target.reset(); rendrePostes();
+  } catch (err) { toast(esc(err.message), 'err'); }
+});
+document.getElementById('tabPostes').addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-basculer], [data-code]'); if (!b) return;
+  try {
+    if (b.dataset.basculer) await apiPostes(`/${b.dataset.basculer}`, { method: 'PATCH', body: JSON.stringify({ actif: b.dataset.actif !== 'true' }) });
+    else if (confirm("Générer un nouveau code ? L'ancien code ne fonctionnera plus.")) montrerCode(await apiPostes(`/${b.dataset.code}/code`, { method: 'POST' }));
+    rendrePostes();
+  } catch (err) { toast(esc(err.message), 'err'); }
+});

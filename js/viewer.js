@@ -85,6 +85,13 @@ export class Visionneuse {
     this.definirNuit(this.nuit);
   }
 
+  /** Affiche un objet 3D déjà construit (atelier de conception). */
+  afficherObjet(obj, { garderVue = false } = {}) {
+    const pos = this.camera.position.clone(), cible = this.controls.target.clone();
+    this._remplacer(obj);
+    if (garderVue) { this.camera.position.copy(pos); this.controls.target.copy(cible); }
+  }
+
   /** Affiche une maquette générée à partir des paramètres "modele" d'un projet. */
   afficherProjet(parametres, { garderVue = false } = {}) {
     const pos = this.camera.position.clone(), cible = this.controls.target.clone();

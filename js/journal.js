@@ -20,6 +20,13 @@ export const LIBELLES_EVENEMENTS = {
   'catalogue.export': 'Catalogue public exporté',
   'sauvegarde.privee': 'Sauvegarde des détails réservés',
   'journal.extrait': 'Extrait du journal produit',
+  'poste.connexion': 'Connexion à un poste',
+  'poste.cree': 'Poste créé',
+  'poste.active': 'Poste réactivé',
+  'poste.desactive': 'Poste désactivé',
+  'poste.nouveau_code': "Nouveau code d'accès",
+  'etude.enregistree': 'Étude enregistrée',
+  'etude.supprimee': 'Étude supprimée',
 };
 
 export function canonique(v) {

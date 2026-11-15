@@ -9,6 +9,8 @@ Ce petit serveur (un *Cloudflare Worker*, gratuit jusqu'à 100 000 appels par jo
 
 Sans ce serveur, le site fonctionne quand même : les demandes partent alors par WhatsApp.
 
+5. **Atelier de conception** (`/studio/*`) : postes de l'équipe avec codes d'accès, études partagées et versionnées, et **5 agents IA spécialisés** (architecte, ingénieur structure, métreur, conformité, rédacteur). L'architecte peut proposer des plans complets que l'on applique dans l'atelier.
+
 ## Ce qu'il vous faut
 
 | Compte | Coût | Pourquoi |
@@ -19,6 +21,8 @@ Sans ce serveur, le site fonctionne quand même : les demandes partent alors par
 
 **Coût de l'IA (ordre de grandeur) :** environ 1 à 3 centimes de dollar par message de visiteur. Les instructions et le catalogue sont mis en cache, ce qui réduit fortement le prix des messages suivants.
 - **Fixez une limite de dépenses mensuelle** dans la Console Anthropic (*Settings → Limits*). Vous ne pourrez jamais dépasser votre budget.
+- **Atelier :** les agents de conception réfléchissent davantage. Comptez environ 5 à 30 centimes par demande, selon la taille du plan. Une proposition de plan complète peut prendre une à deux minutes.
+- **Offre Cloudflare :** l'offre gratuite limite chaque appel à 10 ms de calcul. Cela suffit pour l'assistant du site, mais pas toujours pour les grands plans de l'atelier. Pour l'atelier, prenez l'offre **Workers Paid (5 $/mois)**.
 - Pour réduire le coût, remplacez `claude-opus-5-5` par `claude-sonnet-5-5` ou `claude-haiku-5-5` dans `src/index.js` (constante `MODELE`). Les réponses seront un peu moins fines.
 
 ## Mise en ligne (≈ 15 minutes)
