@@ -1,6 +1,6 @@
 import { CONFIG } from './config.js';
 import { getProjets, formatPrix, transmettre, genererRefRequete } from './store.js';
-import { initialiserPage, carteProjet, esc, LIBELLES_TYPE, toast, blocContacts, lienWhatsApp } from './ui.js';
+import { initialiserPage, carteProjet, esc, LIBELLES_TYPE, toast, blocContacts, lienWhatsApp, blocConfidentialite } from './ui.js';
 import { Visionneuse, vignette } from './viewer.js';
 
 initialiserPage('catalogue');
@@ -83,6 +83,7 @@ document.getElementById('blocsLicences').innerHTML = Object.entries(CONFIG.licen
 
 // ----- Contact -----
 document.getElementById('contactInfos').innerHTML = blocContacts();
+document.querySelector('[data-confidentialite]').innerHTML = blocConfidentialite();
 document.querySelectorAll('[data-acompte]').forEach((e) => { e.textContent = CONFIG.surMesure.acomptePourcent; });
 
 document.getElementById('formContact').addEventListener('submit', async (e) => {

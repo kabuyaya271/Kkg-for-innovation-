@@ -406,7 +406,7 @@ function rendreCommandes() {
       <tr>
         <td><span class="ref">${esc(c.ref)}</span></td>
         <td>${new Date(c.date).toLocaleString('fr-FR')}</td>
-        <td>${esc(c.client.nom)}<br><span class="muted" style="font-size:.8rem">${esc(c.client.email)}<br>${esc(c.client.telephone)}</span></td>
+        <td>${esc(c.client.nom)}${c.client.raisonSociale ? `<br><b>${esc(c.client.raisonSociale)}</b>` : ''}<br><span class="muted" style="font-size:.8rem">${esc(c.client.email)}<br>${esc(c.client.telephone)}${c.client.construction ? `<br>📍 ${esc([c.client.construction.quartier, c.client.construction.ville].filter(Boolean).join(', '))}` : ''}</span></td>
         <td>${c.articles.map((a) => `${esc(a.titre)} <span class="muted">(${esc(a.licence)})</span>`).join('<br>')}</td>
         <td>${esc(c.methode)}</td>
         <td><select class="champ" data-ref="${esc(c.ref)}" style="padding:.3em .5em">
@@ -432,10 +432,11 @@ document.getElementById('tabCommandes').addEventListener('change', (e) => {
   toast('Statut mis à jour et journalisé.');
 });
 document.getElementById('exportCSV').addEventListener('click', () => {
-  const lignes = [['reference', 'date', 'nom', 'email', 'telephone', 'pays', 'projets', 'paiement', 'statut', 'total']];
+  const lignes = [['reference', 'date', 'type_client', 'nom', 'entreprise', 'rccm_nif', 'piece_type', 'piece_numero', 'email', 'telephone', 'numero_payeur', 'pays', 'ville', 'quartier', 'parcelle', 'projets', 'paiement', 'transaction', 'montant_recu', 'statut', 'total']];
   for (const c of getCommandes()) {
-    lignes.push([c.ref, c.date, c.client.nom, c.client.email, c.client.telephone, c.client.pays,
-      c.articles.map((a) => `${a.titre} (${a.licence})`).join(' | '), c.methode, c.statut, c.total]);
+    const cl = c.client || {}; const l = cl.construction || {};
+    lignes.push([c.ref, c.date, cl.typeClient, cl.nom, cl.raisonSociale, cl.rccmNif, cl.piece?.type, cl.piece?.numero, cl.email, cl.telephone, cl.numeroPayeur,
+      l.pays || cl.pays, l.ville, l.quartier, l.parcelle, c.articles.map((a) => `${a.titre} (${a.licence})`).join(' | '), c.methode, c.transaction, c.montantRecu, c.statut, c.total]);
   }
   const csv = lignes.map((l) => l.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';')).join('\n');
   const a = document.createElement('a');
@@ -493,6 +494,11 @@ function afficherRequetes() {
     const details = [
       r.projetReference && `<b>Plan :</b> ${esc(r.projetReference.titre || r.projetReference.id)}`,
       c.lieu && `<b>Lieu :</b> ${esc(c.lieu)}`,
+      c.typeClient && `<b>Client :</b> ${c.typeClient === 'entreprise' ? `Entreprise — ${esc(c.raisonSociale)}${c.rccmNif ? ` (${esc(c.rccmNif)})` : ''}` : 'Particulier'}`,
+      c.piece && `<b>Pièce d'identité :</b> ${esc(c.piece.type)} n° ${esc(c.piece.numero)}`,
+      c.construction && `<b>Lieu de construction :</b> ${esc([c.construction.parcelle, c.construction.quartier, c.construction.ville, c.construction.pays].filter(Boolean).join(', '))}`,
+      c.numeroPayeur && `<b>Numéro payeur :</b> ${esc(c.numeroPayeur)}`,
+      c.note && `<b>Remarques :</b> ${esc(c.note)}`,
       ...Object.entries(b).filter(([, v]) => v).map(([k, v]) => `<b>${esc(k)} :</b> ${esc(v)}`),
       r.articles && `<b>Articles :</b> ${r.articles.map((a) => `${esc(a.titre)} (${esc(a.licence)}) ${formatPrix(a.prix)}`).join(', ')} — <b>Total :</b> ${formatPrix(r.total)} — <b>Paiement :</b> ${esc(r.methode)}`,
       r.resume && `<b>Résumé :</b> ${esc(r.resume)}`,

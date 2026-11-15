@@ -1,6 +1,6 @@
 import { CONFIG } from './config.js';
 import { getProjets, transmettre, genererRefRequete } from './store.js';
-import { initialiserPage, esc, toast, blocContacts, lienWhatsApp } from './ui.js';
+import { initialiserPage, esc, toast, blocContacts, lienWhatsApp, blocConfidentialite } from './ui.js';
 
 initialiserPage('sur-mesure');
 
@@ -8,6 +8,7 @@ const sm = CONFIG.surMesure;
 const valeurs = { acompte: sm.acomptePourcent, revisions: sm.revisionsIncluses, validite: sm.validiteDevisJours, societe: CONFIG.entreprise.raisonSociale };
 document.querySelectorAll('[data-cfg]').forEach((e) => { e.textContent = valeurs[e.dataset.cfg]; });
 document.getElementById('contactsSM').innerHTML = blocContacts();
+document.querySelector('[data-confidentialite]').innerHTML = blocConfidentialite();
 
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);

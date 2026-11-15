@@ -3,7 +3,7 @@ import {
   detailPanier, formatPrix, changerLicence, retirerDuPanier, viderPanier,
   enregistrerCommande, genererReference, transmettre,
 } from './store.js';
-import { initialiserPage, esc, toast, lienWhatsApp } from './ui.js';
+import { initialiserPage, esc, toast, lienWhatsApp, blocConfidentialite, PHRASE_CONFIDENTIALITE } from './ui.js';
 import { vignette } from './viewer.js';
 
 initialiserPage('panier');
@@ -90,13 +90,7 @@ document.getElementById('formCommande').addEventListener('submit', async (e) => 
   const commande = {
     ref: genererReference(),
     date: new Date().toISOString(),
-    client: {
-      nom: document.getElementById('nom').value.trim(),
-      email: document.getElementById('email').value.trim(),
-      telephone: document.getElementById('tel').value.trim(),
-      pays: document.getElementById('pays').value.trim(),
-      note: document.getElementById('note').value.trim(),
-    },
+    client: lireClient(),
     articles: detail.lignes.map((l) => ({ id: l.id, titre: l.projet.titre, licence: CONFIG.licences[l.licence]?.nom, prix: l.prix })),
     total: detail.total,
     devise: CONFIG.devise,
@@ -118,7 +112,67 @@ document.getElementById('formCommande').addEventListener('submit', async (e) => 
 });
 
 function messageWhatsApp(c) {
-  return `Bonjour, je souhaite commander :\n${c.articles.map((a) => `• ${a.titre} — ${a.licence} : ${formatPrix(a.prix)}`).join('\n')}\n\nTotal : ${formatPrix(c.total)}\nRéférence : ${c.ref}\nNom : ${c.client.nom}\nE-mail : ${c.client.email}`;
+  const cl = c.client;
+  return `Bonjour, je souhaite commander :\n${c.articles.map((a) => `• ${a.titre} — ${a.licence} : ${formatPrix(a.prix)}`).join('\n')}\n\nTotal : ${formatPrix(c.total)}\nRéférence : ${c.ref}\nNom : ${cl.nom}${cl.raisonSociale ? ` (${cl.raisonSociale})` : ''}\nE-mail : ${cl.email}\nLieu de construction : ${lieuTexte(cl)}${cl.numeroPayeur ? `\nNuméro payeur : ${cl.numeroPayeur}` : ''}`;
+}
+
+// ---------------- Fiche de commande ----------------
+const val = (id) => document.getElementById(id).value.trim();
+const typeClient = () => document.querySelector('input[name=typeClient]:checked').value;
+
+function lireClient() {
+  const entreprise = typeClient() === 'entreprise';
+  return {
+    typeClient: typeClient(),
+    nom: val('nom'),
+    raisonSociale: entreprise ? val('raisonSociale') : '',
+    rccmNif: entreprise ? val('rccmNif') : '',
+    piece: val('pieceNumero') ? { type: val('pieceType') || 'Non précisé', numero: val('pieceNumero') } : null,
+    telephone: val('tel'),
+    email: val('email'),
+    construction: { pays: val('pays'), ville: val('ville'), quartier: val('quartier'), parcelle: val('parcelle') },
+    numeroPayeur: val('numeroPayeur'),
+    note: val('note'),
+  };
+}
+
+function lieuTexte(cl) {
+  const l = cl.construction || {};
+  return [l.parcelle, l.quartier, l.ville, l.pays].filter(Boolean).join(', ');
+}
+
+document.querySelector('[data-confidentialite]').innerHTML = blocConfidentialite();
+document.querySelectorAll('input[name=typeClient]').forEach((r) => r.addEventListener('change', () => {
+  const e = typeClient() === 'entreprise';
+  document.querySelectorAll('[data-si-entreprise]').forEach((x) => { x.hidden = !e; });
+  document.getElementById('raisonSociale').required = e;
+}));
+
+function bonDeCommande(c) {
+  const cl = c.client;
+  const e = CONFIG.entreprise;
+  const masque = (n) => (n.length > 4 ? `${'•'.repeat(n.length - 4)}${n.slice(-4)}` : n);
+  const ligne = (k, v) => (v ? `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>` : '');
+  return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Bon de commande ${esc(c.ref)}</title>
+<style>body{font:13px/1.5 Arial,sans-serif;color:#111;max-width:760px;margin:24px auto;padding:0 20px}
+h1{font-size:22px;margin:0}h2{font-size:14px;text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid #b8894d;padding-bottom:3px;margin-top:22px}
+table{width:100%;border-collapse:collapse}td,th{padding:5px 4px;border-bottom:1px solid #ddd;text-align:left}td:last-child,th:last-child{text-align:right}
+.meta td:last-child{text-align:left;font-weight:600}.conf{background:#f3f7f3;border:1px solid #9cc5a8;padding:10px 12px;border-radius:6px;font-size:12px}
+.entete{display:flex;justify-content:space-between;border-bottom:3px solid #111;padding-bottom:8px}@media print{.noprint{display:none}}</style></head><body>
+<div class="noprint" style="text-align:right;margin-bottom:10px"><button onclick="print()">Imprimer / enregistrer en PDF</button></div>
+<div class="entete"><div><b>${esc(e.raisonSociale)}</b><br>${esc(e.siege)}<br>${esc(CONFIG.telephone)}${CONFIG.email ? ` · ${esc(CONFIG.email)}` : ''}</div>
+<div style="text-align:right"><h1>Bon de commande</h1>N° <b>${esc(c.ref)}</b><br>${new Date(c.date).toLocaleString('fr-FR')}</div></div>
+<h2>Client</h2><table class="meta">
+${ligne('Type', cl.typeClient === 'entreprise' ? 'Entreprise / organisation' : 'Particulier')}${ligne('Entreprise', cl.raisonSociale)}${ligne('RCCM / NIF', cl.rccmNif)}
+${ligne('Nom', cl.nom)}${cl.piece ? ligne("Pièce d'identité", `${cl.piece.type} n° ${masque(cl.piece.numero)}`) : ''}${ligne('Téléphone', cl.telephone)}${ligne('E-mail', cl.email)}
+${ligne('Lieu de la construction', lieuTexte(cl))}${ligne('Numéro payeur', cl.numeroPayeur)}</table>
+<h2>Commande</h2><table><tr><th>Plan</th><th>Licence</th><th>Prix</th></tr>
+${c.articles.map((a) => `<tr><td>${esc(a.titre)}</td><td>${esc(a.licence)}</td><td>${formatPrix(a.prix)}</td></tr>`).join('')}
+<tr><td colspan="2"><b>Total à payer</b></td><td><b>${formatPrix(c.total)}</b></td></tr></table>
+<p>Mode de paiement choisi : <b>${esc(({ carte: 'Carte bancaire', mobile: 'Mobile Money', virement: 'Virement bancaire', whatsapp: 'WhatsApp' })[c.methode] || c.methode)}</b>. Indiquez la référence <b>${esc(c.ref)}</b> lors du paiement, et payez <b>uniquement</b> sur les numéros officiels affichés sur le site. Les fichiers sont envoyés après vérification du paiement. La licence vaut pour une construction sur le terrain indiqué, sauf licence Exclusivité.</p>
+<div class="conf">🔒 <b>Votre vie privée est respectée.</b> ${esc(PHRASE_CONFIDENTIALITE)}</div>
+<p style="font-size:11px;color:#666;margin-top:14px">Commande soumise aux conditions générales de vente et à la licence d'utilisation de ${esc(e.raisonSociale)}, acceptées par le client lors de la commande.</p>
+</body></html>`;
 }
 
 function confirmer(c, lignes) {
@@ -160,7 +214,7 @@ function confirmer(c, lignes) {
     <h1 style="font-size:2.8rem">Merci ${esc(c.client.nom.split(' ')[0])} !</h1>
     <p class="muted">Votre commande <span class="ref">${esc(c.ref)}</span> a bien été enregistrée.</p>
     <div class="instructions">${instructions}</div>
-    <div style="display:flex;flex-wrap:wrap;gap:.7rem;margin:1.5rem 0">${action}<a class="btn discret" href="index.html#catalogue">Retour au catalogue</a></div>
+    <div style="display:flex;flex-wrap:wrap;gap:.7rem;margin:1.5rem 0">${action}<button class="btn discret" id="bonCommande" type="button">📄 Mon bon de commande</button><a class="btn discret" href="index.html#catalogue">Retour au catalogue</a></div>
     <div class="encart">
       <h4>Détail</h4>
       <table class="tab">
@@ -168,7 +222,14 @@ function confirmer(c, lignes) {
         <tr><td><b>Total</b></td><td><b>${formatPrix(c.total)}</b></td></tr>
       </table>
       <p class="muted" style="margin-top:1rem;font-size:.88rem">Les fichiers seront envoyés à <b>${esc(c.client.email)}</b> dès réception et vérification du paiement.</p>
-    </div>`;
+    </div>
+    ${blocConfidentialite()}`;
+  document.getElementById('bonCommande').addEventListener('click', () => {
+    const w = window.open('', '_blank');
+    if (!w) { toast('Autorisez les fenêtres pop-up pour afficher le bon.', 'err'); return; }
+    w.document.write(bonDeCommande(c));
+    w.document.close();
+  });
 }
 
 rendre();

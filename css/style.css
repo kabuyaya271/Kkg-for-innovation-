@@ -309,3 +309,13 @@ fieldset.prive { border-color: var(--or-fonce); }
 #hTable td { vertical-align: top; font-size: .84rem; }
 #hTable td:last-child { text-align: left; font-family: ui-monospace, monospace; font-size: .75rem; color: var(--muted); }
 .integrite-ok { color: var(--ok); } .integrite-ko { color: var(--err); font-weight: 600; }
+
+/* ---------- Fiche de commande ---------- */
+#formCommande fieldset { margin-top: 1.2rem; }
+.choix-ligne { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1rem; }
+.aide { font-size: .8rem; color: var(--muted); margin: .2rem 0 0; }
+.confidentialite { display: flex; gap: .9rem; align-items: flex-start; background: rgba(95, 179, 138, .08); border: 1px solid rgba(95, 179, 138, .45); border-radius: 12px; padding: 1rem 1.1rem; margin: 1rem 0; }
+.confidentialite .cadenas { font-size: 1.4rem; line-height: 1; }
+.confidentialite p { margin: 0; font-size: .86rem; color: #cfd8d2; line-height: 1.55; }
+.confidentialite b { color: var(--ok); }
+.confidentialite a { color: var(--or); text-decoration: underline; }

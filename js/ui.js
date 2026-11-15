@@ -88,6 +88,13 @@ export function toast(message, type = 'ok') {
   setTimeout(() => t.remove(), 4300);
 }
 
+/** Phrase de confidentialité affichée sur tous les formulaires. */
+export const PHRASE_CONFIDENTIALITE = "Vos informations personnelles sont protégées. Elles servent uniquement à traiter votre demande, à établir votre licence et à vous livrer vos plans. Elles sont transmises par une connexion chiffrée et conservées de façon confidentielle. Elles ne sont jamais vendues, louées ni cédées à qui que ce soit. Votre identité n'est communiquée à personne, sauf obligation légale sur demande officielle des autorités.";
+
+export function blocConfidentialite() {
+  return `<div class="confidentialite"><span class="cadenas" aria-hidden="true">🔒</span><p><b>Votre vie privée est respectée.</b> ${esc(PHRASE_CONFIDENTIALITE)} <a href="conditions.html#confidentialite" target="_blank">En savoir plus</a></p></div>`;
+}
+
 export const LIBELLES_TYPE = {
   villa: 'Villa', maison: 'Maison', duplex: 'Duplex', immeuble: 'Immeuble', commercial: 'Commercial',
 };
