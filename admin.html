@@ -32,6 +32,7 @@
         <button class="actif" data-onglet="projets">Projets</button>
         <button data-onglet="requetes">Requêtes</button>
         <button data-onglet="commandes">Commandes (cet appareil)</button>
+        <button data-onglet="historique">Historique</button>
         <button data-onglet="publier">Publier en ligne</button>
       </div>
 
@@ -179,6 +180,31 @@
         <div class="alerte">Ce tableau liste les commandes passées <b>depuis ce navigateur</b> (utile pour tester). Pour recevoir les commandes de tous vos clients par e-mail, renseignez <code>formspree</code> dans <code>js/config.js</code>.</div>
         <div class="barre-admin"><button class="btn discret" id="exportCSV">Exporter en CSV</button></div>
         <div class="defile-x"><table class="tab" id="tabCommandes"></table></div>
+      </div>
+
+      <!-- ================= HISTORIQUE ================= -->
+      <div data-panneau="historique" hidden>
+        <div class="alerte">
+          <b>Journal des opérations.</b> Chaque commande, requête, changement de statut, paiement, remise de documents et modification du catalogue y est enregistré automatiquement, avec sa date et son heure. Chaque entrée porte une <b>empreinte SHA-256</b> qui la relie à la précédente : une modification ou une suppression après coup est détectée par « Vérifier l'intégrité ».<br>
+          <span class="muted">Ce journal contient des données personnelles. Ne le transmettez qu'aux autorités habilitées, sur demande officielle (réquisition, enquête), ou pour défendre vos droits.</span>
+        </div>
+        <div class="filtres-historique">
+          <div><label class="etiquette">Source</label><select class="champ" id="hSource"><option value="serveur">Journal en ligne (toutes les opérations)</option><option value="local">Journal de cet appareil</option></select></div>
+          <div><label class="etiquette">Du</label><input class="champ" type="date" id="hDu"></div>
+          <div><label class="etiquette">Au</label><input class="champ" type="date" id="hAu"></div>
+          <div><label class="etiquette">Événement</label><select class="champ" id="hType"><option value="">Tous</option></select></div>
+          <div class="large"><label class="etiquette">Recherche (référence, nom, téléphone, transaction…)</label><input class="champ" type="search" id="hRecherche" placeholder="ex. KKG-20261115-AB12 ou 0812345678"></div>
+        </div>
+        <div class="barre-admin" style="margin-top:1rem">
+          <button class="btn" id="hImprimer">🖨 Imprimer / PDF</button>
+          <button class="btn discret" id="hCSV">Excel (CSV)</button>
+          <button class="btn discret" id="hWord">Word (.doc)</button>
+          <button class="btn discret" id="hJSON">JSON (avec empreintes)</button>
+          <button class="btn discret" id="hTexte">Texte (.txt)</button>
+          <button class="btn discret" id="hVerifier">✔ Vérifier l'intégrité</button>
+        </div>
+        <div id="hEtat" class="muted" style="margin-bottom:.8rem"></div>
+        <div class="defile-x"><table class="tab" id="hTable"></table></div>
       </div>
 
       <!-- ================= PUBLIER ================= -->

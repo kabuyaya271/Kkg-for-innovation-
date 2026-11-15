@@ -6,6 +6,8 @@ import {
 import { initialiserPage, esc, toast } from './ui.js';
 import { Visionneuse } from './viewer.js';
 import { MODELE_DEFAUT } from './builder3d.js';
+import { journaliser } from './journal.js';
+import { initialiserHistorique } from './historique.js';
 
 initialiserPage();
 document.querySelectorAll('[data-devise]').forEach((e) => { e.textContent = CONFIG.devise; });
@@ -56,6 +58,7 @@ async function ouvrir() {
   selectionner(0);
   rendreCommandes();
   rendreRequetes();
+  initialiserHistorique();
 }
 
 function majAlerte() { document.getElementById('alerteLocale').hidden = !aDesModificationsLocales(); }
@@ -219,7 +222,10 @@ document.getElementById('enregistrer').addEventListener('click', () => {
   if (conflit !== -1) { toast('Cet identifiant existe déjà, changez-le.', 'err'); return; }
   if (indexCourant === -1) { projets.push(structuredClone(p)); indexCourant = projets.length - 1; }
   else projets[indexCourant] = structuredClone(p);
-  if (sauvegarder()) { champ('id').value = p.id; rendreListe(); toast(`« ${esc(p.titre)} » enregistré.`); }
+  if (sauvegarder()) {
+    champ('id').value = p.id; rendreListe(); toast(`« ${esc(p.titre)} » enregistré.`);
+    journaliser('projet.enregistre', { ref: p.id, details: { titre: p.titre, statut: p.statut || 'en-vente', prixBase: p.prix, devise: CONFIG.devise } });
+  }
 });
 
 document.getElementById('nouveau').addEventListener('click', () => {
@@ -246,8 +252,9 @@ document.getElementById('dupliquer').addEventListener('click', () => {
 document.getElementById('supprimer').addEventListener('click', () => {
   if (indexCourant === -1) { selectionner(0); return; }
   if (!confirm(`Supprimer définitivement « ${projets[indexCourant].titre} » ?`)) return;
-  projets.splice(indexCourant, 1);
+  const [supprime] = projets.splice(indexCourant, 1);
   sauvegarder();
+  journaliser('projet.supprime', { ref: supprime.id, details: { titre: supprime.titre, prixBase: supprime.prix } });
   selectionner(Math.max(0, indexCourant - 1));
   toast('Projet supprimé.');
 });
@@ -260,6 +267,7 @@ document.getElementById('voir').addEventListener('click', (e) => {
 // ---------------- Publication ----------------
 document.getElementById('exporter').addEventListener('click', () => {
   telecharger('projets.json', projets.map(versionPublique));
+  journaliser('catalogue.export', { details: { nombreProjets: projets.length, prix: projets.map((p) => `${p.id}=${p.prix}`).join(', ') } });
   toast('projets.json public téléchargé (sans les détails réservés).');
 });
 
@@ -300,6 +308,7 @@ document.getElementById('exporterPrive').addEventListener('click', () => {
   const d = new Date().toISOString().slice(0, 10);
   telecharger(`kkg-details-reserves-${d}.json`, projets.filter((p) => p.prive).map((p) => ({ id: p.id, titre: p.titre, prive: p.prive })));
   toast('Sauvegarde privée téléchargée — gardez-la hors de GitHub.');
+  journaliser('sauvegarde.privee', { details: { nombreProjets: projets.filter((p) => p.prive).length } });
 });
 
 // ---------------- Détails réservés ----------------
@@ -336,11 +345,19 @@ function telecharger(nom, donnees) {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
-document.getElementById('ficheAcheteur').addEventListener('click', () => {
+document.getElementById('ficheAcheteur').addEventListener('click', async () => {
   const p = lireFormulaire();
   const client = prompt('Nom du client acheteur (inscrit sur chaque page de la fiche) :', '');
   if (client === null) return;
+  const telClient = prompt('Téléphone du client (pour le journal) :', '') || '';
   const ref = prompt('Référence de la commande ou du devis :', '') || '';
+  const w = window.open('', '_blank');
+  if (!w) { toast('Autorisez les fenêtres pop-up pour générer la fiche.', 'err'); return; }
+  const trace = await journaliser('fiche.remise', {
+    ref, client: { nom: client, telephone: telClient },
+    details: { projet: p.id, titre: p.titre, document: 'Fiche acheteur confidentielle' },
+  });
+  const code = trace.hash.slice(0, 12).toUpperCase();
   const pr = p.prive || {};
   const e = CONFIG.entreprise;
   const lignes = (arr) => (arr || []).map((x) => `<li>${esc(x)}</li>`).join('');
@@ -372,10 +389,9 @@ ${pr.notesTechniques ? `<h2>Notes techniques</h2><pre>${esc(pr.notesTechniques)}
 ${p.caracteristiques?.length ? `<h2>Points forts</h2><ul>${lignes(p.caracteristiques)}</ul>` : ''}
 ${p.inclus?.length ? `<h2>Contenu du dossier remis</h2><ul>${lignes(p.inclus)}</ul>` : ''}
 <h2>Avertissement</h2><p style="font-size:12.5px">Les plans sont des documents de conception architecturale. Avant tout commencement des travaux, faites réaliser une étude de sol et le calcul de la structure par un ingénieur qualifié. Obtenez les autorisations nécessaires, avec la signature d'un professionnel agréé si la réglementation locale l'exige. Le budget estimé est indicatif.</p>
-<div class="pied">${esc(e.raisonSociale)} — Document confidentiel remis à ${esc(client || '—')}${ref ? ` — ${esc(ref)}` : ''} — reproduction interdite</div>
+<p style="font-size:11px;color:#666;margin-top:24px">Code de traçabilité : <b>${code}</b> — journal n° ${trace.n} du ${new Date(trace.date).toLocaleString('fr-FR')}</p>
+<div class="pied">${esc(e.raisonSociale)} — Document confidentiel remis à ${esc(client || '—')}${ref ? ` — ${esc(ref)}` : ''} — traçabilité ${code} — reproduction interdite</div>
 </body></html>`;
-  const w = window.open('', '_blank');
-  if (!w) { toast('Autorisez les fenêtres pop-up pour générer la fiche.', 'err'); return; }
   w.document.write(html);
   w.document.close();
 });
@@ -401,7 +417,19 @@ function rendreCommandes() {
 }
 document.getElementById('tabCommandes').addEventListener('change', (e) => {
   const s = e.target.closest('[data-ref]');
-  if (s) { majCommande(s.dataset.ref, { statut: s.value }); toast('Statut mis à jour.'); }
+  if (!s) return;
+  const c = getCommandes().find((x) => x.ref === s.dataset.ref);
+  const changes = { statut: s.value };
+  if (s.value === 'payée') {
+    changes.transaction = prompt('N° de transaction (Mobile Money, virement…) :', c?.transaction || '') || '';
+    changes.montantRecu = prompt('Montant effectivement reçu :', c?.montantRecu || String(c?.total ?? '')) || '';
+  }
+  majCommande(s.dataset.ref, changes);
+  journaliser(s.value === 'payée' ? 'commande.paiement' : 'commande.statut', {
+    ref: s.dataset.ref, client: c?.client,
+    details: { avant: c?.statut || '', apres: s.value, total: c?.total, methode: c?.methode, transaction: changes.transaction, montantRecu: changes.montantRecu },
+  });
+  toast('Statut mis à jour et journalisé.');
 });
 document.getElementById('exportCSV').addEventListener('click', () => {
   const lignes = [['reference', 'date', 'nom', 'email', 'telephone', 'pays', 'projets', 'paiement', 'statut', 'total']];
@@ -487,6 +515,10 @@ function afficherRequetes() {
           ${r.locale ? '' : `
           <div class="form-grille" style="margin-top:1rem">
             <div><label class="etiquette">Statut</label><select class="champ" data-statut="${i}">${STATUTS.map((s) => `<option ${s === r.statut ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
+            ${r.type === 'commande' ? `
+            <div><label class="etiquette">N° de transaction</label><input class="champ" data-transaction="${i}" value="${esc(r.transaction || '')}"></div>
+            <div><label class="etiquette">Montant reçu</label><input class="champ" data-montant="${i}" value="${esc(r.montantRecu || '')}"></div>
+            <div><label class="etiquette">Canal de livraison</label><input class="champ" data-canal="${i}" value="${esc(r.canalLivraison || '')}" placeholder="e-mail, WhatsApp…"></div>` : ''}
             <div class="plein"><label class="etiquette">Note interne</label><textarea class="champ" rows="2" data-note="${i}">${esc(r.note || '')}</textarea></div>
             <div><button class="btn discret" data-maj="${i}">Enregistrer</button></div>
           </div>`}
@@ -504,12 +536,14 @@ document.getElementById('listeRequetes').addEventListener('click', async (e) => 
   const r = requetesCache.filter((x) => !filtre || x.statut === filtre)[i];
   const statut = document.querySelector(`[data-statut="${i}"]`).value;
   const note = document.querySelector(`[data-note="${i}"]`).value;
+  const val = (a) => document.querySelector(`[data-${a}="${i}"]`)?.value;
+  const extra = r.type === 'commande' ? { transaction: val('transaction') || '', montantRecu: val('montant') || '', canalLivraison: val('canal') || '' } : {};
   const rep = await fetch(`${URL_AGENT}/requetes/${encodeURIComponent(r.cle)}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionStorage.getItem(CLE_JETON)}` },
-    body: JSON.stringify({ statut, note }),
+    body: JSON.stringify({ statut, note, ...extra }),
   }).catch(() => null);
-  if (rep?.ok) { Object.assign(r, { statut, note }); toast('Requête mise à jour.'); } else toast('Échec de la mise à jour.', 'err');
+  if (rep?.ok) { Object.assign(r, { statut, note, ...extra }); toast('Requête mise à jour et journalisée.'); } else toast('Échec de la mise à jour.', 'err');
 });
 document.getElementById('rafraichirRequetes').addEventListener('click', rendreRequetes);
 document.getElementById('filtreRequetes').addEventListener('change', afficherRequetes);

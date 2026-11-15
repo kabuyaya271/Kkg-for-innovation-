@@ -76,6 +76,35 @@ La **documentation détaillée** reste privée : description architecturale, emp
 
 À ne jamais mettre en ligne : plans cotés, coupes, ou modèle 3D avec aménagement intérieur. Tout fichier publié peut être copié.
 
+## Historique des opérations (contrôles et enquêtes)
+
+L'onglet **Historique** de `admin.html` est un journal horodaté de toutes les opérations :
+- commandes et requêtes reçues, avec l'adresse IP et le pays ;
+- changements de statut ;
+- paiements, avec le n° de transaction et le montant reçu ;
+- remise de documents : chaque fiche acheteur porte un **code de traçabilité** relié au journal ;
+- modifications et suppressions de projets (prix) ;
+- exports.
+
+**Protection contre la falsification.** Chaque entrée contient l'empreinte **SHA-256** de son contenu et de l'entrée précédente. Une entrée modifiée, insérée ou supprimée est détectée par **« Vérifier l'intégrité »**. Chaque extrait mentionne l'empreinte de la dernière entrée : conservez une copie datée des extraits pour pouvoir aussi détecter une suppression des dernières entrées.
+
+**Filtres :** période, type d'événement, recherche (référence, nom, téléphone, n° de transaction).
+
+**Formats d'export :**
+- **Impression / PDF**, avec en-tête de l'entreprise et zone signature et cachet ;
+- **Excel (CSV)** ;
+- **Word (.doc)** ;
+- **JSON** avec empreintes, pour une vérification technique ;
+- **Texte**.
+
+**Deux journaux :**
+- le **journal en ligne**, tenu par le serveur `agent-ia/`, reçoit toutes les opérations des clients ;
+- le **journal de cet appareil** enregistre les actions faites dans l'espace concepteur.
+
+Sans le serveur, seul le journal de l'appareil existe.
+
+> Ce journal contient des données personnelles. Ne le communiquez qu'aux autorités habilitées, sur demande officielle, ou pour défendre vos droits (c'est ce qu'annonce la politique de confidentialité).
+
 ## Textes juridiques
 
 `conditions.html` protège votre propriété intellectuelle (licence pour une construction, interdiction de revente, sanctions), encadre l'acompte de 50 % et les annulations, limite votre responsabilité (plans de conception ≠ étude de sol, calcul de structure ou suivi de chantier) et encadre l'assistant IA. Les clauses restent équilibrées (pas d'exclusion de la faute lourde, droits impératifs du consommateur préservés) pour rester valables devant un juge.

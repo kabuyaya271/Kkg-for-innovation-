@@ -4,7 +4,8 @@ Ce petit serveur (un *Cloudflare Worker*, gratuit jusqu'à 100 000 appels par jo
 
 1. **Assistant IA** (`POST /chat`) : il répond aux visiteurs 24 h/24. Il connaît le catalogue (lu automatiquement sur le site) et vos règles commerciales (licences, acompte de 50 %, révisions). Il aide à formuler une demande et l'enregistre dans la boîte aux requêtes. Il fonctionne avec Claude (modèle `claude-opus-5-5`) via le SDK officiel d'Anthropic.
 2. **Boîte aux requêtes** (`POST /requetes`) : elle centralise les demandes sur mesure, les adaptations, les questions, les réclamations et les commandes. Elles viennent des formulaires du site et de l'assistant.
-3. **Consultation** (`GET /requetes`, protégé par un jeton) : c'est l'onglet **Requêtes** de `admin.html`. Vous y voyez chaque demande, répondez sur WhatsApp en un clic et suivez le statut (nouvelle → devis envoyé → acompte reçu → terminée).
+3. **Journal des opérations** (`GET/POST /journal`, protégé par jeton) : journal horodaté et chaîné par empreintes SHA-256 de chaque commande, requête, changement de statut et paiement. Il est consultable et exportable dans l'onglet **Historique** de `admin.html`.
+4. **Consultation** (`GET /requetes`, protégé par un jeton) : c'est l'onglet **Requêtes** de `admin.html`. Vous y voyez chaque demande, répondez sur WhatsApp en un clic et suivez le statut (nouvelle → devis envoyé → acompte reçu → terminée).
 
 Sans ce serveur, le site fonctionne quand même : les demandes partent alors par WhatsApp.
 

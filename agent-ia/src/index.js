@@ -5,6 +5,8 @@
 //  POST  /requetes          dépôt d'une requête ou d'une commande (formulaires du site)
 //  GET   /requetes          liste des requêtes        (Authorization: Bearer ADMIN_TOKEN)
 //  PATCH /requetes/:cle     changer le statut / note  (Authorization: Bearer ADMIN_TOKEN)
+//  GET   /journal           journal des opérations    (Authorization: Bearer ADMIN_TOKEN)
+//  POST  /journal           ajouter un événement      (Authorization: Bearer ADMIN_TOKEN)
 // =====================================================================
 import Anthropic from '@anthropic-ai/sdk';
 import { ENTREPRISE } from './connaissances.js';
@@ -28,11 +30,11 @@ export default {
     try {
       if (url.pathname === '/chat' && request.method === 'POST') {
         if (limiteAtteinte(request)) return repondre({ erreur: 'Trop de messages. Réessayez dans une minute.' }, 429);
-        return repondre(await discuter(await lireJson(request, 60_000), env));
+        return repondre(await discuter(await lireJson(request, 60_000), env, infosReseau(request)));
       }
       if (url.pathname === '/requetes' && request.method === 'POST') {
         if (limiteAtteinte(request)) return repondre({ erreur: 'Trop de requêtes. Réessayez dans une minute.' }, 429);
-        const req = await enregistrerRequete(await lireJson(request, MAX_TAILLE_REQUETE), env, ctx);
+        const req = await enregistrerRequete(await lireJson(request, MAX_TAILLE_REQUETE), env, ctx, infosReseau(request));
         return repondre({ ok: true, ref: req.ref }, 201);
       }
       if (url.pathname === '/requetes' && request.method === 'GET') {
@@ -43,6 +45,16 @@ export default {
         if (!autorise(request, env)) return repondre({ erreur: 'Non autorisé' }, 401);
         const cle = decodeURIComponent(url.pathname.slice('/requetes/'.length));
         return repondre(await modifierRequete(cle, await lireJson(request, 5_000), env));
+      }
+      if (url.pathname === '/journal' && request.method === 'GET') {
+        if (!autorise(request, env)) return repondre({ erreur: 'Non autorisé' }, 401);
+        return repondre(await lireJournal(env));
+      }
+      if (url.pathname === '/journal' && request.method === 'POST') {
+        if (!autorise(request, env)) return repondre({ erreur: 'Non autorisé' }, 401);
+        const e = await lireJson(request, 20_000);
+        if (typeof e?.evenement !== 'string') throw new ErreurClient('Événement manquant');
+        return repondre(await journaliser(env, { ...e, origine: 'concepteur' }), 201);
       }
       if (url.pathname === '/' ) return repondre({ service: 'KKG for Innovation — agent IA', ok: true });
       return repondre({ erreur: 'Introuvable' }, 404);
@@ -110,7 +122,11 @@ function nouvelleRef(prefixe = 'REQ') {
   return `${prefixe}-${ymd}-${crypto.randomUUID().slice(0, 4).toUpperCase()}`;
 }
 
-async function enregistrerRequete(donnees, env, ctx) {
+function infosReseau(request) {
+  return { ip: request.headers.get('CF-Connecting-IP') || '', pays: request.cf?.country || '' };
+}
+
+async function enregistrerRequete(donnees, env, ctx, reseau = {}) {
   if (!donnees || typeof donnees !== 'object') throw new ErreurClient('Requête vide');
   const type = TYPES_REQUETE.includes(donnees.type) ? donnees.type : 'question';
   const ref = typeof donnees.ref === 'string' && /^[A-Z]{3}-\d{8}-[A-Z0-9]{4}$/.test(donnees.ref)
@@ -124,6 +140,16 @@ async function enregistrerRequete(donnees, env, ctx) {
   };
   const cle = `req:${String(9e15 - Date.now()).padStart(16, '0')}:${ref}`; // ordre : plus récentes d'abord
   await env.REQUETES.put(cle, JSON.stringify(requete));
+  await journaliser(env, {
+    evenement: type === 'commande' ? 'commande.recue' : 'requete.recue',
+    ref,
+    client: requete.client,
+    origine: requete.source === 'assistant' ? 'assistant' : 'site',
+    reseau,
+    details: type === 'commande'
+      ? { articles: requete.articles, total: requete.total, devise: requete.devise, methode: requete.methode }
+      : { type, projet: requete.projetReference?.id || '', resume: (requete.resume || requete.description || '').slice(0, 300) },
+  });
 
   if (env.FORMSPREE_URL) {
     ctx?.waitUntil?.(fetch(env.FORMSPREE_URL, {
@@ -149,11 +175,73 @@ async function modifierRequete(cle, changements, env) {
   const actuelle = await env.REQUETES.get(cle, 'json');
   if (!actuelle) throw new ErreurClient('Requête introuvable', 404);
   const maj = { ...actuelle };
-  if (typeof changements.statut === 'string') maj.statut = changements.statut.slice(0, 40);
-  if (typeof changements.note === 'string') maj.note = changements.note.slice(0, 2000);
+  const champs = { statut: 40, note: 2000, transaction: 120, montantRecu: 40, canalLivraison: 120 };
+  const modifs = {};
+  for (const [c, max] of Object.entries(champs)) {
+    if (typeof changements[c] === 'string' && changements[c] !== (actuelle[c] || '')) {
+      maj[c] = changements[c].slice(0, max);
+      modifs[c] = { avant: actuelle[c] || '', apres: maj[c] };
+    }
+  }
+  if (!Object.keys(modifs).length) return { ok: true };
   maj.modifieeLe = new Date().toISOString();
   await env.REQUETES.put(cle, JSON.stringify(maj));
+  await journaliser(env, {
+    evenement: modifs.statut ? `${actuelle.type === 'commande' ? 'commande' : 'requete'}.statut` : 'requete.modifiee',
+    ref: actuelle.ref, client: actuelle.client, origine: 'concepteur', details: modifs,
+  });
   return { ok: true };
+}
+
+// ---------------------------------------------------------------------
+//  Journal des opérations (chaîné par empreintes SHA-256)
+//  Chaque entrée contient l'empreinte de la précédente : toute modification
+//  ou suppression ultérieure d'une entrée est détectable.
+// ---------------------------------------------------------------------
+export function canonique(v) {
+  if (Array.isArray(v)) return `[${v.map(canonique).join(',')}]`;
+  if (v && typeof v === 'object') {
+    return `{${Object.keys(v).filter((k) => k !== 'hash' && v[k] !== undefined).sort()
+      .map((k) => `${JSON.stringify(k)}:${canonique(v[k])}`).join(',')}}`;
+  }
+  return JSON.stringify(v ?? null);
+}
+
+async function sha256(texte) {
+  const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(texte));
+  return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function journaliser(env, e) {
+  const dernier = (await env.REQUETES.get('jrn:dernier', 'json')) || { n: 0, hash: 'ORIGINE' };
+  const c = e.client || {};
+  const entree = {
+    n: dernier.n + 1,
+    date: new Date().toISOString(),
+    evenement: String(e.evenement).slice(0, 60),
+    ref: String(e.ref || '').slice(0, 60),
+    client: { nom: String(c.nom || '').slice(0, 120), telephone: String(c.telephone || '').slice(0, 40), email: String(c.email || '').slice(0, 120) },
+    origine: e.origine || 'site',
+    reseau: e.reseau && (e.reseau.ip || e.reseau.pays) ? e.reseau : undefined,
+    details: e.details ?? {},
+    precedent: dernier.hash,
+  };
+  entree.hash = await sha256(canonique(entree));
+  await env.REQUETES.put(`jrn:${String(entree.n).padStart(9, '0')}`, JSON.stringify(entree));
+  await env.REQUETES.put('jrn:dernier', JSON.stringify({ n: entree.n, hash: entree.hash }));
+  return entree;
+}
+
+async function lireJournal(env) {
+  const entrees = [];
+  let cursor;
+  do {
+    const page = await env.REQUETES.list({ prefix: 'jrn:0', cursor, limit: 1000 });
+    const vals = await Promise.all(page.keys.map((k) => env.REQUETES.get(k.name, 'json')));
+    entrees.push(...vals.filter(Boolean));
+    cursor = page.list_complete ? null : page.cursor;
+  } while (cursor && entrees.length < 20_000);
+  return entrees.sort((a, b) => a.n - b.n);
 }
 
 // ---------------------------------------------------------------------
@@ -266,7 +354,7 @@ function validerHistorique(corps) {
   }, []);
 }
 
-async function discuter(corps, env) {
+async function discuter(corps, env, reseau = {}) {
   if (!env.ANTHROPIC_API_KEY) throw new ErreurClient("L'assistant n'est pas encore configuré.", 503);
   const messages = validerHistorique(corps);
   const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 2 });
@@ -326,7 +414,7 @@ async function discuter(corps, env) {
           conversation: messages
             .filter((m) => typeof m.content === 'string')
             .map((m) => `${m.role === 'user' ? 'Visiteur' : 'Assistant'} : ${m.content}`).join('\n').slice(-12_000),
-        }, env);
+        }, env, null, reseau);
         refCreee = req.ref;
         resultats.push({ type: 'tool_result', tool_use_id: bloc.id, content: `Requête enregistrée. Référence : ${req.ref}` });
       }

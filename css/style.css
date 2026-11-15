@@ -304,3 +304,8 @@ input[type=color].champ { padding: 2px; height: 42px; }
 .verrou { border-color: var(--or-fonce); background: linear-gradient(180deg, rgba(201,164,106,.07), var(--surface)); }
 .verrou h3 { font-size: 1.35rem; }
 fieldset.prive { border-color: var(--or-fonce); }
+.filtres-historique { display: grid; grid-template-columns: repeat(4, minmax(140px, 1fr)) 2fr; gap: .8rem; align-items: end; }
+@media (max-width: 900px) { .filtres-historique { grid-template-columns: 1fr 1fr; } .filtres-historique .large { grid-column: 1 / -1; } }
+#hTable td { vertical-align: top; font-size: .84rem; }
+#hTable td:last-child { text-align: left; font-family: ui-monospace, monospace; font-size: .75rem; color: var(--muted); }
+.integrite-ok { color: var(--ok); } .integrite-ko { color: var(--err); font-weight: 600; }
