@@ -30,7 +30,7 @@
             <p class="muted">Les fichiers seront envoyés à cette adresse e-mail.</p>
             <div class="form-grille">
               <div><label class="etiquette" for="nom">Nom complet *</label><input class="champ" id="nom" required autocomplete="name"></div>
-              <div><label class="etiquette" for="email">E-mail *</label><input class="champ" id="email" type="email" required autocomplete="email"></div>
+              <div><label class="etiquette" for="email">E-mail (réception des fichiers) *</label><input class="champ" id="email" type="email" required autocomplete="email"></div>
               <div><label class="etiquette" for="tel">Téléphone / WhatsApp *</label><input class="champ" id="tel" required autocomplete="tel"></div>
               <div><label class="etiquette" for="pays">Pays / ville</label><input class="champ" id="pays" autocomplete="country-name"></div>
               <div class="plein"><label class="etiquette" for="note">Remarques (adaptations souhaitées, terrain…)</label><textarea class="champ" id="note" rows="3"></textarea></div>
@@ -44,9 +44,9 @@
           <div class="total"><span>Total</span><b id="total">–</b></div>
           <h4 style="margin-top:1.6rem">Mode de paiement</h4>
           <div class="methodes" id="methodes"></div>
-          <label class="case" style="margin-bottom:1rem"><input type="checkbox" id="cgv" form="formCommande" required> <span>J'accepte que les plans soient destinés à l'usage prévu par ma licence.</span></label>
+          <label class="case" style="margin-bottom:1rem;align-items:flex-start"><input type="checkbox" id="cgv" form="formCommande" required> <span style="font-size:.85rem">J'accepte les <a href="conditions.html#cgv" target="_blank" style="color:var(--or)">conditions générales de vente</a> et la <a href="conditions.html#licence" target="_blank" style="color:var(--or)">licence d'utilisation</a> (une construction par licence, sauf Exclusivité). Je reconnais qu'un fichier livré ne peut plus être remboursé, sauf défaut.</span></label>
           <button class="btn bloc" id="valider" type="submit" form="formCommande">Valider la commande</button>
-          <p class="muted" style="font-size:.8rem;margin-top:.9rem">Les fichiers sont envoyés après confirmation du paiement.</p>
+          <p class="muted" style="font-size:.8rem;margin-top:.9rem">Les fichiers sont envoyés après confirmation du paiement. Besoin d'adapter le plan à votre terrain ? <a href="sur-mesure.html?type=adaptation" style="color:var(--or)">Demandez un devis</a>.</p>
         </aside>
       </div>
     </div>

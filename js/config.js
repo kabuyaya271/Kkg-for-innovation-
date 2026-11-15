@@ -1,67 +1,81 @@
 // =====================================================================
 //  CONFIGURATION DU SITE — modifiez ce fichier pour personnaliser
+//  Un champ laissé vide ('') est simplement masqué sur le site.
 // =====================================================================
 export const CONFIG = {
-  nomSite: 'KKG Innovation',
-  slogan: 'Plans de construction en 3D, prêts à bâtir',
-  concepteur: 'KKG for Innovation — Bureau de conception',
-  email: 'contact@exemple.com',          // e-mail affiché aux clients
-  telephone: '+243 000 000 000',
-  adresse: 'Kinshasa, RD Congo',
+  nomSite: 'KKG for Innovation',
+  slogan: 'Plans de construction en 3D, prêts à bâtir ou conçus sur mesure',
+
+  // ---------------- Identité de l'entreprise (mentions légales) ----------------
+  entreprise: {
+    raisonSociale: 'KKG for Innovation',
+    formeJuridique: '',        // ex. 'Établissement', 'SARLU', 'SARL'…
+    rccm: '',                  // n° RCCM (Registre du commerce)
+    idNat: '',                 // n° d'identification nationale
+    nif: '',                   // n° impôt (NIF)
+    siege: 'Kinshasa, République Démocratique du Congo',
+    responsable: '',           // nom du responsable / gérant
+  },
+
+  // Coordonnées officielles (les SEULES à utiliser pour payer — voir CGV)
+  email: '',                         // à compléter avec l'adresse Gmail professionnelle
+  telephone: '+243 975 465 965',
+  whatsapp: '243975465965',          // format international sans + ni espaces
 
   // Devise et format des prix
   devise: 'USD',
   locale: 'fr-FR',
 
-  // Licences proposées à la vente (multiplicateur appliqué au prix de base)
+  // ---------------- Licences (vente des plans du catalogue) ----------------
   licences: {
     essentiel: {
       nom: 'Essentiel',
       multiplicateur: 1,
-      description: 'Plans PDF : niveaux, façades, coupes, toiture. Usage pour 1 construction.',
+      description: 'Plans PDF : niveaux, façades, coupes, toiture. Licence pour 1 construction.',
     },
     complet: {
       nom: 'Pack complet',
       multiplicateur: 1.6,
-      description: 'PDF + fichiers DWG modifiables + maquette 3D + métré estimatif. 1 construction.',
+      description: 'PDF + fichiers DWG modifiables + maquette 3D + métré estimatif. Licence pour 1 construction.',
     },
     exclusif: {
       nom: 'Exclusivité',
       multiplicateur: 4,
-      description: 'Pack complet + droits exclusifs : le plan est retiré de la vente. Constructions illimitées.',
+      description: 'Pack complet + exclusivité : le plan est retiré de la vente. Constructions illimitées pour vous.',
     },
   },
 
-  // ---------------------------------------------------------------
-  //  PAIEMENTS — laissez vide ('' ou []) pour désactiver une méthode
-  // ---------------------------------------------------------------
-  // Lien de paiement Stripe général (https://buy.stripe.com/...).
-  // Chaque projet peut aussi avoir son propre "lienPaiement".
-  stripeLienGeneral: '',
-
-  // Numéro WhatsApp (format international sans + ni espaces)
-  whatsapp: '243000000000',
-
-  // Comptes Mobile Money
-  mobileMoney: [
-    { operateur: 'M-Pesa', numero: '+243 81 000 0000', titulaire: 'KKG Innovation' },
-    { operateur: 'Orange Money', numero: '+243 89 000 0000', titulaire: 'KKG Innovation' },
-    { operateur: 'Airtel Money', numero: '+243 99 000 0000', titulaire: 'KKG Innovation' },
-  ],
-
-  // Virement bancaire
-  banque: {
-    banque: 'Nom de la banque',
-    titulaire: 'KKG Innovation',
-    iban: 'XX00 0000 0000 0000 0000 0000',
-    swift: 'XXXXXXXX',
+  // ---------------- Projets sur mesure & adaptations ----------------
+  surMesure: {
+    acomptePourcent: 50,        // avance versée à l'acceptation du devis
+    revisionsIncluses: 2,       // séries de modifications comprises dans le prix
+    validiteDevisJours: 30,
+    delaiReclamationJours: 7,   // délai pour signaler un défaut des fichiers livrés
   },
 
-  // Formspree (https://formspree.io) : reçoit chaque commande par e-mail.
-  // Exemple : 'https://formspree.io/f/abcdwxyz'
+  // ---------------- Paiements ----------------
+  // Lien de paiement par carte (Stripe, CinetPay, Flutterwave, PayPal…). Vide = désactivé.
+  lienPaiementCarte: '',
+
+  mobileMoney: [
+    // Vérifiez l'opérateur et indiquez le nom exact du titulaire du compte.
+    { operateur: 'Airtel Money', numero: '+243 975 465 965', titulaire: '' },
+  ],
+
+  // Virement bancaire — laissez iban vide pour désactiver
+  banque: { banque: '', titulaire: '', iban: '', swift: '' },
+
+  // ---------------- Services en ligne ----------------
+  // Adresse de l'agent IA + boîte aux requêtes (dossier agent-ia/, Cloudflare Worker)
+  // ex. 'https://kkg-agent.votre-compte.workers.dev'
+  agentIA: '',
+
+  // Formspree (https://formspree.io) : copie des commandes / requêtes par e-mail (facultatif)
   formspree: '',
 
-  // Mot de passe de l'espace concepteur (protection simple côté navigateur,
-  // ce n'est PAS une sécurité forte : ne publiez rien de confidentiel).
+  // Mot de passe de l'espace concepteur (protection simple côté navigateur)
   adminMotDePasse: 'kkg2026',
+
+  // Date d'entrée en vigueur des conditions juridiques
+  dateConditions: '15 novembre 2026',
 };

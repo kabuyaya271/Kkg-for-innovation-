@@ -1,9 +1,9 @@
 import { CONFIG } from './config.js';
 import {
   detailPanier, formatPrix, changerLicence, retirerDuPanier, viderPanier,
-  enregistrerCommande, genererReference,
+  enregistrerCommande, genererReference, transmettre,
 } from './store.js';
-import { initialiserPage, esc, toast } from './ui.js';
+import { initialiserPage, esc, toast, lienWhatsApp } from './ui.js';
 import { vignette } from './viewer.js';
 
 initialiserPage('panier');
@@ -11,9 +11,9 @@ initialiserPage('panier');
 // ---------------- Méthodes de paiement disponibles ----------------
 function methodesDisponibles(lignes) {
   const m = [];
-  const stripeProjet = lignes.length === 1 && lignes[0].projet.lienPaiement;
-  if (stripeProjet || CONFIG.stripeLienGeneral) {
-    m.push({ id: 'carte', nom: 'Carte bancaire', info: 'Paiement sécurisé par Stripe (Visa, Mastercard…).' });
+  const lienProjet = lignes.length === 1 && lignes[0].projet.lienPaiement;
+  if (lienProjet || CONFIG.lienPaiementCarte) {
+    m.push({ id: 'carte', nom: 'Carte bancaire', info: 'Paiement sécurisé en ligne (Visa, Mastercard…).' });
   }
   if (CONFIG.mobileMoney?.length) {
     m.push({ id: 'mobile', nom: 'Mobile Money', info: CONFIG.mobileMoney.map((x) => x.operateur).join(', ') });
@@ -109,24 +109,8 @@ document.getElementById('formCommande').addEventListener('submit', async (e) => 
   btn.disabled = true;
   btn.textContent = 'Envoi…';
 
-  // Notification au concepteur (Formspree)
-  if (CONFIG.formspree) {
-    try {
-      await fetch(CONFIG.formspree, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          _subject: `Nouvelle commande ${commande.ref} — ${formatPrix(commande.total)}`,
-          _replyto: commande.client.email,
-          reference: commande.ref,
-          ...commande.client,
-          articles: commande.articles.map((a) => `${a.titre} (${a.licence}) : ${formatPrix(a.prix)}`).join('\n'),
-          total: formatPrix(commande.total),
-          paiement: methode,
-        }),
-      });
-    } catch (err) { console.warn('Formspree indisponible', err); }
-  }
+  // Notification au concepteur (boîte aux requêtes en ligne / Formspree)
+  await transmettre('commande', commande);
 
   const lignes = detail.lignes;
   viderPanier();
@@ -146,7 +130,7 @@ function confirmer(c, lignes) {
   let instructions = '';
   let action = '';
   if (c.methode === 'carte') {
-    const lien = (lignes.length === 1 && lignes[0].projet.lienPaiement) || CONFIG.stripeLienGeneral;
+    const lien = (lignes.length === 1 && lignes[0].projet.lienPaiement) || CONFIG.lienPaiementCarte;
     const url = new URL(lien);
     url.searchParams.set('prefilled_email', c.client.email);
     url.searchParams.set('client_reference_id', c.ref);
@@ -155,17 +139,20 @@ function confirmer(c, lignes) {
     setTimeout(() => { location.href = url.toString(); }, 2500);
   } else if (c.methode === 'mobile') {
     instructions = `<p>Envoyez <b>${formatPrix(c.total)}</b> sur l'un des comptes suivants en indiquant la référence <span class="ref">${esc(c.ref)}</span> :</p>
-      <ul class="liste-coche">${CONFIG.mobileMoney.map((m) => `<li><b>${esc(m.operateur)}</b> : <code>${esc(m.numero)}</code> (${esc(m.titulaire)})</li>`).join('')}</ul>
-      <p style="margin-top:1rem">Envoyez ensuite la capture de la transaction par WhatsApp ou e-mail pour recevoir vos plans.</p>`;
-    if (CONFIG.whatsapp) action = `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(messageWhatsApp(c) + '\n\nJe viens d\'effectuer le paiement Mobile Money.')}">Envoyer la preuve sur WhatsApp</a>`;
+      <ul class="liste-coche">${CONFIG.mobileMoney.map((m) => `<li><b>${esc(m.operateur)}</b> : <code>${esc(m.numero)}</code>${m.titulaire ? ` (${esc(m.titulaire)})` : ''}</li>`).join('')}</ul>
+      <p style="margin-top:1rem">Envoyez ensuite la capture de la transaction par WhatsApp pour recevoir vos plans.</p>
+      <p class="muted" style="font-size:.85rem">⚠ Ne payez que sur le(s) numéro(s) ci-dessus. Nous ne demandons jamais de paiement vers un autre numéro.</p>`;
+    if (CONFIG.whatsapp) action = `<a class="btn" target="_blank" rel="noopener" href="${lienWhatsApp(messageWhatsApp(c) + '\n\nJe viens d\'effectuer le paiement Mobile Money.')}">Envoyer la preuve sur WhatsApp</a>`;
   } else if (c.methode === 'virement') {
     const b = CONFIG.banque;
     instructions = `<p>Effectuez un virement de <b>${formatPrix(c.total)}</b> avec la référence <span class="ref">${esc(c.ref)}</span> :</p>
       <table class="tab"><tr><td>Banque</td><td>${esc(b.banque)}</td></tr><tr><td>Titulaire</td><td>${esc(b.titulaire)}</td></tr><tr><td>IBAN</td><td><code>${esc(b.iban)}</code></td></tr><tr><td>BIC / SWIFT</td><td><code>${esc(b.swift)}</code></td></tr></table>`;
-    action = `<a class="btn" href="mailto:${esc(CONFIG.email)}?subject=${encodeURIComponent('Virement commande ' + c.ref)}&body=${encodeURIComponent(messageWhatsApp(c))}">Envoyer l'avis de virement par e-mail</a>`;
+    action = CONFIG.email
+      ? `<a class="btn" href="mailto:${esc(CONFIG.email)}?subject=${encodeURIComponent('Virement commande ' + c.ref)}&body=${encodeURIComponent(messageWhatsApp(c))}">Envoyer l'avis de virement par e-mail</a>`
+      : `<a class="btn" target="_blank" rel="noopener" href="${lienWhatsApp(messageWhatsApp(c) + '\n\nVirement effectué.')}">Envoyer l'avis de virement sur WhatsApp</a>`;
   } else if (c.methode === 'whatsapp') {
     instructions = `<p>Votre commande est prête. Cliquez ci-dessous pour l'envoyer au concepteur sur WhatsApp et convenir du paiement.</p>`;
-    action = `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(messageWhatsApp(c))}">Ouvrir WhatsApp</a>`;
+    action = `<a class="btn" target="_blank" rel="noopener" href="${lienWhatsApp(messageWhatsApp(c))}">Ouvrir WhatsApp</a>`;
   }
 
   v.innerHTML = `
@@ -180,7 +167,7 @@ function confirmer(c, lignes) {
         ${c.articles.map((a) => `<tr><td>${esc(a.titre)} <span class="muted">· ${esc(a.licence)}</span></td><td>${formatPrix(a.prix)}</td></tr>`).join('')}
         <tr><td><b>Total</b></td><td><b>${formatPrix(c.total)}</b></td></tr>
       </table>
-      <p class="muted" style="margin-top:1rem;font-size:.88rem">Les fichiers seront envoyés à <b>${esc(c.client.email)}</b> dès réception du paiement.</p>
+      <p class="muted" style="margin-top:1rem;font-size:.88rem">Les fichiers seront envoyés à <b>${esc(c.client.email)}</b> dès réception et vérification du paiement.</p>
     </div>`;
 }
 

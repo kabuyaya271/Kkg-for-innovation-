@@ -4,6 +4,19 @@ import { getPanier } from './store.js';
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+export const lienWhatsApp = (texte = '') =>
+  `https://wa.me/${CONFIG.whatsapp}${texte ? `?text=${encodeURIComponent(texte)}` : ''}`;
+
+/** Coordonnées officielles en HTML (n'affiche que celles renseignées). */
+export function blocContacts() {
+  return [
+    CONFIG.whatsapp && `<b>WhatsApp :</b> <a href="${lienWhatsApp()}" target="_blank" rel="noopener">${esc(CONFIG.telephone)}</a>`,
+    CONFIG.telephone && `<b>Téléphone :</b> <a href="tel:${esc(CONFIG.telephone.replace(/\s/g, ''))}">${esc(CONFIG.telephone)}</a>`,
+    CONFIG.email && `<b>E-mail :</b> <a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>`,
+    CONFIG.entreprise.siege && `<b>Siège :</b> ${esc(CONFIG.entreprise.siege)}`,
+  ].filter(Boolean).join('<br>');
+}
+
 export function initialiserPage(actif = '') {
   const header = document.querySelector('[data-header]');
   if (header) {
@@ -13,7 +26,7 @@ export function initialiserPage(actif = '') {
         <button class="burger" aria-label="Menu" aria-expanded="false">☰</button>
         <nav class="liens">
           <a href="index.html#catalogue" class="${actif === 'catalogue' ? 'actif' : ''}">Catalogue</a>
-          <a href="index.html#licences">Licences</a>
+          <a href="sur-mesure.html" class="${actif === 'sur-mesure' ? 'actif' : ''}">Sur mesure</a>
           <a href="index.html#processus">Comment acheter</a>
           <a href="index.html#contact">Contact</a>
           <a href="panier.html" class="btn-panier ${actif === 'panier' ? 'actif' : ''}">Panier <span class="badge" data-badge>0</span></a>
@@ -35,19 +48,28 @@ export function initialiserPage(actif = '') {
           <p class="muted">${esc(CONFIG.slogan)}</p>
         </div>
         <div>
-          <h4>Contact</h4>
-          <p class="muted">${esc(CONFIG.email)}<br>${esc(CONFIG.telephone)}<br>${esc(CONFIG.adresse)}</p>
+          <h4>Contact officiel</h4>
+          <p class="muted">${blocContacts()}</p>
         </div>
         <div>
-          <h4>Liens</h4>
-          <p><a href="index.html#catalogue">Catalogue</a><br><a href="panier.html">Panier</a><br><a href="admin.html">Espace concepteur</a></p>
+          <h4>Informations</h4>
+          <p>
+            <a href="sur-mesure.html">Projet sur mesure / adaptation</a><br>
+            <a href="conditions.html#cgv">Conditions générales de vente</a><br>
+            <a href="conditions.html#licence">Licence d'utilisation des plans</a><br>
+            <a href="conditions.html#sur-mesure">Conditions des projets sur mesure</a><br>
+            <a href="conditions.html#confidentialite">Confidentialité</a><br>
+            <a href="conditions.html#mentions">Mentions légales</a>
+          </p>
         </div>
       </div>
-      <div class="wrap copyright muted">© ${new Date().getFullYear()} ${esc(CONFIG.concepteur)}. Tous les plans sont protégés par le droit d'auteur.</div>`;
+      <div class="wrap copyright muted">© ${new Date().getFullYear()} ${esc(CONFIG.entreprise.raisonSociale)}. Tous les plans, maquettes et rendus sont protégés par le droit d'auteur. Toute reproduction ou réutilisation non autorisée est interdite.<br>
+      <b>Sécurité :</b> nous ne demandons jamais de paiement vers un autre numéro ou compte que ceux indiqués sur ce site.</div>`;
   }
   majBadge();
   window.addEventListener('panier:change', majBadge);
   window.addEventListener('storage', majBadge);
+  import('./assistant.js').then((m) => m.initialiserAssistant()).catch((e) => console.warn('Assistant indisponible', e));
 }
 
 function majBadge() {
@@ -62,22 +84,25 @@ export function toast(message, type = 'ok') {
   t.className = `toast ${type}`;
   t.innerHTML = message;
   zone.appendChild(t);
-  setTimeout(() => t.classList.add('sortie'), 3200);
-  setTimeout(() => t.remove(), 3700);
+  setTimeout(() => t.classList.add('sortie'), 3800);
+  setTimeout(() => t.remove(), 4300);
 }
 
 export const LIBELLES_TYPE = {
   villa: 'Villa', maison: 'Maison', duplex: 'Duplex', immeuble: 'Immeuble', commercial: 'Commercial',
 };
 
+export const estReference = (p) => p.statut === 'reference';
+
 /** Carte d'un projet pour les grilles du catalogue */
 export function carteProjet(p, image, formatPrix) {
+  const ref = estReference(p);
   return `
     <a class="carte" href="projet.html?id=${encodeURIComponent(p.id)}">
       <div class="carte-img">
         <img src="${image}" alt="${esc(p.titre)}" loading="lazy">
         <div class="pastilles">
-          ${p.nouveau ? '<span class="pastille or">Nouveau</span>' : ''}
+          ${ref ? '<span class="pastille or">Réalisation sur mesure</span>' : p.nouveau ? '<span class="pastille or">Nouveau</span>' : ''}
           <span class="pastille">${esc(LIBELLES_TYPE[p.modele?.type] || p.categorie || '')}</span>
         </div>
         <span class="voir3d">Voir en 3D ↻</span>
@@ -91,7 +116,9 @@ export function carteProjet(p, image, formatPrix) {
           <li><b>${esc(p.sallesDeBain)}</b> sdb</li>
           <li><b>${p.etages > 1 ? 'R+' + (p.etages - 1) : 'Plain-pied'}</b></li>
         </ul>
-        <div class="carte-pied"><span class="prix">dès ${formatPrix(p.prix)}</span><span class="fleche">→</span></div>
+        <div class="carte-pied">${ref
+          ? '<span class="muted" style="font-size:.9rem">Projet similaire sur devis</span>'
+          : `<span class="prix">dès ${formatPrix(p.prix)}</span>`}<span class="fleche">→</span></div>
       </div>
     </a>`;
 }

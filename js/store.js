@@ -113,3 +113,60 @@ export function genererReference() {
   const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
   return `KKG-${ymd}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 }
+
+// ---------------- Requêtes (boîte aux requêtes) ----------------
+const LS_REQUETES = 'kkg_requetes';
+export function getRequetesLocales() { return lire(LS_REQUETES, []); }
+
+export function genererRefRequete() {
+  return genererReference().replace('KKG-', 'REQ-');
+}
+
+/**
+ * Transmet une requête ou une commande au concepteur :
+ *  1) boîte aux requêtes en ligne (agent-ia / Cloudflare Worker) si configurée,
+ *  2) copie par e-mail via Formspree si configuré,
+ *  3) copie locale dans ce navigateur.
+ * Retourne { distant: true } si au moins un envoi en ligne a réussi.
+ */
+export async function transmettre(type, donnees) {
+  const envoi = { type, date: new Date().toISOString(), ...donnees };
+  if (type !== 'commande') {
+    const all = getRequetesLocales();
+    all.unshift(envoi);
+    ecrire(LS_REQUETES, all.slice(0, 100));
+  }
+  let distant = false;
+  if (CONFIG.agentIA) {
+    try {
+      const r = await fetch(`${CONFIG.agentIA.replace(/\/$/, '')}/requetes`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(envoi),
+      });
+      distant = r.ok || distant;
+    } catch (e) { console.warn('Boîte aux requêtes indisponible', e); }
+  }
+  if (CONFIG.formspree) {
+    try {
+      const r = await fetch(CONFIG.formspree, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          _subject: `[${type}] ${envoi.ref || ''} — ${envoi.client?.nom || ''}`,
+          _replyto: envoi.client?.email || undefined,
+          ...aplatir(envoi),
+        }),
+      });
+      distant = r.ok || distant;
+    } catch (e) { console.warn('Formspree indisponible', e); }
+  }
+  return { distant };
+}
+
+function aplatir(o, prefixe = '', res = {}) {
+  for (const [k, v] of Object.entries(o)) {
+    const cle = prefixe ? `${prefixe}.${k}` : k;
+    if (v && typeof v === 'object' && !Array.isArray(v)) aplatir(v, cle, res);
+    else res[cle] = Array.isArray(v) ? v.map((x) => (typeof x === 'object' ? JSON.stringify(x) : x)).join(' | ') : v;
+  }
+  return res;
+}

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projet sur mesure et adaptation — KKG for Innovation</title>
+  <meta name="description" content="Faites concevoir votre projet de construction sur mesure ou adapter un plan existant à votre terrain.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <header data-header></header>
+
+  <main class="wrap">
+    <div class="fil"><a href="index.html">Accueil</a> / Sur mesure</div>
+
+    <section style="padding-top:40px;padding-bottom:40px">
+      <span class="surtitre">Conception sur mesure · Adaptation</span>
+      <h1 style="max-width:820px">Votre projet, conçu pour votre terrain.</h1>
+      <p class="muted" style="max-width:700px;font-size:1.08rem">Vous ne trouvez pas le plan idéal dans le catalogue, ou vous voulez adapter un plan existant à votre parcelle, votre climat et votre budget ? Décrivez votre besoin : nous étudions votre demande et vous envoyons un devis détaillé.</p>
+    </section>
+
+    <div class="trois" style="margin-bottom:60px">
+      <div class="bloc-info"><div class="num">01</div><h3>Votre demande</h3><p class="muted">Vous décrivez votre terrain, vos besoins et votre budget via le formulaire ou l'assistant.</p></div>
+      <div class="bloc-info"><div class="num">02</div><h3>Devis</h3><p class="muted">Nous vous envoyons un devis écrit précisant le prix, le contenu et les délais. Il est valable <span data-cfg="validite"></span> jours.</p></div>
+      <div class="bloc-info vedette"><div class="num">03</div><h3>Acompte de <span data-cfg="acompte"></span> %</h3><p class="muted">Les études commencent à réception de l'acompte de <span data-cfg="acompte"></span> % du prix convenu.</p></div>
+      <div class="bloc-info"><div class="num">04</div><h3>Esquisse et 3D</h3><p class="muted">Vous recevez les plans et la maquette 3D en aperçu. <span data-cfg="revisions"></span> séries de modifications sont comprises.</p></div>
+      <div class="bloc-info"><div class="num">05</div><h3>Validation et solde</h3><p class="muted">Après votre validation écrite, vous réglez le solde.</p></div>
+      <div class="bloc-info"><div class="num">06</div><h3>Livraison</h3><p class="muted">Le dossier complet vous est livré. Il sert à une seule construction, sauf accord écrit différent.</p></div>
+    </div>
+
+    <div class="commande" style="padding-top:0">
+      <form id="formRequete" class="encart">
+        <h2 style="font-size:2rem">Déposer une requête</h2>
+        <p class="muted">Les champs marqués * sont obligatoires. Plus votre description est précise, plus le devis sera juste.</p>
+
+        <h4 style="margin-top:1.4rem">Type de demande</h4>
+        <div class="methodes" id="typesDemande">
+          <label class="option"><input type="radio" name="type" value="sur-mesure" checked><b>Nouveau projet sur mesure</b><small>Conception complète d'après votre cahier des charges.</small></label>
+          <label class="option"><input type="radio" name="type" value="adaptation"><b>Adapter un plan du catalogue</b><small>Ajuster un plan existant à votre terrain, votre orientation, vos besoins.</small></label>
+          <label class="option"><input type="radio" name="type" value="question"><b>Question ou problème</b><small>Une question sur un plan, une commande, un chantier…</small></label>
+        </div>
+
+        <div class="form-grille" style="margin-top:1rem">
+          <div class="plein" id="blocProjet" hidden>
+            <label class="etiquette" for="projet">Plan concerné</label>
+            <select class="champ" id="projet"><option value="">— Choisir —</option></select>
+          </div>
+
+          <div><label class="etiquette" for="nom">Nom complet *</label><input class="champ" id="nom" required autocomplete="name"></div>
+          <div><label class="etiquette" for="tel">Téléphone / WhatsApp *</label><input class="champ" id="tel" required autocomplete="tel"></div>
+          <div><label class="etiquette" for="email">E-mail</label><input class="champ" id="email" type="email" autocomplete="email"></div>
+          <div><label class="etiquette" for="lieu">Ville / pays du terrain *</label><input class="champ" id="lieu" required placeholder="ex. Goma, Nord-Kivu"></div>
+        </div>
+
+        <div id="blocTechnique">
+          <h4 style="margin-top:1.6rem">Le terrain</h4>
+          <div class="form-grille">
+            <div><label class="etiquette" for="terrain">Dimensions du terrain</label><input class="champ" id="terrain" placeholder="ex. 20 × 30 m"></div>
+            <div><label class="etiquette" for="relief">Relief</label>
+              <select class="champ" id="relief"><option value="">— Non précisé —</option><option>Plat</option><option>Légère pente</option><option>Forte pente</option><option>Zone inondable / humide</option></select></div>
+            <div class="plein"><label class="etiquette" for="environnement">Environnement et contraintes</label><input class="champ" id="environnement" placeholder="orientation, voisinage, accès, route, climat, règles du quartier…"></div>
+          </div>
+
+          <h4 style="margin-top:1.6rem">Le bâtiment souhaité</h4>
+          <div class="form-grille">
+            <div><label class="etiquette" for="typeBatiment">Type de bâtiment</label>
+              <select class="champ" id="typeBatiment"><option>Maison</option><option>Villa</option><option>Duplex</option><option>Immeuble</option><option>Commercial / bureaux</option><option>Équipement (école, église, centre de santé…)</option><option>Autre</option></select></div>
+            <div><label class="etiquette" for="niveaux">Niveaux</label>
+              <select class="champ" id="niveaux"><option>Plain-pied</option><option>R+1</option><option>R+2</option><option>R+3 et plus</option><option>À conseiller</option></select></div>
+            <div><label class="etiquette" for="chambres">Chambres</label><input class="champ" id="chambres" type="number" min="0" max="200"></div>
+            <div><label class="etiquette" for="sdb">Salles de bain</label><input class="champ" id="sdb" type="number" min="0" max="200"></div>
+            <div><label class="etiquette" for="budget">Budget de construction envisagé</label><input class="champ" id="budget" placeholder="ex. 60 000 $"></div>
+            <div><label class="etiquette" for="delai">Délai souhaité pour les plans</label><input class="champ" id="delai" placeholder="ex. 1 mois"></div>
+            <div class="plein"><label class="etiquette" for="style">Style et équipements</label><input class="champ" id="style" placeholder="moderne, toit plat, piscine, garage, magasin au rez-de-chaussée…"></div>
+          </div>
+        </div>
+
+        <div style="margin-top:1.4rem">
+          <label class="etiquette" for="description">Description de votre projet ou de votre question *</label>
+          <textarea class="champ" id="description" rows="6" required></textarea>
+          <p class="muted" style="font-size:.82rem;margin-top:.4rem">Vous pourrez ensuite envoyer par WhatsApp vos photos du terrain, plan de parcelle, levé topographique ou croquis.</p>
+        </div>
+
+        <label class="case" style="margin:1.2rem 0"><input type="checkbox" id="accord" required>
+          <span>J'ai pris connaissance des <a href="conditions.html#sur-mesure" target="_blank" style="color:var(--or)">conditions des projets sur mesure</a>, de la <a href="conditions.html#confidentialite" target="_blank" style="color:var(--or)">politique de confidentialité</a>, et j'accepte d'être recontacté au sujet de ma demande.</span></label>
+        <button class="btn" id="envoyer">Envoyer ma requête</button>
+      </form>
+
+      <aside class="recap">
+        <div class="encart">
+          <h4>Bon à savoir</h4>
+          <ul class="liste-coche">
+            <li>Le devis est gratuit. Il ne vous engage pas tant que vous ne l'avez pas accepté.</li>
+            <li>Les études commencent à réception de l'acompte de <span data-cfg="acompte"></span> %.</li>
+            <li>Les plans restent la propriété intellectuelle de <span data-cfg="societe"></span>. Vous recevez une licence pour votre construction.</li>
+            <li>Pour le permis de bâtir, la structure et le sol, des études ou une signature locale peuvent être nécessaires.</li>
+          </ul>
+        </div>
+        <div class="encart">
+          <h4>Besoin d'aide pour remplir ?</h4>
+          <p class="muted">Notre assistant répond 24 h/24 et peut préparer la requête avec vous.</p>
+          <button class="btn contour bloc" type="button" data-ouvrir-assistant>Parler à l'assistant</button>
+          <p class="muted" style="margin:1rem 0 0" id="contactsSM"></p>
+        </div>
+      </aside>
+    </div>
+
+    <div id="confirmation" hidden style="max-width:720px;margin:20px auto 100px"></div>
+  </main>
+
+  <footer data-footer></footer>
+  <script type="module" src="js/sur-mesure.js"></script>
+</body>
+</html>

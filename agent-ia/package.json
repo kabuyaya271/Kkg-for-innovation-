@@ -1,0 +1,17 @@
+{
+  "name": "kkg-agent-ia",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Agent IA et boîte aux requêtes de KKG for Innovation (Cloudflare Worker)",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

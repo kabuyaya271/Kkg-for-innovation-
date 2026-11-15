@@ -10,8 +10,12 @@ Site 100 % statique (HTML / CSS / JavaScript + [Three.js](https://threejs.org)) 
 |---|---|
 | `index.html` | Accueil : projet à la une en 3D, catalogue filtrable, licences, contact |
 | `projet.html?id=…` | Fiche projet : visite 3D (rotation, nuit, vue éclatée par niveau, vue de dessus, filaire, plein écran, capture), prix par licence, caractéristiques, tableau des surfaces, contenu du dossier, FAQ |
-| `panier.html` | Panier, coordonnées du client, choix du paiement, instructions de paiement |
-| `admin.html` | **Espace concepteur** : ajouter / modifier / supprimer des projets avec aperçu 3D en direct, images, commandes, publication |
+| `panier.html` | Panier, coordonnées du client, choix du paiement, instructions de paiement, acceptation des CGV |
+| `sur-mesure.html` | **Boîte aux requêtes** : projet sur mesure, adaptation d'un plan à un terrain, question / problème ; processus avec acompte de 50 % |
+| `conditions.html` | **Textes juridiques** : mentions légales, CGV, licence d'utilisation, conditions sur mesure, responsabilité, assistant IA, confidentialité, litiges |
+| `admin.html` | **Espace concepteur** : projets (en vente ou « réalisation sur mesure ») avec aperçu 3D, **requêtes** reçues, commandes, publication |
+
+Sur toutes les pages, une bulle **« Une question ? »** ouvre l'assistant : un **agent IA** si le dossier `agent-ia/` est déployé, sinon un menu d'orientation (sur mesure, adaptation, WhatsApp).
 
 ## Démarrer en local
 
@@ -29,16 +33,18 @@ python3 -m http.server 8000
 
 ## Personnaliser — `js/config.js`
 
-- Nom, e-mail, téléphone, adresse
+- Identité de l'entreprise (RCCM, Id. Nat., NIF… — affichés dans les mentions légales dès qu'ils sont remplis), e-mail, WhatsApp
 - Devise (`USD`, `EUR`, `CDF`, `XAF`…)
 - **Licences** et leur multiplicateur de prix (Essentiel ×1, Pack complet ×1,6, Exclusivité ×4)
 - **Paiements** :
-  - `stripeLienGeneral` : un [lien de paiement Stripe](https://dashboard.stripe.com/payment-links). Chaque projet peut aussi avoir son propre lien (champ « Lien de paiement Stripe » dans l'espace concepteur) ;
+  - `lienPaiementCarte` : un lien de paiement en ligne (CinetPay, Flutterwave, PayPal, Stripe…). Chaque projet peut aussi avoir son propre lien ;
   - `mobileMoney` : vos numéros M-Pesa / Orange Money / Airtel Money ;
   - `banque` : vos coordonnées de virement ;
   - `whatsapp` : votre numéro pour les commandes et questions.
   Laissez un champ vide pour désactiver la méthode.
 - `formspree` : créez un formulaire gratuit sur [formspree.io](https://formspree.io) et collez son adresse pour **recevoir chaque commande et chaque demande de contact par e-mail**.
+- `surMesure` : acompte (50 %), nombre de révisions incluses, validité des devis — repris automatiquement dans les conditions juridiques.
+- `agentIA` : adresse du serveur de l'assistant IA et de la boîte aux requêtes (voir [`agent-ia/README.md`](agent-ia/README.md)).
 - `adminMotDePasse` : mot de passe de l'espace concepteur (à changer !).
 
 ## Ajouter un projet
@@ -52,6 +58,17 @@ python3 -m http.server 8000
 5. **Enregistrer**, puis onglet **Publier en ligne → Télécharger projets.json** et remplacez `data/projets.json` dans le dépôt.
 
 > Les modifications faites dans l'espace concepteur sont d'abord enregistrées dans votre navigateur : elles ne sont visibles par les visiteurs qu'après avoir remplacé `data/projets.json`.
+
+## Deux sortes de projets
+
+- **En vente** : plan du catalogue, acheté directement avec une licence (Essentiel, Pack complet, Exclusivité). Bouton « Adapter ce plan à mon terrain » pour une adaptation sur devis.
+- **Réalisation sur mesure** : projet conçu pour un client, montré en 3D comme référence mais non vendu ; bouton « Commander un projet similaire ». Choisissez le statut dans l'espace concepteur. (Le projet « Résidence privée Ngaliema » est un exemple à remplacer.)
+
+## Textes juridiques
+
+`conditions.html` protège votre propriété intellectuelle (licence pour une construction, interdiction de revente, sanctions), encadre l'acompte de 50 % et les annulations, limite votre responsabilité (plans de conception ≠ étude de sol, calcul de structure ou suivi de chantier) et encadre l'assistant IA. Les clauses restent équilibrées (pas d'exclusion de la faute lourde, droits impératifs du consommateur préservés) pour rester valables devant un juge.
+
+> ⚠ Ces textes sont un modèle sérieux mais ne remplacent pas un avocat : faites-les relire par un avocat inscrit au barreau en RDC, complétez RCCM / Id. Nat. / NIF dans `js/config.js`, et vérifiez si la réglementation locale exige la signature d'un architecte agréé pour les permis.
 
 ## Processus de vente
 
@@ -69,13 +86,15 @@ python3 -m http.server 8000
 ## Structure
 
 ```
-index.html  projet.html  panier.html  admin.html
+index.html  projet.html  panier.html  sur-mesure.html  conditions.html  admin.html
 css/style.css
 js/config.js      ← configuration
 js/store.js       ← projets, panier, commandes
 js/builder3d.js   ← générateur de maquettes 3D
 js/viewer.js      ← visionneuse 3D (Three.js)
-js/ui.js, accueil.js, projet.js, panier.js, admin.js
+js/assistant.js    ← bulle de l'assistant
+js/ui.js, accueil.js, projet.js, panier.js, sur-mesure.js, conditions.js, admin.js
+agent-ia/         ← serveur de l'agent IA + boîte aux requêtes (Cloudflare Worker)
 data/projets.json ← catalogue des projets
 modeles/          ← vos fichiers .glb
 images/           ← vos images

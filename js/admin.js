@@ -1,7 +1,7 @@
 import { CONFIG } from './config.js';
 import {
   getProjets, enregistrerProjetsLocaux, aDesModificationsLocales, supprimerModificationsLocales,
-  getCommandes, majCommande, formatPrix, prixLicence,
+  getCommandes, majCommande, formatPrix, prixLicence, getRequetesLocales,
 } from './store.js';
 import { initialiserPage, esc, toast } from './ui.js';
 import { Visionneuse } from './viewer.js';
@@ -37,7 +37,7 @@ const slug = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
 
 function projetVierge() {
   return {
-    id: '', titre: 'Nouveau projet', categorie: 'Résidentiel', style: 'Contemporain', resume: '', description: '',
+    id: '', statut: 'en-vente', titre: 'Nouveau projet', categorie: 'Résidentiel', style: 'Contemporain', resume: '', description: '',
     prix: 200, surface: 120, chambres: 3, sallesDeBain: 2, etages: 1, terrain: '', dimensions: '', budgetEstime: '',
     delaiConstruction: '', vedette: false, nouveau: true, caracteristiques: [], pieces: [], inclus: [
       'Plans de chaque niveau cotés (1/50)', 'Façades et coupes', 'Plan de toiture', 'Plan de fondations',
@@ -55,6 +55,7 @@ async function ouvrir() {
   rendreListe();
   selectionner(0);
   rendreCommandes();
+  rendreRequetes();
 }
 
 function majAlerte() { document.getElementById('alerteLocale').hidden = !aDesModificationsLocales(); }
@@ -66,6 +67,7 @@ document.querySelector('.onglets').addEventListener('click', (e) => {
   document.querySelectorAll('.onglets button').forEach((x) => x.classList.toggle('actif', x === b));
   document.querySelectorAll('[data-panneau]').forEach((p) => { p.hidden = p.dataset.panneau !== b.dataset.onglet; });
   if (b.dataset.onglet === 'commandes') rendreCommandes();
+  if (b.dataset.onglet === 'requetes') rendreRequetes();
 });
 
 // ---------------- Liste ----------------
@@ -97,6 +99,7 @@ function remplirFormulaire(p) {
     let v = b ? p.modele?.[b] ?? MODELE_DEFAUT[b] : p[a];
     if (a === 'caracteristiques' || a === 'inclus') v = (v || []).join('\n');
     if (a === 'pieces') v = (v || []).map((x) => `${x.nom} : ${x.surface}`).join('\n');
+    if (a === 'statut' && !v) v = 'en-vente';
     if (el.type === 'checkbox') el.checked = !!v; else el.value = v ?? '';
   }
   rendreGalerie();
@@ -319,3 +322,108 @@ document.getElementById('exportCSV').addEventListener('click', () => {
   a.click();
 });
 
+
+// ---------------- Requêtes (boîte aux requêtes en ligne) ----------------
+const CLE_JETON = 'kkg_jeton_agent';
+const URL_AGENT = (CONFIG.agentIA || '').replace(/\/$/, '');
+const LIBELLE_TYPE = { 'sur-mesure': 'Sur mesure', adaptation: 'Adaptation', question: 'Question', reclamation: 'Réclamation', commande: 'Commande' };
+const STATUTS = ['nouvelle', 'en cours', 'devis envoyé', 'acompte reçu', 'terminée', 'sans suite', 'en attente', 'payée', 'livrée'];
+let requetesCache = [];
+
+async function chargerRequetes() {
+  if (!URL_AGENT) return { distantes: null, message: "Boîte aux requêtes en ligne non configurée (champ <code>agentIA</code> de <code>js/config.js</code>) : seules les requêtes déposées depuis <b>ce navigateur</b> s'affichent. Les clients doivent donc aussi vous écrire sur WhatsApp." };
+  let jeton = sessionStorage.getItem(CLE_JETON);
+  if (!jeton) {
+    jeton = prompt("Jeton d'accès à la boîte aux requêtes (ADMIN_TOKEN de l'agent) :") || '';
+    if (!jeton) return { distantes: null, message: 'Jeton non fourni.' };
+    sessionStorage.setItem(CLE_JETON, jeton);
+  }
+  try {
+    const r = await fetch(`${URL_AGENT}/requetes`, { headers: { Authorization: `Bearer ${jeton}` } });
+    if (r.status === 401) { sessionStorage.removeItem(CLE_JETON); return { distantes: null, message: 'Jeton refusé. Cliquez sur « Actualiser » pour réessayer.' }; }
+    if (!r.ok) throw new Error(r.status);
+    return { distantes: await r.json(), message: '' };
+  } catch (e) {
+    return { distantes: null, message: `Impossible de joindre la boîte aux requêtes (${esc(e.message)}).` };
+  }
+}
+
+async function rendreRequetes() {
+  const zone = document.getElementById('listeRequetes');
+  zone.innerHTML = '<p class="muted">Chargement…</p>';
+  const { distantes, message } = await chargerRequetes();
+  document.getElementById('oublierJeton').hidden = !URL_AGENT;
+  const alerte = document.getElementById('alerteRequetes');
+  alerte.hidden = !message;
+  alerte.innerHTML = message;
+  requetesCache = distantes || getRequetesLocales().map((r) => ({ ...r, locale: true }));
+  afficherRequetes();
+}
+
+function afficherRequetes() {
+  const filtre = document.getElementById('filtreRequetes').value;
+  const liste = requetesCache.filter((r) => !filtre || r.statut === filtre);
+  const zone = document.getElementById('listeRequetes');
+  if (!liste.length) { zone.innerHTML = '<div class="vide">Aucune requête.</div>'; return; }
+  zone.innerHTML = liste.map((r, i) => {
+    const c = r.client || {};
+    const b = r.besoin || {};
+    const details = [
+      r.projetReference && `<b>Plan :</b> ${esc(r.projetReference.titre || r.projetReference.id)}`,
+      c.lieu && `<b>Lieu :</b> ${esc(c.lieu)}`,
+      ...Object.entries(b).filter(([, v]) => v).map(([k, v]) => `<b>${esc(k)} :</b> ${esc(v)}`),
+      r.articles && `<b>Articles :</b> ${r.articles.map((a) => `${esc(a.titre)} (${esc(a.licence)}) ${formatPrix(a.prix)}`).join(', ')} — <b>Total :</b> ${formatPrix(r.total)} — <b>Paiement :</b> ${esc(r.methode)}`,
+      r.resume && `<b>Résumé :</b> ${esc(r.resume)}`,
+    ].filter(Boolean).join('<br>');
+    return `
+      <details class="encart requete">
+        <summary>
+          <span class="ref">${esc(r.ref || '—')}</span>
+          <span class="statut">${esc(LIBELLE_TYPE[r.type] || r.type)}</span>
+          <b>${esc(c.nom || 'Sans nom')}</b>
+          <span class="muted">${new Date(r.recueLe || r.date).toLocaleString('fr-FR')}</span>
+          <span class="statut ${r.statut === 'nouvelle' ? 'payee' : ''}">${esc(r.statut || '')}</span>
+        </summary>
+        <div style="margin-top:1rem">
+          <p>${c.telephone ? `📞 ${esc(c.telephone)} · <a href="https://wa.me/${numeroInternational(c.telephone)}?text=${encodeURIComponent(`Bonjour ${c.nom || ''}, concernant votre demande ${r.ref} :`)}" target="_blank" rel="noopener" style="color:var(--or)">Répondre sur WhatsApp</a>` : ''}
+            ${c.email ? ` · ✉ <a href="mailto:${esc(c.email)}?subject=${encodeURIComponent('Votre demande ' + (r.ref || ''))}" style="color:var(--or)">${esc(c.email)}</a>` : ''}</p>
+          ${details ? `<p>${details}</p>` : ''}
+          ${r.description ? `<p style="white-space:pre-wrap">${esc(r.description)}</p>` : ''}
+          ${r.conversation ? `<details><summary class="muted">Conversation avec l'assistant</summary><pre style="white-space:pre-wrap;font-size:.8rem" class="muted">${esc(r.conversation)}</pre></details>` : ''}
+          ${r.locale ? '' : `
+          <div class="form-grille" style="margin-top:1rem">
+            <div><label class="etiquette">Statut</label><select class="champ" data-statut="${i}">${STATUTS.map((s) => `<option ${s === r.statut ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
+            <div class="plein"><label class="etiquette">Note interne</label><textarea class="champ" rows="2" data-note="${i}">${esc(r.note || '')}</textarea></div>
+            <div><button class="btn discret" data-maj="${i}">Enregistrer</button></div>
+          </div>`}
+        </div>
+      </details>`;
+  }).join('');
+  zone.dataset.filtre = filtre;
+}
+
+document.getElementById('listeRequetes').addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-maj]');
+  if (!b) return;
+  const i = +b.dataset.maj;
+  const filtre = document.getElementById('filtreRequetes').value;
+  const r = requetesCache.filter((x) => !filtre || x.statut === filtre)[i];
+  const statut = document.querySelector(`[data-statut="${i}"]`).value;
+  const note = document.querySelector(`[data-note="${i}"]`).value;
+  const rep = await fetch(`${URL_AGENT}/requetes/${encodeURIComponent(r.cle)}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionStorage.getItem(CLE_JETON)}` },
+    body: JSON.stringify({ statut, note }),
+  }).catch(() => null);
+  if (rep?.ok) { Object.assign(r, { statut, note }); toast('Requête mise à jour.'); } else toast('Échec de la mise à jour.', 'err');
+});
+document.getElementById('rafraichirRequetes').addEventListener('click', rendreRequetes);
+document.getElementById('filtreRequetes').addEventListener('change', afficherRequetes);
+document.getElementById('oublierJeton').addEventListener('click', () => { sessionStorage.removeItem(CLE_JETON); rendreRequetes(); });
+
+function numeroInternational(tel) {
+  let n = String(tel || '').replace(/\D/g, '');
+  if (n.startsWith('00')) n = n.slice(2);
+  else if (n.startsWith('0')) n = `243${n.slice(1)}`; // numéro local RDC
+  return n;
+}

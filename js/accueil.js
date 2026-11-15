@@ -1,6 +1,6 @@
 import { CONFIG } from './config.js';
-import { getProjets, formatPrix } from './store.js';
-import { initialiserPage, carteProjet, esc, LIBELLES_TYPE, toast } from './ui.js';
+import { getProjets, formatPrix, transmettre, genererRefRequete } from './store.js';
+import { initialiserPage, carteProjet, esc, LIBELLES_TYPE, toast, blocContacts, lienWhatsApp } from './ui.js';
 import { Visionneuse, vignette } from './viewer.js';
 
 initialiserPage('catalogue');
@@ -82,31 +82,28 @@ document.getElementById('blocsLicences').innerHTML = Object.entries(CONFIG.licen
   </div>`).join('');
 
 // ----- Contact -----
-document.getElementById('contactInfos').innerHTML = `
-  <b>E-mail :</b> <a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a><br>
-  <b>Téléphone :</b> ${esc(CONFIG.telephone)}<br>
-  ${CONFIG.whatsapp ? `<b>WhatsApp :</b> <a href="https://wa.me/${esc(CONFIG.whatsapp)}" target="_blank" rel="noopener">écrire un message</a><br>` : ''}
-  <b>Adresse :</b> ${esc(CONFIG.adresse)}`;
+document.getElementById('contactInfos').innerHTML = blocContacts();
+document.querySelectorAll('[data-acompte]').forEach((e) => { e.textContent = CONFIG.surMesure.acomptePourcent; });
 
 document.getElementById('formContact').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const d = {
-    nom: document.getElementById('cNom').value,
-    telephone: document.getElementById('cTel').value,
-    email: document.getElementById('cEmail').value,
-    message: document.getElementById('cMsg').value,
+  const requete = {
+    ref: genererRefRequete(),
+    source: 'contact',
+    client: {
+      nom: document.getElementById('cNom').value.trim(),
+      telephone: document.getElementById('cTel').value.trim(),
+      email: document.getElementById('cEmail').value.trim(),
+    },
+    description: document.getElementById('cMsg').value.trim(),
   };
-  if (CONFIG.formspree) {
-    try {
-      const r = await fetch(CONFIG.formspree, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ _subject: 'Demande de projet sur mesure', ...d }) });
-      if (!r.ok) throw new Error();
-      toast('Merci ! Votre demande a bien été envoyée.');
-      e.target.reset();
-      return;
-    } catch { toast("L'envoi a échoué, ouverture de votre messagerie…", 'err'); }
+  const { distant } = await transmettre('question', requete);
+  if (distant) {
+    toast(`Merci ! Message reçu (réf. ${requete.ref}). Nous vous répondons rapidement.`);
+    e.target.reset();
+  } else {
+    window.open(lienWhatsApp(`Bonjour, je suis ${requete.client.nom} (${requete.client.telephone}).\n${requete.description}`), '_blank', 'noopener');
   }
-  const corps = `Nom : ${d.nom}\nTéléphone : ${d.telephone}\nE-mail : ${d.email}\n\n${d.message}`;
-  location.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent('Demande de projet sur mesure')}&body=${encodeURIComponent(corps)}`;
 });
 
 demarrer();

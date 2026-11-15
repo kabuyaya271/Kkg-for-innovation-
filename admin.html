@@ -30,7 +30,8 @@
     <div id="espace" hidden>
       <div class="onglets" style="margin-top:24px">
         <button class="actif" data-onglet="projets">Projets</button>
-        <button data-onglet="commandes">Commandes</button>
+        <button data-onglet="requetes">Requêtes</button>
+        <button data-onglet="commandes">Commandes (cet appareil)</button>
         <button data-onglet="publier">Publier en ligne</button>
       </div>
 
@@ -59,6 +60,11 @@
                   <legend>Informations</legend>
                   <div class="form-grille">
                     <div class="plein"><label class="etiquette">Titre *</label><input class="champ" name="titre" required></div>
+                    <div class="plein"><label class="etiquette">Statut</label>
+                      <select class="champ" name="statut">
+                        <option value="en-vente">En vente — plan disponible à l'achat</option>
+                        <option value="reference">Réalisation sur mesure — visible, non vendue (projet similaire sur devis)</option>
+                      </select></div>
                     <div><label class="etiquette">Identifiant (URL)</label><input class="champ" name="id" pattern="[a-z0-9\-]+" title="minuscules, chiffres et tirets"></div>
                     <div><label class="etiquette">Catégorie</label><input class="champ" name="categorie" list="categories"></div>
                     <div><label class="etiquette">Style architectural</label><input class="champ" name="style"></div>
@@ -122,8 +128,8 @@
                   <label class="etiquette">Photos, rendus, plans 2D (JPG/PNG — la 1re sert de vignette)</label>
                   <input type="file" id="ajoutImages" accept="image/*" multiple class="champ">
                   <div class="galerie-admin" id="galerie"></div>
-                  <label class="etiquette" style="margin-top:1rem">Lien de paiement Stripe propre à ce projet (facultatif)</label>
-                  <input class="champ" name="lienPaiement" placeholder="https://buy.stripe.com/...">
+                  <label class="etiquette" style="margin-top:1rem">Lien de paiement par carte propre à ce projet (facultatif)</label>
+                  <input class="champ" name="lienPaiement" placeholder="https://…">
                 </fieldset>
               </form>
 
@@ -140,6 +146,20 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- ================= REQUÊTES ================= -->
+      <div data-panneau="requetes" hidden>
+        <div class="alerte" id="alerteRequetes"></div>
+        <div class="barre-admin">
+          <button class="btn discret" id="rafraichirRequetes">Actualiser</button>
+          <select class="champ" id="filtreRequetes" style="width:auto">
+            <option value="">Toutes</option><option value="nouvelle">Nouvelles</option><option value="en cours">En cours</option>
+            <option value="devis envoyé">Devis envoyé</option><option value="acompte reçu">Acompte reçu</option><option value="terminée">Terminées</option>
+          </select>
+          <button class="btn discret" id="oublierJeton" hidden>Changer le jeton d'accès</button>
+        </div>
+        <div id="listeRequetes"></div>
       </div>
 
       <!-- ================= COMMANDES ================= -->

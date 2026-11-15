@@ -1,6 +1,6 @@
 import { CONFIG } from './config.js';
 import { getProjets, formatPrix, prixLicence, ajouterAuPanier, getPanier } from './store.js';
-import { initialiserPage, esc, carteProjet, toast, LIBELLES_TYPE } from './ui.js';
+import { initialiserPage, esc, carteProjet, toast, LIBELLES_TYPE, estReference, lienWhatsApp } from './ui.js';
 import { Visionneuse, vignette } from './viewer.js';
 
 initialiserPage();
@@ -73,39 +73,55 @@ async function demarrer() {
   }
 
   // ---------------- Achat ----------------
-  const options = Object.entries(CONFIG.licences).map(([k, l], i) => `
-    <label class="option">
-      <input type="radio" name="licence" value="${k}" ${i === 0 ? 'checked' : ''}>
-      <b>${esc(l.nom)}</b><span class="p">${formatPrix(prixLicence(p, k))}</span>
-      <small>${esc(l.description)}</small>
-    </label>`).join('');
-  document.getElementById('achat').innerHTML = `
+  const zoneAchat = document.getElementById('achat');
+  const entete = `
     <span class="style">${esc(p.style || '')} · ${esc(LIBELLES_TYPE[p.modele?.type] || p.categorie || '')}</span>
     <h1>${esc(p.titre)}</h1>
-    <p class="muted">${esc(p.resume)}</p>
-    <div class="options-licence">${options}</div>
-    <div class="actions">
-      <button class="btn bloc" id="acheter">Acheter maintenant</button>
-      <button class="btn contour bloc" id="ajouter">Ajouter au panier</button>
-      ${CONFIG.whatsapp ? `<a class="btn discret bloc" target="_blank" rel="noopener" id="whatsapp">Poser une question sur WhatsApp</a>` : ''}
-    </div>
-    <ul class="garanties">
-      <li>Fichiers livrés par e-mail sous 24 h</li>
-      <li>Paiement carte, Mobile Money ou virement</li>
-      <li>Modifications possibles sur devis</li>
-    </ul>`;
-  const licence = () => document.querySelector('input[name=licence]:checked').value;
-  document.getElementById('ajouter').addEventListener('click', () => {
-    const deja = getPanier().some((i) => i.id === p.id);
-    ajouterAuPanier(p.id, licence());
-    toast(`${deja ? 'Licence mise à jour' : 'Ajouté au panier'} : <b>${esc(p.titre)}</b> — <a href="panier.html">Voir le panier</a>`);
-  });
-  document.getElementById('acheter').addEventListener('click', () => {
-    ajouterAuPanier(p.id, licence());
-    location.href = 'panier.html';
-  });
-  const wa = document.getElementById('whatsapp');
-  if (wa) wa.href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(`Bonjour, j'ai une question sur le plan « ${p.titre} » : ${location.href}`)}`;
+    <p class="muted">${esc(p.resume)}</p>`;
+  const lienQuestion = CONFIG.whatsapp
+    ? `<a class="btn discret bloc" target="_blank" rel="noopener" href="${lienWhatsApp(`Bonjour, j'ai une question sur le plan « ${p.titre} » : ${location.href}`)}">Poser une question sur WhatsApp</a>` : '';
+
+  if (estReference(p)) {
+    zoneAchat.innerHTML = `${entete}
+      <div class="alerte" style="margin:1.2rem 0">Ce projet a été <b>conçu sur mesure</b> pour un client. Il n'est pas vendu tel quel, mais nous pouvons concevoir pour vous un projet similaire, adapté à votre terrain.</div>
+      <div class="actions">
+        <a class="btn bloc" href="sur-mesure.html?type=similaire&projet=${encodeURIComponent(p.id)}">Commander un projet similaire</a>
+        <button class="btn contour bloc" type="button" data-ouvrir-assistant>Discuter avec l'assistant</button>
+        ${lienQuestion}
+      </div>
+      <ul class="garanties"><li>Devis gratuit et sans engagement</li><li>Démarrage avec un acompte de ${CONFIG.surMesure.acomptePourcent} %</li><li>${CONFIG.surMesure.revisionsIncluses} séries de modifications incluses</li></ul>`;
+  } else {
+    const options = Object.entries(CONFIG.licences).map(([k, l], i) => `
+      <label class="option">
+        <input type="radio" name="licence" value="${k}" ${i === 0 ? 'checked' : ''}>
+        <b>${esc(l.nom)}</b><span class="p">${formatPrix(prixLicence(p, k))}</span>
+        <small>${esc(l.description)}</small>
+      </label>`).join('');
+    zoneAchat.innerHTML = `${entete}
+      <div class="options-licence">${options}</div>
+      <div class="actions">
+        <button class="btn bloc" id="acheter">Acheter maintenant</button>
+        <button class="btn contour bloc" id="ajouter">Ajouter au panier</button>
+        <a class="btn discret bloc" href="sur-mesure.html?type=adaptation&projet=${encodeURIComponent(p.id)}">Adapter ce plan à mon terrain</a>
+        ${lienQuestion}
+      </div>
+      <ul class="garanties">
+        <li>Fichiers livrés sous 24 h après paiement</li>
+        <li>Paiement Mobile Money ou WhatsApp</li>
+        <li>Adaptation à votre terrain sur devis</li>
+        <li><a href="conditions.html#licence" style="text-decoration:underline">Conditions de la licence</a></li>
+      </ul>`;
+    const licence = () => document.querySelector('input[name=licence]:checked').value;
+    document.getElementById('ajouter').addEventListener('click', () => {
+      const deja = getPanier().some((i) => i.id === p.id);
+      ajouterAuPanier(p.id, licence());
+      toast(`${deja ? 'Licence mise à jour' : 'Ajouté au panier'} : <b>${esc(p.titre)}</b> — <a href="panier.html">Voir le panier</a>`);
+    });
+    document.getElementById('acheter').addEventListener('click', () => {
+      ajouterAuPanier(p.id, licence());
+      location.href = 'panier.html';
+    });
+  }
 
   // ---------------- Détails ----------------
   const stats = [
