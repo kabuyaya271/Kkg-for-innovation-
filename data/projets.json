@@ -13,7 +13,6 @@
     "sallesDeBain": 4,
     "etages": 2,
     "terrain": "25 × 35 m minimum",
-    "dimensions": "16 × 11 m",
     "budgetEstime": "120 000 – 160 000 $",
     "delaiConstruction": "10 à 14 mois",
     "vedette": true,
@@ -25,36 +24,6 @@
       "Cuisine ouverte avec îlot",
       "Ventilation traversante",
       "Suite parentale avec dressing"
-    ],
-    "pieces": [
-      {
-        "nom": "Séjour + salle à manger",
-        "surface": 62
-      },
-      {
-        "nom": "Cuisine ouverte",
-        "surface": 18
-      },
-      {
-        "nom": "Suite parentale",
-        "surface": 32
-      },
-      {
-        "nom": "Chambres (×3)",
-        "surface": 48
-      },
-      {
-        "nom": "Salles de bain (×4)",
-        "surface": 30
-      },
-      {
-        "nom": "Bureau",
-        "surface": 12
-      },
-      {
-        "nom": "Garage",
-        "surface": 28
-      }
     ],
     "inclus": [
       "Plans de chaque niveau cotés (1/50)",
@@ -98,7 +67,6 @@
     "sallesDeBain": 2,
     "etages": 1,
     "terrain": "15 × 25 m minimum",
-    "dimensions": "13 × 10 m",
     "budgetEstime": "35 000 – 50 000 $",
     "delaiConstruction": "5 à 7 mois",
     "vedette": false,
@@ -109,32 +77,6 @@
       "Véranda couverte",
       "Plan économique",
       "Extension possible à l'étage"
-    ],
-    "pieces": [
-      {
-        "nom": "Séjour",
-        "surface": 34
-      },
-      {
-        "nom": "Cuisine",
-        "surface": 12
-      },
-      {
-        "nom": "Chambre principale",
-        "surface": 16
-      },
-      {
-        "nom": "Chambres (×2)",
-        "surface": 24
-      },
-      {
-        "nom": "Salles de bain (×2)",
-        "surface": 12
-      },
-      {
-        "nom": "Magasin / buanderie",
-        "surface": 6
-      }
     ],
     "inclus": [
       "Plan coté (1/50)",
@@ -177,7 +119,6 @@
     "sallesDeBain": 3,
     "etages": 2,
     "terrain": "20 × 30 m minimum",
-    "dimensions": "14 × 10 m",
     "budgetEstime": "70 000 – 95 000 $",
     "delaiConstruction": "8 à 11 mois",
     "vedette": true,
@@ -188,32 +129,6 @@
       "Mezzanine",
       "Toit 2 pans",
       "Chambre d'amis au RDC"
-    ],
-    "pieces": [
-      {
-        "nom": "Séjour double hauteur",
-        "surface": 45
-      },
-      {
-        "nom": "Cuisine + cellier",
-        "surface": 16
-      },
-      {
-        "nom": "Chambre d'amis RDC",
-        "surface": 13
-      },
-      {
-        "nom": "Chambres étage (×3)",
-        "surface": 44
-      },
-      {
-        "nom": "Salles de bain (×3)",
-        "surface": 18
-      },
-      {
-        "nom": "Garage",
-        "surface": 26
-      }
     ],
     "inclus": [
       "Plans RDC + étage cotés (1/50)",
@@ -256,7 +171,6 @@
     "sallesDeBain": 24,
     "etages": 6,
     "terrain": "25 × 30 m minimum",
-    "dimensions": "20 × 12 m",
     "budgetEstime": "550 000 – 750 000 $",
     "delaiConstruction": "18 à 24 mois",
     "vedette": true,
@@ -267,20 +181,6 @@
       "Panneaux solaires",
       "Parking au RDC possible",
       "Structure béton armé"
-    ],
-    "pieces": [
-      {
-        "nom": "Appartement T3 (×12)",
-        "surface": 95
-      },
-      {
-        "nom": "Hall d'entrée",
-        "surface": 30
-      },
-      {
-        "nom": "Cage d'escalier + ascenseur / niveau",
-        "surface": 22
-      }
     ],
     "inclus": [
       "Plans de tous les niveaux (1/100 et 1/50)",
@@ -324,7 +224,6 @@
     "sallesDeBain": 9,
     "etages": 3,
     "terrain": "30 × 35 m minimum",
-    "dimensions": "24 × 16 m",
     "budgetEstime": "600 000 – 850 000 $",
     "delaiConstruction": "16 à 20 mois",
     "vedette": false,
@@ -335,20 +234,6 @@
       "Trame 8 m",
       "Toiture technique",
       "Accès PMR"
-    ],
-    "pieces": [
-      {
-        "nom": "Commerces RDC",
-        "surface": 360
-      },
-      {
-        "nom": "Plateaux de bureaux (×2)",
-        "surface": 720
-      },
-      {
-        "nom": "Sanitaires / locaux techniques",
-        "surface": 70
-      }
     ],
     "inclus": [
       "Plans de tous les niveaux",
@@ -391,7 +276,6 @@
     "sallesDeBain": 1,
     "etages": 1,
     "terrain": "12 × 15 m minimum",
-    "dimensions": "9 × 7 m",
     "budgetEstime": "15 000 – 22 000 $",
     "delaiConstruction": "2 à 3 mois",
     "vedette": false,
@@ -401,20 +285,6 @@
       "Toit ventilé",
       "Terrasse",
       "Idéal location"
-    ],
-    "pieces": [
-      {
-        "nom": "Séjour / kitchenette",
-        "surface": 26
-      },
-      {
-        "nom": "Chambre",
-        "surface": 14
-      },
-      {
-        "nom": "Salle d'eau",
-        "surface": 6
-      }
     ],
     "inclus": [
       "Plan coté (1/50)",
@@ -456,7 +326,6 @@
     "sallesDeBain": 5,
     "etages": 2,
     "terrain": "Terrain en pente, 30 × 40 m",
-    "dimensions": "18 × 12 m",
     "budgetEstime": "",
     "delaiConstruction": "",
     "vedette": false,
@@ -468,7 +337,6 @@
       "Garage",
       "Ventilation naturelle"
     ],
-    "pieces": [],
     "inclus": [],
     "modele": {
       "type": "villa",

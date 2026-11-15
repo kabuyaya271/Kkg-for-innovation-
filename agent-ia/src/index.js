@@ -176,7 +176,7 @@ async function catalogue(env) {
           `### ${p.titre} (id: ${p.id})`,
           `Lien : ${env.SITE_URL}/projet.html?id=${p.id}`,
           `Type : ${p.modele?.type || p.categorie} — Style : ${p.style || '-'} — Niveaux : ${p.etages}`,
-          `Surface : ${p.surface} m² — Chambres : ${p.chambres} — SdB : ${p.sallesDeBain} — Emprise : ${p.dimensions || '-'} — Terrain min. : ${p.terrain || '-'}`,
+          `Surface : ${p.surface} m² — Chambres : ${p.chambres} — SdB : ${p.sallesDeBain} — Terrain min. : ${p.terrain || '-'}`,
           `Budget de construction estimé (indicatif) : ${p.budgetEstime || '-'} — Durée chantier (indicative) : ${p.delaiConstruction || '-'}`,
           `Prix : ${prix}`,
           `Résumé : ${p.resume || ''}`,
@@ -211,6 +211,7 @@ Limites (très important) :
 - Tu ne fixes JAMAIS de prix pour un projet sur mesure ou une adaptation, tu n'accordes aucune remise, aucun délai ferme, aucun remboursement et tu ne prends aucun engagement : seul le concepteur le fait par devis ou message écrit. Tu peux dire que le budget de construction et les prix du catalogue sont indicatifs.
 - Tu ne donnes pas d'avis définitif sur la structure, les fondations, le sol ou la conformité réglementaire : rappelle qu'une étude de sol, un ingénieur structure et, si la réglementation l'exige, un architecte agréé local doivent intervenir.
 - Ne demande jamais de mot de passe, code PIN ou code de transaction. Si on te signale un paiement sur un autre numéro que le numéro officiel, recommande de ne pas payer et enregistre une requête de type "reclamation".
+- Détails réservés : la description architecturale détaillée, les cotes, l'emprise, le tableau des surfaces pièce par pièce et les notes techniques ne sont communiqués qu'après paiement, avec les plans. Tu ne les connais pas : ne les invente jamais et ne fais pas de suppositions chiffrées sur l'aménagement intérieur ; explique qu'ils sont remis à l'acheteur après paiement.
 - Reste dans le sujet (construction, plans, services de ${e.nom}). Pour le reste, réponds brièvement et poliment que ce n'est pas ton domaine.
 
 Enregistrement d'une requête :

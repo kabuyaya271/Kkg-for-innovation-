@@ -64,6 +64,18 @@ python3 -m http.server 8000
 - **En vente** : plan du catalogue, acheté directement avec une licence (Essentiel, Pack complet, Exclusivité). Bouton « Adapter ce plan à mon terrain » pour une adaptation sur devis.
 - **Réalisation sur mesure** : projet conçu pour un client, montré en 3D comme référence mais non vendu ; bouton « Commander un projet similaire ». Choisissez le statut dans l'espace concepteur. (Le projet « Résidence privée Ngaliema » est un exemple à remplacer.)
 
+## Détails réservés aux acheteurs
+
+Le site public ne montre qu'une **présentation commerciale** : 3D extérieure, perspectives, chiffres clés, points forts, contenu du dossier.
+
+La **documentation détaillée** reste privée : description architecturale, emprise et cotes, tableau des surfaces, notes techniques.
+- Vous la saisissez dans l'espace concepteur, section 🔒.
+- Elle reste dans votre navigateur et n'est **jamais** incluse dans `data/projets.json` (ce fichier est public, n'importe qui peut le télécharger).
+- Après paiement, le bouton **🔒 Fiche acheteur** génère un PDF confidentiel au nom du client, à envoyer avec les plans.
+- Sauvegardez régulièrement vos détails réservés (onglet « Publier en ligne »). Gardez ce fichier **hors de GitHub**.
+
+À ne jamais mettre en ligne : plans cotés, coupes, ou modèle 3D avec aménagement intérieur. Tout fichier publié peut être copié.
+
 ## Textes juridiques
 
 `conditions.html` protège votre propriété intellectuelle (licence pour une construction, interdiction de revente, sanctions), encadre l'acompte de 50 % et les annulations, limite votre responsabilité (plans de conception ≠ étude de sol, calcul de structure ou suivi de chantier) et encadre l'assistant IA. Les clauses restent équilibrées (pas d'exclusion de la faute lourde, droits impératifs du consommateur préservés) pour rester valables devant un juge.

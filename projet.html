@@ -50,12 +50,22 @@
 
     <div class="details-grille">
       <div>
-        <h2>Description</h2>
+        <h2>Présentation</h2>
         <p id="description" class="muted" style="font-size:1.05rem"></p>
-        <h3 style="margin-top:2rem">Caractéristiques</h3>
+        <h3 style="margin-top:2rem">Points forts</h3>
         <ul class="liste-coche" id="caracteristiques"></ul>
-        <h3 style="margin-top:2.5rem">Tableau des surfaces</h3>
-        <table class="tab" id="pieces"></table>
+        <div class="encart verrou" id="verrou" style="margin-top:2.5rem">
+          <h3>🔒 Détails architecturaux réservés aux acheteurs</h3>
+          <p class="muted">Pour protéger le travail du concepteur, la documentation détaillée n'est communiquée qu'<b>après paiement</b>, avec vos plans :</p>
+          <ul class="liste-coche">
+            <li>description architecturale complète : organisation des espaces, circulations, orientation, principes constructifs ;</li>
+            <li>tableau des surfaces pièce par pièce ;</li>
+            <li>emprise, cotes et hauteurs ;</li>
+            <li>notes techniques : structure, matériaux, réseaux ;</li>
+            <li>plans, façades et coupes selon la licence choisie.</li>
+          </ul>
+          <div style="display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem" id="verrouActions"></div>
+        </div>
       </div>
       <div>
         <div class="encart">

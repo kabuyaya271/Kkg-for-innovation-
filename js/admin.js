@@ -39,7 +39,7 @@ function projetVierge() {
   return {
     id: '', statut: 'en-vente', titre: 'Nouveau projet', categorie: 'Résidentiel', style: 'Contemporain', resume: '', description: '',
     prix: 200, surface: 120, chambres: 3, sallesDeBain: 2, etages: 1, terrain: '', dimensions: '', budgetEstime: '',
-    delaiConstruction: '', vedette: false, nouveau: true, caracteristiques: [], pieces: [], inclus: [
+    delaiConstruction: '', vedette: false, nouveau: true, caracteristiques: [], inclus: [
       'Plans de chaque niveau cotés (1/50)', 'Façades et coupes', 'Plan de toiture', 'Plan de fondations',
     ],
     modele: { ...MODELE_DEFAUT, etages: 1 }, modeleGLB: '', images: [], lienPaiement: '',
@@ -49,7 +49,7 @@ function projetVierge() {
 async function ouvrir() {
   connexion.hidden = true;
   document.getElementById('espace').hidden = false;
-  projets = structuredClone(await getProjets());
+  projets = migrer(structuredClone(await getProjets()));
   apercu = new Visionneuse(document.getElementById('apercu3d'), { rotationAuto: false });
   majAlerte();
   rendreListe();
@@ -95,8 +95,11 @@ function selectionner(i) {
 function remplirFormulaire(p) {
   for (const el of form.elements) {
     if (!el.name) continue;
-    const [a, b] = el.name.startsWith('m.') ? ['modele', el.name.slice(2)] : [el.name];
-    let v = b ? p.modele?.[b] ?? MODELE_DEFAUT[b] : p[a];
+    let a = el.name;
+    let v;
+    if (el.name.startsWith('m.')) v = p.modele?.[el.name.slice(2)] ?? MODELE_DEFAUT[el.name.slice(2)];
+    else if (el.name.startsWith('p.')) { a = el.name.slice(2); v = p.prive?.[a]; }
+    else v = p[a];
     if (a === 'caracteristiques' || a === 'inclus') v = (v || []).join('\n');
     if (a === 'pieces') v = (v || []).map((x) => `${x.nom} : ${x.surface}`).join('\n');
     if (a === 'statut' && !v) v = 'en-vente';
@@ -113,12 +116,13 @@ function lireFormulaire() {
     let v = el.type === 'checkbox' ? el.checked : el.type === 'number' ? (el.value === '' ? '' : +el.value) : el.value.trim();
     if (el.name.startsWith('m.')) { p.modele[el.name.slice(2)] = v; continue; }
     if (el.name === 'caracteristiques' || el.name === 'inclus') v = v.split('\n').map((s) => s.trim()).filter(Boolean);
-    if (el.name === 'pieces') {
+    if (el.name === 'p.pieces') {
       v = v.split('\n').map((l) => l.trim()).filter(Boolean).map((l) => {
         const m = /^(.*?)[\s:;–-]+(\d+(?:[.,]\d+)?)\s*(m²|m2)?$/i.exec(l);
         return m ? { nom: m[1].trim(), surface: +m[2].replace(',', '.') } : { nom: l, surface: '' };
       });
     }
+    if (el.name.startsWith('p.')) { p.prive = { ...(p.prive || {}), [el.name.slice(2)]: v }; continue; }
     p[el.name] = v;
   }
   p.etages = p.modele.etages;
@@ -255,12 +259,8 @@ document.getElementById('voir').addEventListener('click', (e) => {
 
 // ---------------- Publication ----------------
 document.getElementById('exporter').addEventListener('click', () => {
-  const blob = new Blob([JSON.stringify(projets, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'projets.json';
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  telecharger('projets.json', projets.map(versionPublique));
+  toast('projets.json public téléchargé (sans les détails réservés).');
 });
 
 document.getElementById('importer').addEventListener('change', async (e) => {
@@ -269,21 +269,115 @@ document.getElementById('importer').addEventListener('change', async (e) => {
   try {
     const data = JSON.parse(await f.text());
     if (!Array.isArray(data)) throw new Error();
-    projets = data;
+    if (data.every((x) => x.id && x.prive && !x.modele)) {
+      // sauvegarde des détails réservés : fusion par identifiant
+      let n = 0;
+      for (const d of data) { const p = projets.find((x) => x.id === d.id); if (p) { p.prive = d.prive; n++; } }
+      toast(`Détails réservés restaurés pour ${n} projet(s).`);
+    } else {
+      const anciens = new Map(projets.map((p) => [p.id, p.prive]));
+      projets = migrer(data).map((p) => (p.prive || !anciens.get(p.id) ? p : { ...p, prive: anciens.get(p.id) }));
+      toast(`${data.length} projets importés.`);
+    }
     sauvegarder();
-    selectionner(0);
-    toast(`${data.length} projets importés.`);
+    selectionner(Math.max(0, indexCourant));
   } catch { toast('Fichier JSON invalide.', 'err'); }
   e.target.value = '';
 });
 
 document.getElementById('reinitialiser').addEventListener('click', async () => {
-  if (!confirm('Revenir à la version publiée (data/projets.json) ? Les modifications non exportées seront perdues.')) return;
+  if (!confirm('Revenir à la version publiée (data/projets.json) ? Les modifications non exportées seront perdues (les détails réservés sont conservés).')) return;
+  const anciens = new Map(projets.map((p) => [p.id, p.prive]));
   supprimerModificationsLocales();
-  projets = structuredClone(await getProjets());
+  projets = migrer(structuredClone(await getProjets())).map((p) => ({ ...p, prive: p.prive || anciens.get(p.id) }));
+  if ([...anciens.values()].some(Boolean)) sauvegarder();
   majAlerte();
   selectionner(0);
   toast('Version publiée restaurée.');
+});
+
+document.getElementById('exporterPrive').addEventListener('click', () => {
+  const d = new Date().toISOString().slice(0, 10);
+  telecharger(`kkg-details-reserves-${d}.json`, projets.filter((p) => p.prive).map((p) => ({ id: p.id, titre: p.titre, prive: p.prive })));
+  toast('Sauvegarde privée téléchargée — gardez-la hors de GitHub.');
+});
+
+// ---------------- Détails réservés ----------------
+const CHAMPS_PRIVES_ANCIENS = ['pieces', 'dimensions'];
+
+/** Déplace d'anciens champs publics (pièces, emprise) vers les détails réservés. */
+function migrer(liste) {
+  return liste.map((p) => {
+    const q = { ...p, prive: { ...(p.prive || {}) } };
+    for (const c of CHAMPS_PRIVES_ANCIENS) {
+      if (q[c] !== undefined) {
+        const vide = q[c] === '' || (Array.isArray(q[c]) && !q[c].length);
+        if (!vide && !q.prive[c]?.length) q.prive[c] = q[c];
+        delete q[c];
+      }
+    }
+    if (!Object.values(q.prive).some((v) => (Array.isArray(v) ? v.length : v))) delete q.prive;
+    return q;
+  });
+}
+
+/** Ce qui est publié : tout sauf les détails réservés. */
+function versionPublique(p) {
+  const { prive, ...pub } = p;
+  for (const c of CHAMPS_PRIVES_ANCIENS) delete pub[c];
+  return pub;
+}
+
+function telecharger(nom, donnees) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(donnees, null, 2)], { type: 'application/json' }));
+  a.download = nom;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+document.getElementById('ficheAcheteur').addEventListener('click', () => {
+  const p = lireFormulaire();
+  const client = prompt('Nom du client acheteur (inscrit sur chaque page de la fiche) :', '');
+  if (client === null) return;
+  const ref = prompt('Référence de la commande ou du devis :', '') || '';
+  const pr = p.prive || {};
+  const e = CONFIG.entreprise;
+  const lignes = (arr) => (arr || []).map((x) => `<li>${esc(x)}</li>`).join('');
+  const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Fiche acheteur — ${esc(p.titre)}</title>
+<style>
+  body{font:14px/1.55 Georgia,serif;color:#222;max-width:800px;margin:30px auto;padding:0 24px}
+  h1{font-size:28px;margin:0} h2{font-size:17px;border-bottom:2px solid #b8894d;padding-bottom:4px;margin-top:28px;color:#6d4a2f}
+  .entete{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #222;padding-bottom:10px;margin-bottom:18px}
+  .conf{background:#f6efe3;border:1px solid #b8894d;padding:10px 14px;font-size:12.5px}
+  table{width:100%;border-collapse:collapse} td,th{border-bottom:1px solid #ddd;padding:6px 4px;text-align:left} td:last-child,th:last-child{text-align:right}
+  .grille{display:grid;grid-template-columns:1fr 1fr;gap:4px 24px}
+  .pied{position:fixed;bottom:8px;left:0;right:0;text-align:center;font-size:10px;color:#777}
+  pre{white-space:pre-wrap;font:inherit}
+  @media print{.noprint{display:none} body{margin:0}}
+</style></head><body>
+<div class="noprint" style="text-align:right;margin-bottom:12px"><button onclick="print()">Imprimer / enregistrer en PDF</button></div>
+<div class="entete"><div><small>${esc(e.raisonSociale)}</small><h1>${esc(p.titre)}</h1><small>${esc(p.style || '')}</small></div>
+<div style="text-align:right;font-size:12px">Fiche acheteur<br>${ref ? `Réf. ${esc(ref)}<br>` : ''}${new Date().toLocaleDateString('fr-FR')}</div></div>
+<div class="conf"><b>Document confidentiel</b>, remis à <b>${esc(client || '—')}</b> après paiement. Il est protégé par le droit d'auteur et ne peut servir qu'à la construction autorisée par la licence achetée. Toute diffusion, copie ou réutilisation est interdite (voir les conditions de la licence).</div>
+<h2>Chiffres clés</h2><div class="grille">
+<div>Surface habitable : <b>${esc(p.surface)} m²</b></div><div>Niveaux : <b>${p.etages > 1 ? 'R+' + (p.etages - 1) : 'Plain-pied'}</b></div>
+<div>Chambres : <b>${esc(p.chambres)}</b></div><div>Salles de bain : <b>${esc(p.sallesDeBain)}</b></div>
+${pr.dimensions ? `<div>Emprise : <b>${esc(pr.dimensions)}</b></div>` : ''}${pr.hauteur ? `<div>Hauteur totale : <b>${esc(pr.hauteur)}</b></div>` : ''}
+${p.terrain ? `<div>Terrain : <b>${esc(p.terrain)}</b></div>` : ''}${p.budgetEstime ? `<div>Budget estimé (indicatif) : <b>${esc(p.budgetEstime)}</b></div>` : ''}
+</div>
+${pr.descriptionArchitecturale ? `<h2>Description architecturale</h2><pre>${esc(pr.descriptionArchitecturale)}</pre>` : ''}
+${pr.pieces?.length ? `<h2>Tableau des surfaces</h2><table><tr><th>Pièce</th><th>Surface</th></tr>${pr.pieces.map((x) => `<tr><td>${esc(x.nom)}</td><td>${esc(x.surface)} m²</td></tr>`).join('')}<tr><td><b>Total</b></td><td><b>${pr.pieces.reduce((t, x) => t + (+x.surface || 0), 0)} m²</b></td></tr></table>` : ''}
+${pr.notesTechniques ? `<h2>Notes techniques</h2><pre>${esc(pr.notesTechniques)}</pre>` : ''}
+${p.caracteristiques?.length ? `<h2>Points forts</h2><ul>${lignes(p.caracteristiques)}</ul>` : ''}
+${p.inclus?.length ? `<h2>Contenu du dossier remis</h2><ul>${lignes(p.inclus)}</ul>` : ''}
+<h2>Avertissement</h2><p style="font-size:12.5px">Les plans sont des documents de conception architecturale. Avant tout commencement des travaux, faites réaliser une étude de sol et le calcul de la structure par un ingénieur qualifié. Obtenez les autorisations nécessaires, avec la signature d'un professionnel agréé si la réglementation locale l'exige. Le budget estimé est indicatif.</p>
+<div class="pied">${esc(e.raisonSociale)} — Document confidentiel remis à ${esc(client || '—')}${ref ? ` — ${esc(ref)}` : ''} — reproduction interdite</div>
+</body></html>`;
+  const w = window.open('', '_blank');
+  if (!w) { toast('Autorisez les fenêtres pop-up pour générer la fiche.', 'err'); return; }
+  w.document.write(html);
+  w.document.close();
 });
 
 // ---------------- Commandes ----------------

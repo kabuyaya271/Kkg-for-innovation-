@@ -51,6 +51,7 @@
               <button class="btn" id="enregistrer">Enregistrer</button>
               <a class="btn discret" id="voir" target="_blank">Voir la fiche ↗</a>
               <button class="btn discret" id="dupliquer">Dupliquer</button>
+              <button class="btn discret" id="ficheAcheteur" title="Fiche complète à envoyer au client après paiement">🔒 Fiche acheteur</button>
               <button class="btn danger" id="supprimer">Supprimer</button>
             </div>
 
@@ -70,7 +71,8 @@
                     <div><label class="etiquette">Style architectural</label><input class="champ" name="style"></div>
                     <div><label class="etiquette">Prix de base (<span data-devise></span>, licence Essentiel)</label><input class="champ" name="prix" type="number" min="0" step="1" required></div>
                     <div class="plein"><label class="etiquette">Résumé (1 ligne)</label><input class="champ" name="resume"></div>
-                    <div class="plein"><label class="etiquette">Description détaillée</label><textarea class="champ" name="description" rows="5"></textarea></div>
+                    <div class="plein"><label class="etiquette">Présentation commerciale (publique)</label><textarea class="champ" name="description" rows="4"></textarea>
+                      <p class="muted" style="font-size:.78rem;margin:.3rem 0 0">Texte d'accroche visible par tous : ambiance, points forts, public visé. Ne mettez ici aucun détail technique.</p></div>
                     <label class="case"><input type="checkbox" name="vedette"> À la une (page d'accueil)</label>
                     <label class="case"><input type="checkbox" name="nouveau"> Badge « Nouveau »</label>
                   </div>
@@ -78,18 +80,28 @@
                 </fieldset>
 
                 <fieldset>
-                  <legend>Données techniques</legend>
+                  <legend>Chiffres clés (publics)</legend>
                   <div class="form-grille">
                     <div><label class="etiquette">Surface (m²)</label><input class="champ" name="surface" type="number" min="0"></div>
                     <div><label class="etiquette">Chambres</label><input class="champ" name="chambres" type="number" min="0"></div>
                     <div><label class="etiquette">Salles de bain</label><input class="champ" name="sallesDeBain" type="number" min="0"></div>
-                    <div><label class="etiquette">Dimensions / emprise</label><input class="champ" name="dimensions" placeholder="14 × 10 m"></div>
                     <div><label class="etiquette">Terrain minimum</label><input class="champ" name="terrain" placeholder="20 × 30 m"></div>
                     <div><label class="etiquette">Budget de construction estimé</label><input class="champ" name="budgetEstime"></div>
                     <div><label class="etiquette">Durée du chantier</label><input class="champ" name="delaiConstruction"></div>
-                    <div class="plein"><label class="etiquette">Caractéristiques (une par ligne)</label><textarea class="champ" name="caracteristiques" rows="4"></textarea></div>
-                    <div class="plein"><label class="etiquette">Pièces : « Nom : surface » (une par ligne)</label><textarea class="champ" name="pieces" rows="5" placeholder="Séjour : 40&#10;Cuisine : 14"></textarea></div>
+                    <div class="plein"><label class="etiquette">Points forts (une par ligne)</label><textarea class="champ" name="caracteristiques" rows="4"></textarea></div>
                     <div class="plein"><label class="etiquette">Contenu du dossier vendu (une ligne par élément)</label><textarea class="champ" name="inclus" rows="4"></textarea></div>
+                  </div>
+                </fieldset>
+
+                <fieldset class="prive">
+                  <legend>🔒 Détails réservés aux acheteurs — jamais publiés</legend>
+                  <p class="muted" style="font-size:.82rem;margin-top:0">Ces informations restent dans votre navigateur. Elles ne figurent pas dans le fichier publié <code>projets.json</code>. Vous les remettez au client après paiement, avec ses plans, grâce au bouton « Fiche acheteur ». Pensez à les sauvegarder (onglet « Publier en ligne »).</p>
+                  <div class="form-grille">
+                    <div class="plein"><label class="etiquette">Description architecturale détaillée</label><textarea class="champ" name="p.descriptionArchitecturale" rows="6" placeholder="Organisation des espaces, circulations, orientation, principes constructifs, matériaux, ventilation…"></textarea></div>
+                    <div><label class="etiquette">Emprise / dimensions hors tout</label><input class="champ" name="p.dimensions" placeholder="16 × 11 m"></div>
+                    <div><label class="etiquette">Hauteur totale</label><input class="champ" name="p.hauteur" placeholder="7,8 m"></div>
+                    <div class="plein"><label class="etiquette">Tableau des surfaces : « Pièce : surface » (une par ligne)</label><textarea class="champ" name="p.pieces" rows="6" placeholder="Séjour : 40&#10;Cuisine : 14"></textarea></div>
+                    <div class="plein"><label class="etiquette">Notes techniques (structure, fondations, matériaux, réseaux…)</label><textarea class="champ" name="p.notesTechniques" rows="4"></textarea></div>
                   </div>
                 </fieldset>
 
@@ -117,7 +129,7 @@
                     <div class="plein">
                       <label class="etiquette">Ou votre propre modèle 3D (.glb) — chemin dans le dossier <code>modeles/</code></label>
                       <input class="champ" name="modeleGLB" placeholder="modeles/villa-horizon.glb">
-                      <p class="muted" style="font-size:.8rem;margin:.4rem 0 0">Exportez en glTF/GLB depuis SketchUp, Revit, ArchiCAD, Blender… Nommez les calques « niveau-0 », « niveau-1 »… pour activer la vue éclatée.
+                      <p class="muted" style="font-size:.8rem;margin:.4rem 0 0">Exportez en glTF/GLB depuis SketchUp, Revit, ArchiCAD, Blender… Nommez les calques « niveau-0 », « niveau-1 »… pour activer la vue éclatée. <b>⚠ Publiez un modèle extérieur simplifié</b>, sans aménagement intérieur ni cotes : tout fichier mis en ligne peut être téléchargé.
                         <label class="btn discret" style="padding:.3em .9em;margin-top:.4rem;cursor:pointer">Tester un fichier .glb <input type="file" accept=".glb,.gltf" id="testGLB" hidden></label></p>
                     </div>
                   </div>
@@ -125,7 +137,7 @@
 
                 <fieldset>
                   <legend>Images &amp; vente</legend>
-                  <label class="etiquette">Photos, rendus, plans 2D (JPG/PNG — la 1re sert de vignette)</label>
+                  <label class="etiquette">Photos et perspectives (JPG/PNG — la 1re sert de vignette). <b>⚠ Jamais de plans cotés ni de coupes : ils seraient visibles par tous.</b></label>
                   <input type="file" id="ajoutImages" accept="image/*" multiple class="champ">
                   <div class="galerie-admin" id="galerie"></div>
                   <label class="etiquette" style="margin-top:1rem">Lien de paiement par carte propre à ce projet (facultatif)</label>
@@ -180,8 +192,10 @@
             <li>Si vous utilisez des modèles .glb, déposez-les dans le dossier <code>modeles/</code>.</li>
             <li>Le site se met à jour automatiquement (GitHub Pages / Netlify) en 1 à 2 minutes.</li>
           </ol>
+          <div class="alerte">🔒 <b>Détails réservés.</b> Le fichier public <code>projets.json</code> ne contient jamais les détails réservés aux acheteurs : description architecturale, cotes, tableau des surfaces, notes techniques. Ces détails restent dans ce navigateur. Sauvegardez-les régulièrement avec « Sauvegarder les détails réservés » et gardez ce fichier en lieu sûr (clé USB, Google Drive privé). <b>Ne déposez jamais ce fichier sur GitHub</b> : le dépôt est public.</div>
           <div class="barre-admin" style="margin-top:1.5rem">
-            <button class="btn" id="exporter">Télécharger projets.json</button>
+            <button class="btn" id="exporter">Télécharger projets.json (public)</button>
+            <button class="btn discret" id="exporterPrive">🔒 Sauvegarder les détails réservés</button>
             <label class="btn discret" style="cursor:pointer">Importer un fichier JSON<input type="file" id="importer" accept=".json" hidden></label>
             <button class="btn danger" id="reinitialiser">Annuler mes modifications locales</button>
           </div>

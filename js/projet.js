@@ -129,7 +129,6 @@ async function demarrer() {
     [p.etages > 1 ? `R+${p.etages - 1}` : 'Plain-pied', 'Niveaux'],
     [p.chambres, 'Chambres'],
     [p.sallesDeBain, 'Salles de bain'],
-    [p.dimensions, 'Emprise'],
     [p.terrain, 'Terrain'],
     [p.budgetEstime, 'Budget estimé'],
     [p.delaiConstruction, 'Durée chantier'],
@@ -138,10 +137,9 @@ async function demarrer() {
   document.getElementById('description').textContent = p.description || '';
   document.getElementById('caracteristiques').innerHTML = (p.caracteristiques || []).map((c) => `<li>${esc(c)}</li>`).join('');
   document.getElementById('inclus').innerHTML = (p.inclus || []).map((c) => `<li>${esc(c)}</li>`).join('');
-  const pieces = p.pieces || [];
-  document.getElementById('pieces').innerHTML = pieces.length
-    ? `<tr><th>Pièce</th><th>Surface</th></tr>` + pieces.map((x) => `<tr><td>${esc(x.nom)}</td><td>${esc(x.surface)} m²</td></tr>`).join('')
-    : '<tr><td class="muted">Détail communiqué avec le dossier.</td></tr>';
+  document.getElementById('verrouActions').innerHTML = estReference(p)
+    ? `<a class="btn" href="sur-mesure.html?type=similaire&projet=${encodeURIComponent(p.id)}">Commander un projet similaire</a>`
+    : `<a class="btn" href="#achat">Choisir ma licence</a><button class="btn discret" type="button" data-ouvrir-assistant>Poser une question</button>`;
 
   // ---------------- Similaires ----------------
   const autres = projets.filter((x) => x.id !== p.id)

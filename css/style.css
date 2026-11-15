@@ -301,3 +301,6 @@ input[type=color].champ { padding: 2px; height: 42px; }
 .sommaire a:hover { color: var(--or); }
 .requete { padding: 1rem 1.2rem; margin-bottom: .7rem; }
 .requete > summary { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; cursor: pointer; }
+.verrou { border-color: var(--or-fonce); background: linear-gradient(180deg, rgba(201,164,106,.07), var(--surface)); }
+.verrou h3 { font-size: 1.35rem; }
+fieldset.prive { border-color: var(--or-fonce); }
