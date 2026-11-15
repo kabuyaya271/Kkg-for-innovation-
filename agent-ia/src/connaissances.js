@@ -7,7 +7,7 @@ export const ENTREPRISE = {
   activite: 'Bureau de conception de plans de construction (maisons, villas, duplex, immeubles, bâtiments commerciaux et équipements)',
   siege: 'Kinshasa, République Démocratique du Congo',
   whatsapp: '+243 975 465 965',
-  email: '', // à compléter quand l'adresse professionnelle sera créée
+  email: 'kkgforbusiness@gmail.com',
   devise: 'USD',
   licences: {
     essentiel: { nom: 'Essentiel', multiplicateur: 1, contenu: 'PDF : niveaux, façades, coupes, toiture ; 1 construction' },

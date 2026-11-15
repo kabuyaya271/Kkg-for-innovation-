@@ -18,7 +18,7 @@ export const CONFIG = {
   },
 
   // Coordonnées officielles (les SEULES à utiliser pour payer — voir CGV)
-  email: '',                         // à compléter avec l'adresse Gmail professionnelle
+  email: 'kkgforbusiness@gmail.com',
   telephone: '+243 975 465 965',
   whatsapp: '243975465965',          // format international sans + ni espaces
 
