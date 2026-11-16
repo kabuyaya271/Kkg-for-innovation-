@@ -89,8 +89,10 @@ export const CONFIG = {
   // Formspree (https://formspree.io) : copie des commandes / requêtes par e-mail (facultatif)
   formspree: '',
 
-  // Mot de passe de l'espace concepteur (protection simple côté navigateur)
-  adminMotDePasse: 'kkg2026',
+  // Empreinte SHA-256 du mot de passe de l'espace concepteur (le mot de passe
+  // lui-même n'apparaît nulle part). Pour le changer : admin.html → onglet
+  // « Publier en ligne » → « Changer le mot de passe », puis collez la ligne obtenue ici.
+  adminEmpreinteMotDePasse: '1894023ae719101eb83f558b2fefddfd9eb80620a6f47da6186e2c25277531e0',
 
   // Date d'entrée en vigueur des conditions juridiques
   dateConditions: '15 novembre 2026',

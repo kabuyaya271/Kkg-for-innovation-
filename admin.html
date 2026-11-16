@@ -244,6 +244,14 @@
             <label class="btn discret" style="cursor:pointer">Importer un fichier JSON<input type="file" id="importer" accept=".json" hidden></label>
             <button class="btn danger" id="reinitialiser">Annuler mes modifications locales</button>
           </div>
+          <h3 style="margin-top:2rem">Changer le mot de passe</h3>
+          <p class="muted">Le mot de passe n'est jamais écrit sur le site, seule son empreinte chiffrée l'est.</p>
+          <form id="formMdp" class="form-grille" style="max-width:620px">
+            <div><input class="champ" type="password" id="mdp1" placeholder="Nouveau mot de passe (10 caractères min.)" autocomplete="new-password"></div>
+            <div><input class="champ" type="password" id="mdp2" placeholder="Confirmer" autocomplete="new-password"></div>
+            <div><button class="btn discret">Générer la ligne à coller</button></div>
+          </form>
+          <div id="ligneMdp" style="margin-top:1rem"></div>
           <p class="muted" style="font-size:.85rem">Astuce : les images ajoutées ici sont intégrées dans le JSON. Pour un site plus rapide, placez plutôt vos images dans le dossier <code>images/</code> et indiquez leur chemin.</p>
         </div>
       </div>

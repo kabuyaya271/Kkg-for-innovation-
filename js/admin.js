@@ -6,7 +6,7 @@ import {
 import { initialiserPage, esc, toast } from './ui.js';
 import { Visionneuse } from './viewer.js';
 import { MODELE_DEFAUT } from './builder3d.js';
-import { journaliser } from './journal.js';
+import { journaliser, sha256 } from './journal.js';
 import { initialiserHistorique } from './historique.js';
 
 initialiserPage();
@@ -15,9 +15,10 @@ document.querySelectorAll('[data-devise]').forEach((e) => { e.textContent = CONF
 // ---------------- Connexion ----------------
 const CLE_SESSION = 'kkg_admin';
 const connexion = document.getElementById('connexion');
-connexion.addEventListener('submit', (e) => {
+const empreinteMdp = (mdp) => sha256(`kkg:${mdp}`);
+connexion.addEventListener('submit', async (e) => {
   e.preventDefault();
-  if (document.getElementById('mdp').value === CONFIG.adminMotDePasse) {
+  if (await empreinteMdp(document.getElementById('mdp').value) === CONFIG.adminEmpreinteMotDePasse) {
     sessionStorage.setItem(CLE_SESSION, '1');
     ouvrir();
   } else toast('Mot de passe incorrect.', 'err');
@@ -616,4 +617,16 @@ document.getElementById('tabPostes').addEventListener('click', async (e) => {
     else if (confirm("Générer un nouveau code ? L'ancien code ne fonctionnera plus.")) montrerCode(await apiPostes(`/${b.dataset.code}/code`, { method: 'POST' }));
     rendrePostes();
   } catch (err) { toast(esc(err.message), 'err'); }
+});
+
+// ---------------- Changer le mot de passe ----------------
+document.getElementById('formMdp').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const a = document.getElementById('mdp1').value, b = document.getElementById('mdp2').value;
+  if (a.length < 10) { toast('Choisissez au moins 10 caractères.', 'err'); return; }
+  if (a !== b) { toast('Les deux mots de passe ne correspondent pas.', 'err'); return; }
+  const ligne = `adminEmpreinteMotDePasse: '${await empreinteMdp(a)}',`;
+  document.getElementById('ligneMdp').innerHTML = `<div class="alerte">Dans <code>js/config.js</code>, remplacez la ligne <code>adminEmpreinteMotDePasse: '…',</code> par :<br><code class="ref" style="word-break:break-all">${esc(ligne)}</code> <button class="btn discret" type="button" id="copierLigne">Copier</button><br><span class="muted">Le nouveau mot de passe fonctionnera dès que le site sera republié.</span></div>`;
+  document.getElementById('copierLigne').addEventListener('click', () => { navigator.clipboard?.writeText(ligne); toast('Ligne copiée.'); });
+  e.target.reset();
 });

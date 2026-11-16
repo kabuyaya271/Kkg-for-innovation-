@@ -45,7 +45,7 @@ python3 -m http.server 8000
 - `formspree` : créez un formulaire gratuit sur [formspree.io](https://formspree.io) et collez son adresse pour **recevoir chaque commande et chaque demande de contact par e-mail**.
 - `surMesure` : acompte (50 %), nombre de révisions incluses, validité des devis — repris automatiquement dans les conditions juridiques.
 - `agentIA` : adresse du serveur de l'assistant IA et de la boîte aux requêtes (voir [`agent-ia/README.md`](agent-ia/README.md)).
-- `adminMotDePasse` : mot de passe de l'espace concepteur (à changer !).
+- `adminEmpreinteMotDePasse` : empreinte chiffrée du mot de passe de l'espace concepteur (le mot de passe n'est écrit nulle part). Pour le changer : admin.html → « Publier en ligne » → « Changer le mot de passe ».
 
 ## Ajouter un projet
 
