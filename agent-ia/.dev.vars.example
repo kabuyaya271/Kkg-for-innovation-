@@ -1,0 +1,5 @@
+# Clé API Anthropic (console Anthropic → API Keys), commence par sk-ant-
+ANTHROPIC_API_KEY=
+# Mot de passe long (20 caractères ou plus) : code du poste « Directeur » dans l'atelier,
+# accès aux requêtes, à l'historique et à la gestion des postes dans l'espace concepteur
+ADMIN_TOKEN=
