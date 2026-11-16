@@ -261,8 +261,8 @@ async function catalogue(env) {
     if (r.ok) {
       const projets = await r.json();
       texte = projets.map((p) => {
-        const ref = p.statut === 'reference';
-        const prix = ref ? 'non vendu tel quel (réalisation sur mesure) — projet similaire sur devis'
+        const ref = p.statut === 'reference' || p.exemple;
+        const prix = ref ? `non vendu tel quel (${p.exemple ? 'exemple' : 'réalisation sur mesure'}) — projet similaire sur devis`
           : Object.values(ENTREPRISE.licences).map((l) => `${l.nom} ${Math.round(p.prix * l.multiplicateur)} ${ENTREPRISE.devise}`).join(' / ');
         return [
           `### ${p.titre} (id: ${p.id})`,

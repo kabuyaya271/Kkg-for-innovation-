@@ -109,7 +109,7 @@ export function carteProjet(p, image, formatPrix) {
       <div class="carte-img">
         <img src="${image}" alt="${esc(p.titre)}" loading="lazy">
         <div class="pastilles">
-          ${ref ? '<span class="pastille or">Réalisation sur mesure</span>' : p.nouveau ? '<span class="pastille or">Nouveau</span>' : ''}
+          ${p.exemple ? '<span class="pastille">Exemple</span>' : ref ? '<span class="pastille or">Réalisation sur mesure</span>' : p.nouveau ? '<span class="pastille or">Nouveau</span>' : ''}
           <span class="pastille">${esc(LIBELLES_TYPE[p.modele?.type] || p.categorie || '')}</span>
         </div>
         <span class="voir3d">Voir en 3D ↻</span>
@@ -123,7 +123,7 @@ export function carteProjet(p, image, formatPrix) {
           <li><b>${esc(p.sallesDeBain)}</b> sdb</li>
           <li><b>${p.etages > 1 ? 'R+' + (p.etages - 1) : 'Plain-pied'}</b></li>
         </ul>
-        <div class="carte-pied">${ref
+        <div class="carte-pied">${ref || p.exemple
           ? '<span class="muted" style="font-size:.9rem">Projet similaire sur devis</span>'
           : `<span class="prix">dès ${formatPrix(p.prix)}</span>`}<span class="fleche">→</span></div>
       </div>

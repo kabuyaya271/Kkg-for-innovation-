@@ -33,7 +33,7 @@ async function demarrer() {
       const p = liste[i % liste.length];
       if (p.modeleGLB) v.chargerGLB(p.modeleGLB).catch(() => v.afficherProjet(p.modele));
       else v.afficherProjet(p.modele);
-      lien.textContent = `${p.titre} — dès ${formatPrix(p.prix)} →`;
+      lien.textContent = p.exemple || p.statut === 'reference' ? `${p.titre} — voir le projet →` : `${p.titre} — dès ${formatPrix(p.prix)} →`;
       lien.href = `projet.html?id=${encodeURIComponent(p.id)}`;
       document.getElementById('herosLegende').hidden = false;
       i++;

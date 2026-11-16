@@ -18,6 +18,9 @@ function methodesDisponibles(lignes) {
   if (CONFIG.mobileMoney?.length) {
     m.push({ id: 'mobile', nom: 'Mobile Money', info: CONFIG.mobileMoney.map((x) => x.operateur).join(', ') });
   }
+  if (CONFIG.transfertInternational?.actif) {
+    m.push({ id: 'international', nom: "Depuis l'étranger (carte ou transfert)", info: `Payez par carte via ${CONFIG.transfertInternational.services.slice(0, 2).map((x) => x.nom).join(' ou ')} : l'argent arrive sur notre ${CONFIG.transfertInternational.operateur}.` });
+  }
   if (CONFIG.banque?.iban) m.push({ id: 'virement', nom: 'Virement bancaire', info: 'Délai de 1 à 3 jours ouvrés.' });
   if (CONFIG.whatsapp) m.push({ id: 'whatsapp', nom: 'Commander via WhatsApp', info: 'Finalisez la commande en discutant avec le concepteur.' });
   return m;
@@ -104,11 +107,11 @@ document.getElementById('formCommande').addEventListener('submit', async (e) => 
   btn.textContent = 'Envoi…';
 
   // Notification au concepteur (boîte aux requêtes en ligne / Formspree)
-  await transmettre('commande', commande);
+  const { distant } = await transmettre('commande', commande);
 
   const lignes = detail.lignes;
   viderPanier();
-  confirmer(commande, lignes);
+  confirmer(commande, lignes, distant);
 });
 
 function messageWhatsApp(c) {
@@ -169,13 +172,13 @@ ${ligne('Lieu de la construction', lieuTexte(cl))}${ligne('Numéro payeur', cl.n
 <h2>Commande</h2><table><tr><th>Plan</th><th>Licence</th><th>Prix</th></tr>
 ${c.articles.map((a) => `<tr><td>${esc(a.titre)}</td><td>${esc(a.licence)}</td><td>${formatPrix(a.prix)}</td></tr>`).join('')}
 <tr><td colspan="2"><b>Total à payer</b></td><td><b>${formatPrix(c.total)}</b></td></tr></table>
-<p>Mode de paiement choisi : <b>${esc(({ carte: 'Carte bancaire', mobile: 'Mobile Money', virement: 'Virement bancaire', whatsapp: 'WhatsApp' })[c.methode] || c.methode)}</b>. Indiquez la référence <b>${esc(c.ref)}</b> lors du paiement, et payez <b>uniquement</b> sur les numéros officiels affichés sur le site. Les fichiers sont envoyés après vérification du paiement. La licence vaut pour une construction sur le terrain indiqué, sauf licence Exclusivité.</p>
+<p>Mode de paiement choisi : <b>${esc(({ carte: 'Carte bancaire', mobile: 'Mobile Money', international: "Depuis l'étranger (transfert vers Mobile Money)", virement: 'Virement bancaire', whatsapp: 'WhatsApp' })[c.methode] || c.methode)}</b>. Indiquez la référence <b>${esc(c.ref)}</b> lors du paiement, et payez <b>uniquement</b> sur les numéros officiels affichés sur le site. Les fichiers sont envoyés après vérification du paiement. La licence vaut pour une construction sur le terrain indiqué, sauf licence Exclusivité.</p>
 <div class="conf">🔒 <b>Votre vie privée est respectée.</b> ${esc(PHRASE_CONFIDENTIALITE)}</div>
 <p style="font-size:11px;color:#666;margin-top:14px">Commande soumise aux conditions générales de vente et à la licence d'utilisation de ${esc(e.raisonSociale)}, acceptées par le client lors de la commande.</p>
 </body></html>`;
 }
 
-function confirmer(c, lignes) {
+function confirmer(c, lignes, distant = false) {
   document.getElementById('vueCommande').hidden = true;
   const v = document.getElementById('vueConfirmation');
   v.hidden = false;
@@ -204,6 +207,18 @@ function confirmer(c, lignes) {
     action = CONFIG.email
       ? `<a class="btn" href="mailto:${esc(CONFIG.email)}?subject=${encodeURIComponent('Virement commande ' + c.ref)}&body=${encodeURIComponent(messageWhatsApp(c))}">Envoyer l'avis de virement par e-mail</a>`
       : `<a class="btn" target="_blank" rel="noopener" href="${lienWhatsApp(messageWhatsApp(c) + '\n\nVirement effectué.')}">Envoyer l'avis de virement sur WhatsApp</a>`;
+  } else if (c.methode === 'international') {
+    const t = CONFIG.transfertInternational;
+    instructions = `<p>Vous pouvez payer depuis n'importe quel pays, <b>avec votre carte bancaire</b>, via un service de transfert international. L'argent arrive directement sur notre compte ${esc(t.operateur)}.</p>
+      <ol class="liste-coche">
+        <li>Ouvrez l'un de ces services : ${t.services.map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener" style="color:var(--or)">${esc(x.nom)}</a>`).join(', ')}.</li>
+        <li>Pays de destination : <b>RD Congo</b>. Mode de réception : <b>Mobile Money — ${esc(t.operateur)}</b>.</li>
+        <li>Numéro du bénéficiaire : <code>${esc(t.numero)}</code>${t.beneficiaire ? ` — nom : <b>${esc(t.beneficiaire)}</b>` : ' — demandez-nous le nom exact du bénéficiaire sur WhatsApp avant d\'envoyer'}.</li>
+        <li>Montant à faire <b>recevoir</b> : <b>${formatPrix(c.total)}</b>. Les frais du service sont à votre charge. Indiquez la référence <span class="ref">${esc(c.ref)}</span> en motif si le service le permet.</li>
+        <li>Envoyez-nous ensuite le reçu du transfert sur WhatsApp. Vos plans vous sont envoyés dès la réception des fonds.</li>
+      </ol>
+      <p class="muted" style="font-size:.85rem">⚠ N'envoyez de l'argent qu'au numéro ci-dessus. Nous ne demandons jamais de paiement vers un autre numéro ou un autre nom.</p>`;
+    action = `<a class="btn" target="_blank" rel="noopener" href="${lienWhatsApp(`${messageWhatsApp(c)}\n\nJe paie depuis l'étranger.${t.beneficiaire ? '' : ' Pouvez-vous me confirmer le nom exact du bénéficiaire ?'}`)}">${t.beneficiaire ? 'Envoyer le reçu sur WhatsApp' : 'Demander le nom du bénéficiaire sur WhatsApp'}</a>`;
   } else if (c.methode === 'whatsapp') {
     instructions = `<p>Votre commande est prête. Cliquez ci-dessous pour l'envoyer au concepteur sur WhatsApp et convenir du paiement.</p>`;
     action = `<a class="btn" target="_blank" rel="noopener" href="${lienWhatsApp(messageWhatsApp(c))}">Ouvrir WhatsApp</a>`;
@@ -213,6 +228,7 @@ function confirmer(c, lignes) {
     <div class="succes-icone">✓</div>
     <h1 style="font-size:2.8rem">Merci ${esc(c.client.nom.split(' ')[0])} !</h1>
     <p class="muted">Votre commande <span class="ref">${esc(c.ref)}</span> a bien été enregistrée.</p>
+    ${distant ? '' : `<div class="alerte" style="margin:1rem 0"><b>Important :</b> pour que votre commande nous parvienne, envoyez-la-nous sur WhatsApp avec le bouton ci-dessous.</div>`}
     <div class="instructions">${instructions}</div>
     <div style="display:flex;flex-wrap:wrap;gap:.7rem;margin:1.5rem 0">${action}<button class="btn discret" id="bonCommande" type="button">📄 Mon bon de commande</button><a class="btn discret" href="index.html#catalogue">Retour au catalogue</a></div>
     <div class="encart">

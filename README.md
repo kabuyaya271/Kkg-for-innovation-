@@ -59,6 +59,16 @@ python3 -m http.server 8000
 
 > Les modifications faites dans l'espace concepteur sont d'abord enregistrées dans votre navigateur : elles ne sont visibles par les visiteurs qu'après avoir remplacé `data/projets.json`.
 
+## Démarrer sans banque ni RCCM (test du marché)
+
+- **Paiement local :** Mobile Money (Airtel Money).
+- **Paiement depuis l'étranger :** le client paie **par carte bancaire** via un service de transfert international (Taptap Send, WorldRemit, Western Union, MoneyGram). L'argent arrive sur votre Airtel Money.
+  - Renseignez le **nom exact du titulaire** dans `js/config.js` → `transfertInternational.beneficiaire`.
+  - Tant que ce nom est vide, le client est invité à vous le demander sur WhatsApp.
+- **Réception des commandes :** sans serveur ni Formspree, elles vous parviennent par **WhatsApp**. Le client y est explicitement invité après sa commande.
+- **Projets d'exemple :** les projets de démonstration portent la mention « Exemple ». Ils sont visibles mais **non achetables** et mènent à une demande de projet similaire. Quand vous publiez vos vrais plans, décochez « Projet d'exemple » ou supprimez les exemples.
+- **Par la suite :** passez à une passerelle de paiement (CinetPay, MaxiCash) dès que l'entreprise est immatriculée.
+
 ## Deux sortes de projets
 
 - **En vente** : plan du catalogue, acheté directement avec une licence (Essentiel, Pack complet, Exclusivité). Bouton « Adapter ce plan à mon terrain » pour une adaptation sur devis.

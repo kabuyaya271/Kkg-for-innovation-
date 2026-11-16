@@ -62,6 +62,22 @@ export const CONFIG = {
     { operateur: 'Airtel Money', numero: '+243 975 465 965', titulaire: '' },
   ],
 
+  // Paiement depuis l'étranger, sans banque : le client envoie l'argent sur votre
+  // Mobile Money via un service de transfert international (carte bancaire acceptée
+  // par ces services). Fonctionne sans RCCM ni compte bancaire.
+  transfertInternational: {
+    actif: true,
+    numero: '+243 975 465 965',
+    operateur: 'Airtel Money',
+    beneficiaire: '',   // nom EXACT du titulaire du compte Airtel Money (exigé par les services de transfert)
+    services: [
+      { nom: 'Taptap Send', url: 'https://www.taptapsend.com' },
+      { nom: 'WorldRemit', url: 'https://www.worldremit.com' },
+      { nom: 'Western Union', url: 'https://www.westernunion.com' },
+      { nom: 'MoneyGram', url: 'https://www.moneygram.com' },
+    ],
+  },
+
   // Virement bancaire — laissez iban vide pour désactiver
   banque: { banque: '', titulaire: '', iban: '', swift: '' },
 

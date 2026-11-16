@@ -81,9 +81,11 @@ async function demarrer() {
   const lienQuestion = CONFIG.whatsapp
     ? `<a class="btn discret bloc" target="_blank" rel="noopener" href="${lienWhatsApp(`Bonjour, j'ai une question sur le plan « ${p.titre} » : ${location.href}`)}">Poser une question sur WhatsApp</a>` : '';
 
-  if (estReference(p)) {
+  if (estReference(p) || p.exemple) {
     zoneAchat.innerHTML = `${entete}
-      <div class="alerte" style="margin:1.2rem 0">Ce projet a été <b>conçu sur mesure</b> pour un client. Il n'est pas vendu tel quel, mais nous pouvons concevoir pour vous un projet similaire, adapté à votre terrain.</div>
+      <div class="alerte" style="margin:1.2rem 0">${p.exemple
+        ? "Ce projet est un <b>exemple</b> de ce que nous concevons. Il n'est pas vendu tel quel, mais nous pouvons concevoir pour vous un projet de ce type, adapté à votre terrain et à votre budget."
+        : "Ce projet a été <b>conçu sur mesure</b> pour un client. Il n'est pas vendu tel quel, mais nous pouvons concevoir pour vous un projet similaire, adapté à votre terrain."}</div>
       <div class="actions">
         <a class="btn bloc" href="sur-mesure.html?type=similaire&projet=${encodeURIComponent(p.id)}">Commander un projet similaire</a>
         <button class="btn contour bloc" type="button" data-ouvrir-assistant>Discuter avec l'assistant</button>
@@ -137,7 +139,7 @@ async function demarrer() {
   document.getElementById('description').textContent = p.description || '';
   document.getElementById('caracteristiques').innerHTML = (p.caracteristiques || []).map((c) => `<li>${esc(c)}</li>`).join('');
   document.getElementById('inclus').innerHTML = (p.inclus || []).map((c) => `<li>${esc(c)}</li>`).join('');
-  document.getElementById('verrouActions').innerHTML = estReference(p)
+  document.getElementById('verrouActions').innerHTML = estReference(p) || p.exemple
     ? `<a class="btn" href="sur-mesure.html?type=similaire&projet=${encodeURIComponent(p.id)}">Commander un projet similaire</a>`
     : `<a class="btn" href="#achat">Choisir ma licence</a><button class="btn discret" type="button" data-ouvrir-assistant>Poser une question</button>`;
 

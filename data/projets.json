@@ -51,7 +51,8 @@
     },
     "modeleGLB": "",
     "images": [],
-    "lienPaiement": ""
+    "lienPaiement": "",
+    "exemple": true
   },
   {
     "id": "maison-kivu",
@@ -103,7 +104,8 @@
     },
     "modeleGLB": "",
     "images": [],
-    "lienPaiement": ""
+    "lienPaiement": "",
+    "exemple": true
   },
   {
     "id": "duplex-mangrove",
@@ -155,7 +157,8 @@
     },
     "modeleGLB": "",
     "images": [],
-    "lienPaiement": ""
+    "lienPaiement": "",
+    "exemple": true
   },
   {
     "id": "residence-lumiere",
@@ -208,7 +211,8 @@
     },
     "modeleGLB": "",
     "images": [],
-    "lienPaiement": ""
+    "lienPaiement": "",
+    "exemple": true
   },
   {
     "id": "centre-nova",
@@ -260,7 +264,8 @@
     },
     "modeleGLB": "",
     "images": [],
-    "lienPaiement": ""
+    "lienPaiement": "",
+    "exemple": true
   },
   {
     "id": "bungalow-savane",
@@ -310,7 +315,8 @@
     },
     "modeleGLB": "",
     "images": [],
-    "lienPaiement": ""
+    "lienPaiement": "",
+    "exemple": true
   },
   {
     "id": "residence-ngaliema",
@@ -356,6 +362,7 @@
     },
     "modeleGLB": "",
     "images": [],
-    "lienPaiement": ""
+    "lienPaiement": "",
+    "exemple": true
   }
 ]
