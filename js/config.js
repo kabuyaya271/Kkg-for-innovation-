@@ -31,12 +31,12 @@ export const CONFIG = {
     essentiel: {
       nom: 'Essentiel',
       multiplicateur: 1,
-      description: 'Plans PDF : niveaux, façades, coupes, toiture. Licence pour 1 construction.',
+      description: 'Plans cotés de chaque niveau et plan de masse (PDF), tableau des surfaces. Licence pour 1 construction.',
     },
     complet: {
       nom: 'Pack complet',
       multiplicateur: 1.6,
-      description: 'PDF + fichiers DWG modifiables + maquette 3D + métré estimatif. Licence pour 1 construction.',
+      description: 'Essentiel + fichiers DXF modifiables (AutoCAD) + maquette 3D complète. Licence pour 1 construction.',
     },
     exclusif: {
       nom: 'Exclusivité',

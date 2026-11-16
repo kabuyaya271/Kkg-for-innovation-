@@ -21,6 +21,7 @@ async function demarrer() {
     return;
   }
   document.getElementById('nbProjets').textContent = projets.length;
+  document.getElementById('nbProjets').nextElementSibling.textContent = projets.length > 1 ? 'projets à explorer' : 'projet à explorer';
 
   // ----- Héros 3D : fait défiler les projets à la une -----
   const vedettes = projets.filter((p) => p.vedette);

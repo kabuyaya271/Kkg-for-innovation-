@@ -10,8 +10,8 @@ export const ENTREPRISE = {
   email: 'kkgforbusiness@gmail.com',
   devise: 'USD',
   licences: {
-    essentiel: { nom: 'Essentiel', multiplicateur: 1, contenu: 'PDF : niveaux, façades, coupes, toiture ; 1 construction' },
-    complet: { nom: 'Pack complet', multiplicateur: 1.6, contenu: 'PDF + DWG modifiables + maquette 3D + métré estimatif ; 1 construction' },
+    essentiel: { nom: 'Essentiel', multiplicateur: 1, contenu: 'plans cotés des niveaux et plan de masse en PDF, tableau des surfaces ; 1 construction' },
+    complet: { nom: 'Pack complet', multiplicateur: 1.6, contenu: 'Essentiel + fichiers DXF modifiables + maquette 3D complète ; 1 construction' },
     exclusif: { nom: 'Exclusivité', multiplicateur: 4, contenu: 'Pack complet + plan retiré de la vente, constructions illimitées pour le client' },
   },
   surMesure: { acomptePourcent: 50, revisionsIncluses: 2, validiteDevisJours: 30 },
