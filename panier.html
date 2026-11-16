@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panier et paiement — KKG Innovation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <header data-header></header>
+  <main class="wrap">
+    <div id="vueCommande">
+      <div class="fil"><a href="index.html">Accueil</a> / Panier</div>
+      <div class="commande">
+        <div>
+          <h1 style="font-size:2.6rem">Votre panier</h1>
+          <div id="lignes"></div>
+
+          <form id="formCommande" style="margin-top:2.5rem">
+            <h2 style="font-size:1.9rem">Fiche de commande</h2>
+            <p class="muted">Ces informations servent à établir votre licence à votre nom et à vous livrer vos plans en toute sécurité. Les champs marqués * sont obligatoires.</p>
+            <div data-confidentialite></div>
+
+            <fieldset>
+              <legend>1. Qui êtes-vous ?</legend>
+              <div class="choix-ligne">
+                <label class="case"><input type="radio" name="typeClient" value="particulier" checked> Particulier</label>
+                <label class="case"><input type="radio" name="typeClient" value="entreprise"> Entreprise / organisation</label>
+              </div>
+              <div class="form-grille">
+                <div class="plein" data-si-entreprise hidden><label class="etiquette" for="raisonSociale">Nom de l'entreprise ou de l'organisation *</label><input class="champ" id="raisonSociale" autocomplete="organization"></div>
+                <div class="plein" data-si-entreprise hidden><label class="etiquette" for="rccmNif">RCCM / NIF (pour la facture, facultatif)</label><input class="champ" id="rccmNif"></div>
+                <div class="plein"><label class="etiquette" for="nom">Nom complet, tel qu'il figure sur votre pièce d'identité * <span data-si-entreprise hidden>(représentant)</span></label><input class="champ" id="nom" required autocomplete="name"></div>
+                <div><label class="etiquette" for="pieceType">Pièce d'identité (facultatif)</label>
+                  <select class="champ" id="pieceType"><option value="">— Non communiquée —</option><option>Carte d'électeur</option><option>Passeport</option><option>Permis de conduire</option><option>Carte de séjour</option><option>Autre</option></select></div>
+                <div><label class="etiquette" for="pieceNumero">N° de la pièce</label><input class="champ" id="pieceNumero" autocomplete="off"></div>
+                <p class="plein aide">Facultatif, mais <b>recommandé pour la licence Exclusivité</b> : cela prouve que la licence vous appartient en cas de contestation. Ne nous envoyez jamais de photo de votre pièce par ce formulaire.</p>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>2. Comment vous joindre</legend>
+              <div class="form-grille">
+                <div><label class="etiquette" for="tel">Téléphone / WhatsApp *</label><input class="champ" id="tel" required autocomplete="tel" placeholder="+243 …"></div>
+                <div><label class="etiquette" for="email">E-mail (réception des fichiers) *</label><input class="champ" id="email" type="email" required autocomplete="email"></div>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>3. Lieu de la construction</legend>
+              <div class="form-grille">
+                <div><label class="etiquette" for="pays">Pays *</label><input class="champ" id="pays" required value="RD Congo" autocomplete="country-name"></div>
+                <div><label class="etiquette" for="ville">Ville / province *</label><input class="champ" id="ville" required placeholder="ex. Goma, Nord-Kivu"></div>
+                <div><label class="etiquette" for="quartier">Commune / quartier</label><input class="champ" id="quartier"></div>
+                <div><label class="etiquette" for="parcelle">Adresse ou n° de parcelle</label><input class="champ" id="parcelle" placeholder="si vous le connaissez"></div>
+                <p class="plein aide">Votre licence vaut pour <b>une construction sur ce terrain</b>. Si le terrain n'est pas encore acquis, indiquez la ville : vous préciserez l'adresse plus tard.</p>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>4. Paiement et remarques</legend>
+              <div class="form-grille">
+                <div class="plein"><label class="etiquette" for="numeroPayeur">Numéro qui effectuera le paiement Mobile Money (s'il est différent du vôtre)</label><input class="champ" id="numeroPayeur" placeholder="nous permet d'identifier votre paiement rapidement"></div>
+                <div class="plein"><label class="etiquette" for="note">Remarques (adaptations souhaitées, questions…)</label><textarea class="champ" id="note" rows="3"></textarea></div>
+              </div>
+              <p class="aide">⚠ Nous ne vous demanderons <b>jamais</b> votre code PIN, votre mot de passe ou un code reçu par SMS.</p>
+            </fieldset>
+          </form>
+        </div>
+
+        <aside class="recap encart">
+          <h4>Récapitulatif</h4>
+          <div id="recapLignes"></div>
+          <div class="total"><span>Total</span><b id="total">–</b></div>
+          <h4 style="margin-top:1.6rem">Mode de paiement</h4>
+          <div class="methodes" id="methodes"></div>
+          <label class="case" style="margin-bottom:.6rem;align-items:flex-start"><input type="checkbox" id="exactitude" form="formCommande" required> <span style="font-size:.85rem">Je certifie que les informations de ma fiche de commande sont exactes.</span></label>
+          <label class="case" style="margin-bottom:1rem;align-items:flex-start"><input type="checkbox" id="cgv" form="formCommande" required> <span style="font-size:.85rem">J'accepte les <a href="conditions.html#cgv" target="_blank" style="color:var(--or)">conditions générales de vente</a> et la <a href="conditions.html#licence" target="_blank" style="color:var(--or)">licence d'utilisation</a> (une construction par licence, sauf Exclusivité). Je reconnais qu'un fichier livré ne peut plus être remboursé, sauf défaut.</span></label>
+          <button class="btn bloc" id="valider" type="submit" form="formCommande">Valider la commande</button>
+          <p class="muted" style="font-size:.8rem;margin-top:.9rem">Les fichiers sont envoyés après confirmation du paiement. Besoin d'adapter le plan à votre terrain ? <a href="sur-mesure.html?type=adaptation" style="color:var(--or)">Demandez un devis</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+    <div id="vueConfirmation" hidden style="max-width:720px;margin:60px auto 100px"></div>
+  </main>
+  <footer data-footer></footer>
+  <script type="module" src="js/panier.js"></script>
+</body>
+</html>

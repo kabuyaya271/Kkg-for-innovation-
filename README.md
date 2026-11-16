@@ -1,1 +1,192 @@
-# Kkg-for-innovation-
+# KKG Innovation — Boutique de plans de construction en 3D
+
+Site web pour vendre des plans de construction : chaque projet se visite en **3D interactive**, possède une **fiche technique complète**, et peut être **acheté en ligne** (carte bancaire, Mobile Money, virement, WhatsApp).
+
+Site 100 % statique (HTML / CSS / JavaScript + [Three.js](https://threejs.org)) : aucun serveur ni base de données à gérer, hébergement gratuit possible sur GitHub Pages ou Netlify.
+
+## Pages
+
+| Page | Rôle |
+|---|---|
+| `index.html` | Accueil : projet à la une en 3D, catalogue filtrable, licences, contact |
+| `projet.html?id=…` | Fiche projet : visite 3D (rotation, nuit, vue éclatée par niveau, vue de dessus, filaire, plein écran, capture), prix par licence, caractéristiques, tableau des surfaces, contenu du dossier, FAQ |
+| `panier.html` | Panier, coordonnées du client, choix du paiement, instructions de paiement, acceptation des CGV |
+| `sur-mesure.html` | **Boîte aux requêtes** : projet sur mesure, adaptation d'un plan à un terrain, question / problème ; processus avec acompte de 50 % |
+| `conditions.html` | **Textes juridiques** : mentions légales, CGV, licence d'utilisation, conditions sur mesure, responsabilité, assistant IA, confidentialité, litiges |
+| `admin.html` | **Espace concepteur** : projets (en vente ou « réalisation sur mesure ») avec aperçu 3D, **requêtes** reçues, commandes, publication |
+
+Sur toutes les pages, une bulle **« Une question ? »** ouvre l'assistant : un **agent IA** si le dossier `agent-ia/` est déployé, sinon un menu d'orientation (sur mesure, adaptation, WhatsApp).
+
+## Démarrer en local
+
+Les navigateurs bloquent les modules JavaScript ouverts en `file://`, il faut donc un petit serveur :
+
+```bash
+python3 -m http.server 8000
+# puis ouvrir http://localhost:8000
+```
+
+## Mettre en ligne (GitHub Pages, gratuit)
+
+1. Sur GitHub : **Settings → Pages → Source : Deploy from a branch**, choisir la branche et le dossier `/ (root)`.
+2. Le site est disponible à `https://<votre-compte>.github.io/<nom-du-dépôt>/`.
+
+## Personnaliser — `js/config.js`
+
+- Identité de l'entreprise (RCCM, Id. Nat., NIF… — affichés dans les mentions légales dès qu'ils sont remplis), e-mail, WhatsApp
+- Devise (`USD`, `EUR`, `CDF`, `XAF`…)
+- **Licences** et leur multiplicateur de prix (Essentiel ×1, Pack complet ×1,6, Exclusivité ×4)
+- **Paiements** :
+  - `lienPaiementCarte` : un lien de paiement en ligne (CinetPay, Flutterwave, PayPal, Stripe…). Chaque projet peut aussi avoir son propre lien ;
+  - `mobileMoney` : vos numéros M-Pesa / Orange Money / Airtel Money ;
+  - `banque` : vos coordonnées de virement ;
+  - `whatsapp` : votre numéro pour les commandes et questions.
+  Laissez un champ vide pour désactiver la méthode.
+- `formspree` : créez un formulaire gratuit sur [formspree.io](https://formspree.io) et collez son adresse pour **recevoir chaque commande et chaque demande de contact par e-mail**.
+- `surMesure` : acompte (50 %), nombre de révisions incluses, validité des devis — repris automatiquement dans les conditions juridiques.
+- `agentIA` : adresse du serveur de l'assistant IA et de la boîte aux requêtes (voir [`agent-ia/README.md`](agent-ia/README.md)).
+- `adminEmpreinteMotDePasse` : empreinte chiffrée du mot de passe de l'espace concepteur (le mot de passe n'est écrit nulle part). Pour le changer : admin.html → « Publier en ligne » → « Changer le mot de passe ».
+
+## Ajouter un projet
+
+1. Ouvrez `admin.html`, connectez-vous.
+2. **+ Nouveau projet** : titre, prix, description, surfaces, pièces, contenu du dossier…
+3. **Maquette 3D** — deux options :
+   - réglez les paramètres (type, niveaux, dimensions, toiture, couleurs, piscine, garage…) : la maquette est générée automatiquement et l'aperçu se met à jour en direct ;
+   - **ou** utilisez votre vrai modèle : exportez-le en **.glb** depuis SketchUp, Revit, ArchiCAD, Blender…, placez-le dans `modeles/` et indiquez son chemin (ex. `modeles/villa-horizon.glb`). Nommez les objets `niveau-0`, `niveau-1`… pour que la vue éclatée fonctionne.
+4. Ajoutez photos, rendus et plans 2D (ou capturez la vue 3D avec 📷).
+5. **Enregistrer**, puis onglet **Publier en ligne → Télécharger projets.json** et remplacez `data/projets.json` dans le dépôt.
+
+> Les modifications faites dans l'espace concepteur sont d'abord enregistrées dans votre navigateur : elles ne sont visibles par les visiteurs qu'après avoir remplacé `data/projets.json`.
+
+## Démarrer sans banque ni RCCM (test du marché)
+
+- **Paiement local :** Mobile Money (Airtel Money).
+- **Paiement depuis l'étranger :** le client paie **par carte bancaire** via un service de transfert international (Taptap Send, WorldRemit, Western Union, MoneyGram). L'argent arrive sur votre Airtel Money.
+  - Renseignez le **nom exact du titulaire** dans `js/config.js` → `transfertInternational.beneficiaire`.
+  - Tant que ce nom est vide, le client est invité à vous le demander sur WhatsApp.
+- **Réception des commandes :** sans serveur ni Formspree, elles vous parviennent par **WhatsApp**. Le client y est explicitement invité après sa commande.
+- **Projets d'exemple :** les projets de démonstration portent la mention « Exemple ». Ils sont visibles mais **non achetables** et mènent à une demande de projet similaire. Quand vous publiez vos vrais plans, décochez « Projet d'exemple » ou supprimez les exemples.
+- **Par la suite :** passez à une passerelle de paiement (CinetPay, MaxiCash) dès que l'entreprise est immatriculée.
+
+## Deux sortes de projets
+
+- **En vente** : plan du catalogue, acheté directement avec une licence (Essentiel, Pack complet, Exclusivité). Bouton « Adapter ce plan à mon terrain » pour une adaptation sur devis.
+- **Réalisation sur mesure** : projet conçu pour un client, montré en 3D comme référence mais non vendu ; bouton « Commander un projet similaire ». Choisissez le statut dans l'espace concepteur. (Le projet « Résidence privée Ngaliema » est un exemple à remplacer.)
+
+## Détails réservés aux acheteurs
+
+Le site public ne montre qu'une **présentation commerciale** : 3D extérieure, perspectives, chiffres clés, points forts, contenu du dossier.
+
+La **documentation détaillée** reste privée : description architecturale, emprise et cotes, tableau des surfaces, notes techniques.
+- Vous la saisissez dans l'espace concepteur, section 🔒.
+- Elle reste dans votre navigateur et n'est **jamais** incluse dans `data/projets.json` (ce fichier est public, n'importe qui peut le télécharger).
+- Après paiement, le bouton **🔒 Fiche acheteur** génère un PDF confidentiel au nom du client, à envoyer avec les plans.
+- Sauvegardez régulièrement vos détails réservés (onglet « Publier en ligne »). Gardez ce fichier **hors de GitHub**.
+
+À ne jamais mettre en ligne : plans cotés, coupes, ou modèle 3D avec aménagement intérieur. Tout fichier publié peut être copié.
+
+## Atelier de conception (`studio.html`) — postes de l'équipe
+
+L'atelier est le poste de travail des architectes, ingénieurs et dessinateurs.
+
+**Dessin 2D :**
+- murs, rectangles de murs, portes, fenêtres, baies, pièces, cotes et textes ;
+- mode **ORTHO** (F8), **accrochage** aux extrémités, aux murs et à la grille (F9) ;
+- **longueur tapée au clavier** (ex. `4.5` Entrée, ou `12x9` pour un rectangle) ;
+- poignées d'édition, annuler/rétablir illimité, raccourcis façon AutoCAD ;
+- **calque de fond** : un plan scanné ou un croquis à redessiner.
+
+**Niveaux :** plusieurs étages, avec le niveau inférieur affiché en transparence.
+
+**3D en direct** du plan : murs percés aux ouvertures, dalles, toiture, vue éclatée par niveau, mode nuit.
+
+**Métré automatique :** surfaces, linéaires, maçonnerie, nombre de blocs, ouvertures et **estimation chiffrée** (prix unitaires modifiables).
+
+**5 agents IA spécialisés**, qui lisent le plan en cours :
+- **Architecte concepteur** : il propose des plans complets, appliqués d'un clic puis retouchables à la main ;
+- **Ingénieur structure** : pré-dimensionnement indicatif et dispositions parasismiques ;
+- **Métreur-économiste** : devis par lot ;
+- **Conformité & climat** : revue critique du plan ;
+- **Rédacteur** : textes catalogue et description réservée.
+
+**Exports :**
+- **DXF** (calques MURS / OUVERTURES / PIÈCES / COTES…, accents compatibles AutoCAD) ;
+- **planche PDF** avec cartouche ;
+- SVG, image 3D, étude JSON ;
+- **maquette .glb** publique (extérieur seul) ou complète ;
+- **« Envoyer au catalogue »** : la fiche du plan est créée dans l'espace concepteur, avec les détails réservés déjà remplis.
+
+**Équipe :** dans `admin.html`, onglet **Postes de l'équipe**, le directeur crée un poste par collaborateur.
+- Chaque poste reçoit un code d'accès personnel, révocable.
+- Les études sont **partagées** et versionnées : si deux personnes modifient la même étude, la seconde est avertie au lieu d'écraser le travail de la première.
+- Connexions et enregistrements sont inscrits dans l'historique.
+
+Sans le serveur `agent-ia/`, l'atelier fonctionne **hors ligne** sur un seul ordinateur, sans agents ni partage.
+
+> L'atelier ne remplace pas AutoCAD pour le dessin d'exécution détaillé. Il sert à concevoir vite, chiffrer, visualiser et publier. Pour finaliser dans AutoCAD, exportez en DXF.
+
+## Historique des opérations (contrôles et enquêtes)
+
+L'onglet **Historique** de `admin.html` est un journal horodaté de toutes les opérations :
+- commandes et requêtes reçues, avec l'adresse IP et le pays ;
+- changements de statut ;
+- paiements, avec le n° de transaction et le montant reçu ;
+- remise de documents : chaque fiche acheteur porte un **code de traçabilité** relié au journal ;
+- modifications et suppressions de projets (prix) ;
+- exports.
+
+**Protection contre la falsification.** Chaque entrée contient l'empreinte **SHA-256** de son contenu et de l'entrée précédente. Une entrée modifiée, insérée ou supprimée est détectée par **« Vérifier l'intégrité »**. Chaque extrait mentionne l'empreinte de la dernière entrée : conservez une copie datée des extraits pour pouvoir aussi détecter une suppression des dernières entrées.
+
+**Filtres :** période, type d'événement, recherche (référence, nom, téléphone, n° de transaction).
+
+**Formats d'export :**
+- **Impression / PDF**, avec en-tête de l'entreprise et zone signature et cachet ;
+- **Excel (CSV)** ;
+- **Word (.doc)** ;
+- **JSON** avec empreintes, pour une vérification technique ;
+- **Texte**.
+
+**Deux journaux :**
+- le **journal en ligne**, tenu par le serveur `agent-ia/`, reçoit toutes les opérations des clients ;
+- le **journal de cet appareil** enregistre les actions faites dans l'espace concepteur.
+
+Sans le serveur, seul le journal de l'appareil existe.
+
+> Ce journal contient des données personnelles. Ne le communiquez qu'aux autorités habilitées, sur demande officielle, ou pour défendre vos droits (c'est ce qu'annonce la politique de confidentialité).
+
+## Textes juridiques
+
+`conditions.html` protège votre propriété intellectuelle (licence pour une construction, interdiction de revente, sanctions), encadre l'acompte de 50 % et les annulations, limite votre responsabilité (plans de conception ≠ étude de sol, calcul de structure ou suivi de chantier) et encadre l'assistant IA. Les clauses restent équilibrées (pas d'exclusion de la faute lourde, droits impératifs du consommateur préservés) pour rester valables devant un juge.
+
+> ⚠ Ces textes sont un modèle sérieux mais ne remplacent pas un avocat : faites-les relire par un avocat inscrit au barreau en RDC, complétez RCCM / Id. Nat. / NIF dans `js/config.js`, et vérifiez si la réglementation locale exige la signature d'un architecte agréé pour les permis.
+
+## Processus de vente
+
+1. Le client choisit un projet et une licence, puis valide son panier avec ses coordonnées.
+2. Une référence de commande est générée (ex. `KKG-20261114-A1B2`) ; vous la recevez par e-mail si Formspree est configuré.
+3. Le client paie (redirection Stripe, ou instructions Mobile Money / virement / WhatsApp avec la référence).
+4. Vous vérifiez le paiement et envoyez les fichiers par e-mail (lien Google Drive, WeTransfer…).
+
+## Sécurité — à savoir
+
+- Le mot de passe de l'espace concepteur est vérifié dans le navigateur : il évite les modifications accidentelles mais ne protège pas réellement. Il ne donne de toute façon accès à aucune donnée sensible : les vraies données publiées sont dans le dépôt GitHub.
+- **Ne déposez jamais les fichiers de plans vendus (PDF, DWG) dans ce dépôt public** : envoyez-les uniquement après paiement.
+- Pour une livraison 100 % automatique après paiement, il faudra ajouter un service côté serveur (Stripe Checkout + webhooks, ou une plateforme comme Gumroad / Lemon Squeezy) — le site est prêt pour cette évolution.
+
+## Structure
+
+```
+index.html  projet.html  panier.html  sur-mesure.html  conditions.html  admin.html
+css/style.css
+js/config.js      ← configuration
+js/store.js       ← projets, panier, commandes
+js/builder3d.js   ← générateur de maquettes 3D
+js/viewer.js      ← visionneuse 3D (Three.js)
+js/assistant.js    ← bulle de l'assistant
+js/ui.js, accueil.js, projet.js, panier.js, sur-mesure.js, conditions.js, admin.js
+agent-ia/         ← serveur de l'agent IA + boîte aux requêtes (Cloudflare Worker)
+data/projets.json ← catalogue des projets
+modeles/          ← vos fichiers .glb
+images/           ← vos images
+```

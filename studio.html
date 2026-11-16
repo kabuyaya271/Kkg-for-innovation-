@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Atelier de conception — KKG for Innovation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/studio.css">
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <!-- Connexion au poste -->
+  <div id="connexion" class="connexion">
+    <form id="cxForm" class="carte-cx">
+      <div class="logo">▲ KKG <span>Atelier</span></div>
+      <h1>Poste de conception</h1>
+      <p id="cxMessage">Entrez le code d'accès de votre poste, fourni par le directeur.</p>
+      <input id="cxCode" type="password" placeholder="KKG-XXXX-XXXX-XXXX" autocomplete="off">
+      <p id="cxErreur" class="erreur"></p>
+      <button id="cxEntrer" class="principal">Ouvrir mon poste</button>
+      <button id="cxLocal" type="button">Travailler hors ligne sur cet ordinateur</button>
+      <p class="petit"><a href="index.html">← Retour au site</a></p>
+    </form>
+  </div>
+
+  <div id="atelier" class="atelier" hidden>
+    <header class="barre">
+      <div class="logo">▲ KKG <span>Atelier</span></div>
+      <button id="btnEtudes" title="Ouvrir / créer une étude">📁 Études</button>
+      <input id="nomEtude" class="nom-etude" aria-label="Nom de l'étude">
+      <span id="etatSauvegarde"></span>
+      <div class="sep"></div>
+      <label class="niveaux">Niveau <select id="niveau"></select></label>
+      <button id="btnNiveauPlus" title="Ajouter un niveau">＋</button>
+      <button id="btnNiveauMoins" title="Supprimer le niveau">－</button>
+      <div class="sep"></div>
+      <button id="btnAnnuler" title="Annuler (Ctrl+Z)">↶</button>
+      <button id="btnRetablir" title="Rétablir (Ctrl+Y)">↷</button>
+      <button id="btnEnregistrer" class="principal" title="Enregistrer (Ctrl+S)">💾 Enregistrer</button>
+      <button id="btnExporter">⤓ Exporter</button>
+      <div class="espace"></div>
+      <a id="lienPostes" href="admin.html" target="_blank" hidden title="Gérer les postes de l'équipe (onglet Postes)">👥 Postes</a>
+      <span id="posteNom" class="poste"></span>
+      <button id="btnDeconnexion" title="Quitter le poste">⏻</button>
+    </header>
+
+    <nav id="palette" class="palette"></nav>
+
+    <main class="zone-plan">
+      <div class="options-plan">
+        <button id="bt-ortho" title="Mode orthogonal (F8)">ORTHO</button>
+        <button id="bt-aimant" title="Accrochage à la grille (F9)">AIMANT</button>
+        <label>Pas <select id="pas"><option value="0.01">1 cm</option><option value="0.05" selected>5 cm</option><option value="0.1">10 cm</option><option value="0.25">25 cm</option><option value="0.5">50 cm</option></select></label>
+        <button id="btnCadrer" title="Tout afficher (Z)">⤢ Cadrer</button>
+      </div>
+      <svg id="plan" class="plan" tabindex="0"></svg>
+      <footer class="statut">
+        <b id="stOutil"></b><span id="stAide"></span><span class="espace"></span>
+        <span id="stAccroche" class="accent"></span><span id="stSaisie" class="accent"></span><span id="stMesure"></span><span id="stPos" class="pos"></span>
+      </footer>
+    </main>
+
+    <aside class="droite">
+      <div id="onglets" class="onglets">
+        <button data-p="pProps" class="actif">Propriétés</button>
+        <button data-p="p3d">3D</button>
+        <button data-p="pMetre">Métré</button>
+        <button data-p="pAgents">Agents IA</button>
+      </div>
+      <section id="pProps" class="panneau"></section>
+      <section id="p3d" class="panneau" hidden>
+        <div id="vue3d" class="vue3d"></div>
+        <div class="outils3d">
+          <label>Vue éclatée <input type="range" id="eclat3d" min="0" max="1" step="0.01" value="0"></label>
+          <button id="nuit3d">☾ Nuit</button><button id="cadrer3d">⤢</button>
+        </div>
+        <p class="aide-pr">La maquette se met à jour à chaque modification du plan.</p>
+      </section>
+      <section id="pMetre" class="panneau" hidden></section>
+      <section id="pAgents" class="panneau agents" hidden>
+        <div id="agentChoix" class="agent-choix"></div>
+        <div id="agentFil" class="agent-fil"></div>
+        <div id="agentSugg" class="agent-sugg"></div>
+        <form id="agentForm" class="agent-form">
+          <textarea id="agentTexte" rows="2" placeholder="Demandez à l'agent… (Entrée pour envoyer)"></textarea>
+          <button class="principal">➤</button>
+        </form>
+        <p class="aide-pr">Les agents proposent, vous décidez. Leurs chiffres techniques sont indicatifs et doivent être validés par un professionnel habilité.</p>
+      </section>
+    </aside>
+  </div>
+
+  <div id="modale" class="modale" hidden><div id="modaleContenu" class="modale-contenu"></div></div>
+
+  <script type="module" src="js/studio/app.js"></script>
+</body>
+</html>

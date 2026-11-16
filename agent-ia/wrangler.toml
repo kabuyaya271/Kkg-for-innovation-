@@ -1,0 +1,23 @@
+# Configuration du Cloudflare Worker (agent IA + boîte aux requêtes)
+name = "kkg-agent"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Adresse publique du site (pour lire le catalogue data/projets.json)
+SITE_URL = "https://kabuyaya271.github.io/Kkg-for-innovation-"
+# Origines autorisées à appeler l'agent (séparées par des virgules)
+ALLOWED_ORIGINS = "https://kabuyaya271.github.io"
+
+# Stockage des requêtes : créez-le avec
+#   npx wrangler kv namespace create REQUETES
+# puis remplacez l'id ci-dessous par celui affiché.
+[[kv_namespaces]]
+binding = "REQUETES"
+id = "REMPLACER_PAR_L_ID_DU_NAMESPACE"
+
+# Secrets (ne JAMAIS les écrire ici) :
+#   npx wrangler secret put ANTHROPIC_API_KEY   -> clé API Anthropic
+#   npx wrangler secret put ADMIN_TOKEN         -> mot de passe long pour lire les requêtes
+#   npx wrangler secret put FORMSPREE_URL       -> (facultatif) copie de chaque requête par e-mail
