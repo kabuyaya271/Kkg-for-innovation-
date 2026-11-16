@@ -25,15 +25,24 @@ Sans ce serveur, le site fonctionne quand même : les demandes partent alors par
 - **Offre Cloudflare :** l'offre gratuite limite chaque appel à 10 ms de calcul. Cela suffit pour l'assistant du site, mais pas toujours pour les grands plans de l'atelier. Pour l'atelier, prenez l'offre **Workers Paid (5 $/mois)**.
 - Pour réduire le coût, remplacez `claude-opus-5-5` par `claude-sonnet-5-5` ou `claude-haiku-5-5` dans `src/index.js` (constante `MODELE`). Les réponses seront un peu moins fines.
 
-## Mise en ligne (≈ 15 minutes)
+## Mise en ligne la plus simple : le bouton (sans ordinateur)
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/kabuyaya271/Kkg-for-innovation-/tree/main/agent-ia)
+
+1. Cliquez sur le bouton et connectez votre compte Cloudflare et votre compte GitHub.
+2. Cloudflare crée automatiquement le stockage `REQUETES`.
+3. Remplissez les deux secrets demandés :
+   - `ANTHROPIC_API_KEY` : votre clé Anthropic (`sk-ant-…`) ;
+   - `ADMIN_TOKEN` : un mot de passe long.
+4. Validez. Cloudflare affiche l'adresse du serveur, du type `https://kkg-agent.<votre-compte>.workers.dev`.
+5. Collez cette adresse dans `js/config.js` → `agentIA`, puis republiez le site.
+
+## Mise en ligne en ligne de commande (≈ 15 minutes)
 
 ```bash
 cd agent-ia
 npm install
 npx wrangler login                          # ouvre le navigateur pour vous connecter à Cloudflare
-
-npx wrangler kv namespace create REQUETES   # crée le stockage des requêtes
-# → copiez l'"id" affiché dans wrangler.toml (ligne id = "...")
 
 npx wrangler secret put ANTHROPIC_API_KEY   # collez votre clé API Anthropic (sk-ant-...)
 npx wrangler secret put ADMIN_TOKEN         # inventez un mot de passe long (≥ 20 caractères)

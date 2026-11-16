@@ -10,12 +10,10 @@ SITE_URL = "https://kabuyaya271.github.io/Kkg-for-innovation-"
 # Origines autorisées à appeler l'agent (séparées par des virgules)
 ALLOWED_ORIGINS = "https://kabuyaya271.github.io"
 
-# Stockage des requêtes : créez-le avec
-#   npx wrangler kv namespace create REQUETES
-# puis remplacez l'id ci-dessous par celui affiché.
+# Stockage des requêtes, du journal, des postes et des études.
+# Pas d'id : Cloudflare crée l'espace automatiquement au premier déploiement.
 [[kv_namespaces]]
 binding = "REQUETES"
-id = "REMPLACER_PAR_L_ID_DU_NAMESPACE"
 
 # Secrets (ne JAMAIS les écrire ici) :
 #   npx wrangler secret put ANTHROPIC_API_KEY   -> clé API Anthropic
