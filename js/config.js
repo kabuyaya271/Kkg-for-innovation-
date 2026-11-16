@@ -59,7 +59,7 @@ export const CONFIG = {
 
   mobileMoney: [
     // Vérifiez l'opérateur et indiquez le nom exact du titulaire du compte.
-    { operateur: 'Airtel Money', numero: '+243 975 465 965', titulaire: '' },
+    { operateur: 'Airtel Money', numero: '+243 975 465 965', titulaire: 'Grâce Kabuyaya' },
   ],
 
   // Paiement depuis l'étranger, sans banque : le client envoie l'argent sur votre
@@ -69,7 +69,7 @@ export const CONFIG = {
     actif: true,
     numero: '+243 975 465 965',
     operateur: 'Airtel Money',
-    beneficiaire: '',   // nom EXACT du titulaire du compte Airtel Money (exigé par les services de transfert)
+    beneficiaire: 'Grâce Kabuyaya',   // nom exact du titulaire du compte Airtel Money
     services: [
       { nom: 'Taptap Send', url: 'https://www.taptapsend.com' },
       { nom: 'WorldRemit', url: 'https://www.worldremit.com' },

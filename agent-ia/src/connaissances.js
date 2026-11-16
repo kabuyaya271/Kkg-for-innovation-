@@ -15,5 +15,5 @@ export const ENTREPRISE = {
     exclusif: { nom: 'Exclusivité', multiplicateur: 4, contenu: 'Pack complet + plan retiré de la vente, constructions illimitées pour le client' },
   },
   surMesure: { acomptePourcent: 50, revisionsIncluses: 2, validiteDevisJours: 30 },
-  paiements: "Mobile Money (Airtel Money au +243 975 465 965) ; depuis l'étranger : par carte bancaire via un service de transfert international (Taptap Send, WorldRemit, Western Union, MoneyGram) vers ce même compte Airtel Money ; ou commande via WhatsApp",
+  paiements: "Mobile Money (Airtel Money au +243 975 465 965, titulaire : Grâce Kabuyaya) ; depuis l'étranger : par carte bancaire via un service de transfert international (Taptap Send, WorldRemit, Western Union, MoneyGram) vers ce même compte Airtel Money ; ou commande via WhatsApp",
 };
