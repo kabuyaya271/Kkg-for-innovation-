@@ -39,3 +39,22 @@ Plans sur mesure adaptés à votre terrain — devis gratuit.
 - **Image de couverture** : utilisez `couverture.jpg`.
 - **Horaires** : publiez en fin de journée (18 h – 21 h), quand votre public est sur son téléphone.
 - **Honnêteté** : les maquettes de la vidéo sont des exemples de ce que vous concevez. Ne promettez pas de plans « en stock » tant que vos vrais projets ne sont pas en vente.
+
+---
+
+## Villa Royale — texte de publication
+
+👑 **VILLA ROYALE** — le prestige néoclassique, signé **KKG for Innovation**.
+
+Portique à colonnes corinthiennes, hall en double hauteur avec escalier hélicoïdal en bois éclairé, majlis, salon ovale sous rotonde, plafonds sculptés de lumière et **piscine intérieure sous verrière**.
+≈ 980 m² · 5 chambres · 5 salles de bain · terrasse panoramique · parcelle 32 × 43 m.
+
+📐 Plan disponible : plans cotés, fichiers DXF, maquette 3D — ou adaptation à votre terrain.
+🌐 kabuyaya271.github.io/Kkg-for-innovation-
+📲 WhatsApp : +243 975 465 965
+✉️ kkgforbusiness@gmail.com
+📍 Kinshasa — RD Congo
+
+#VillaRoyale #Architecture #Néoclassique #Villa #Kinshasa #RDC #PlanDeMaison #Luxe #KKGforInnovation
+
+Vidéos : `villa-royale-pub.mp4` (voix + musique) · `villa-royale-pub-instrumental.mp4` (musique seule, pour CapCut) · couverture : `villa-royale-couverture.jpg`
