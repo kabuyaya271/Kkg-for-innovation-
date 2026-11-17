@@ -15,7 +15,7 @@ export class Visite {
   /** Indique si la maquette contient des repères de visite. */
   static disponible(racine) {
     let ok = false;
-    racine?.traverse((o) => { if (/^visite-entree-\d+/.test(o.name)) ok = true; });
+    racine?.traverse((o) => { if (/^visite-(entree-\d+|depart)/.test(o.name)) ok = true; });
     return ok;
   }
 
@@ -39,6 +39,7 @@ export class Visite {
       let m;
       if ((m = /^visite-entree-(\d+)/.exec(o.name))) entrees[m[1]] = { libelle: o.userData.libelle || `Entrée ${m[1]}`, dehors: p(o) };
       else if ((m = /^visite-dedans-(\d+)/.exec(o.name))) dedans[m[1]] = p(o);
+      else if (o.name.startsWith('visite-depart')) this.depart = p(o);
       else if (/^visite-piece-\d+/.test(o.name)) this.pieces.push({ libelle: o.userData.libelle || 'Pièce', niveau: +(o.userData.niveau || 0), pos: p(o) });
       else if (o.isMesh) {
         const nom = this._nom(o);
@@ -70,24 +71,38 @@ export class Visite {
     for (const [i, p] of this.pieces.entries()) (parNiveau[p.niveau] ||= []).push([i, p]);
     const panneau = document.createElement('div'); panneau.className = 'visite-panneau'; panneau.hidden = true;
     panneau.innerHTML = `
-      <strong>Visite intérieure</strong>
-      <select class="visite-choix-entree" aria-label="Entrer par"><option value="">Entrer par…</option>${this.entrees.map((e, i) => `<option value="${i}">${esc(e.libelle)}</option>`).join('')}</select>
+      <strong>🚶 Visite</strong>
+      <select class="visite-choix-entree" aria-label="Se rendre à une entrée"><option value="">Aller à une entrée…</option>${this.entrees.map((e, i) => `<option value="${i}">${esc(e.libelle)}</option>`).join('')}</select>
       <select class="visite-choix-piece" aria-label="Aller à une pièce"><option value="">Aller à une pièce…</option>${Object.keys(parNiveau).sort((a, b) => a - b).map((n) =>
         `<optgroup label="${esc(NIVEAUX[n] || `Niveau ${n}`)}">${parNiveau[n].map(([i, p]) => `<option value="${i}">${esc(p.libelle)}</option>`).join('')}</optgroup>`).join('')}</select>
-      <button class="visite-entrees">Entrées</button>
-      <button class="visite-sortir">Sortir</button>
-      <small class="visite-aide">Glissez pour regarder · touchez le sol pour y aller · flèches / ZQSD pour marcher</small>`;
+      <button class="visite-rue">↺ Revenir dans la rue</button>
+      <button class="visite-entrees">🏠 Vue d'ensemble</button>
+      <button class="visite-sortir">✕ Quitter</button>
+      <small class="visite-aide">Joystick ou flèches / ZQSD pour marcher · glissez pour regarder · touchez le sol pour y aller · les portes sont ouvertes</small>`;
     this.sceneEl.appendChild(panneau); this.panneau = panneau;
     panneau.querySelector('.visite-choix-piece').addEventListener('change', (ev) => { if (ev.target.value !== '') this.aller(+ev.target.value); ev.target.value = ''; });
     panneau.querySelector('.visite-choix-entree').addEventListener('change', (ev) => { if (ev.target.value !== '') this.entrer(+ev.target.value); ev.target.value = ''; });
     panneau.querySelector('.visite-sortir').addEventListener('click', () => this.desactiver());
     panneau.querySelector('.visite-entrees').addEventListener('click', () => this.dehors());
+    panneau.querySelector('.visite-rue').addEventListener('click', () => this.demarrer());
+    if (!this.depart) panneau.querySelector('.visite-rue').hidden = true;
+    const hud = document.createElement('div'); hud.className = 'visite-hud'; hud.hidden = true; this.sceneEl.appendChild(hud); this.hud = hud;
 
-    const pad = document.createElement('div'); pad.className = 'visite-pad'; pad.hidden = true;
-    pad.innerHTML = ['avant:▲', 'gauche:◀', 'droite:▶', 'arriere:▼'].map((s) => { const [k, t] = s.split(':'); return `<button data-k="${k}" aria-label="${k}">${t}</button>`; }).join('');
-    this.sceneEl.appendChild(pad); this.pad = pad;
-    const appui = (ev, on) => { const b = ev.target.closest('button[data-k]'); if (!b) return; ev.preventDefault(); on ? this.touches.add('pad-' + b.dataset.k) : this.touches.delete('pad-' + b.dataset.k); };
-    pad.addEventListener('pointerdown', (e) => appui(e, true)); ['pointerup', 'pointerleave', 'pointercancel'].forEach((t) => pad.addEventListener(t, (e) => appui(e, false)));
+    // joystick virtuel (comme dans un jeu mobile)
+    const pad = document.createElement('div'); pad.className = 'visite-joystick'; pad.hidden = true;
+    pad.innerHTML = '<div class="visite-manette"></div>';
+    this.sceneEl.appendChild(pad); this.pad = pad; this.joy = { x: 0, y: 0 };
+    const manette = pad.firstChild; let id = null;
+    const lire = (e) => {
+      const r = pad.getBoundingClientRect(), R = r.width / 2;
+      let dx = e.clientX - (r.left + R), dy = e.clientY - (r.top + R); const d = Math.hypot(dx, dy);
+      if (d > R) { dx *= R / d; dy *= R / d; }
+      manette.style.transform = `translate(${dx}px, ${dy}px)`; this.joy = { x: dx / R, y: dy / R }; this.cible = null;
+    };
+    pad.addEventListener('pointerdown', (e) => { id = e.pointerId; pad.setPointerCapture(id); lire(e); e.preventDefault(); });
+    pad.addEventListener('pointermove', (e) => { if (e.pointerId === id) lire(e); });
+    const lacher = (e) => { if (e.pointerId !== id) return; id = null; this.joy = { x: 0, y: 0 }; manette.style.transform = ''; };
+    ['pointerup', 'pointercancel'].forEach((t) => pad.addEventListener(t, lacher));
 
     // regard + toucher le sol
     const c = this.v.renderer.domElement;
@@ -121,12 +136,18 @@ export class Visite {
     this.actif = true; this.calque.hidden = false; this.panneau.hidden = false;
     this.v.surBoucle = (dt) => this.tick(dt);
     this.sceneEl.classList.add('en-visite');
-    this.dehors();
+    if (this.depart) this.demarrer(); else this.dehors();
+  }
+
+  /** Départ « jeu vidéo » : le visiteur est dans la rue, face au portail, et entre à pied. */
+  demarrer() {
+    this.v.controls.enabled = false; this.calque.hidden = true; this._lumiere(true);
+    this._placer(this.depart, 0, -0.05);
   }
 
   /** Vue extérieure avec les pastilles d'entrée. */
   dehors() {
-    this._lumiere(false); this.interieur = false; this.pad.hidden = true; this.calque.hidden = false;
+    this._lumiere(false); this.interieur = false; this.pad.hidden = true; this.hud.hidden = true; this.calque.hidden = false;
     this.v.controls.enabled = true; this.v.cadrer();
   }
 
@@ -157,7 +178,7 @@ export class Visite {
   }
 
   _placer(oeil, yaw, pitch) {
-    this.interieur = true; this.pad.hidden = false; this.cible = null;
+    this.interieur = true; this.pad.hidden = false; this.hud.hidden = false; this.cible = null;
     this.yaw = yaw; this.pitch = pitch;
     this.pieds.copy(oeil).y -= YEUX;
     const s = this._sol(this.pieds, 1.0, 4.0); if (s !== null) this.pieds.y = s;
@@ -177,6 +198,7 @@ export class Visite {
     } else if (!interieur && this._sauve) {
       v.hemi.intensity = this._sauve.hemi; v.soleil.castShadow = this._sauve.ombre; v.scene.fog = this._sauve.fog; v.renderer.toneMappingExposure = this._sauve.expo;
       v.camera.remove(this.lampe); this.lampe.dispose?.(); this.lampe = null; this._sauve = null;
+      this.plafonniers?.forEach((l) => { v.scene.remove(l); l.dispose?.(); }); this.plafonniers = null;
       v.camera.rotation.set(0, 0, 0);
     }
   }
@@ -222,6 +244,7 @@ export class Visite {
     if (T.has('arriere') || T.has('pad-arriere')) m.sub(avant);
     if (T.has('pasd')) m.add(cote);
     if (T.has('pasg')) m.sub(cote);
+    if (Math.hypot(this.joy.x, this.joy.y) > 0.15) { m.addScaledVector(avant, -this.joy.y).addScaledVector(cote, this.joy.x); this._course = Math.min(1.6, Math.hypot(this.joy.x, this.joy.y) * 1.6); } else this._course = 1;
     if (this.cible && m.lengthSq() === 0) {
       const d = this.cible.clone().sub(this.pieds); d.y = 0;
       if (d.length() < 0.15) this.cible = null;
@@ -231,7 +254,7 @@ export class Visite {
       }
     }
     if (m.lengthSq() > 0) {
-      m.normalize(); const pas = VITESSE * dt;
+      m.normalize(); const pas = VITESSE * (this._course || 1) * dt;
       if (!this._bloque(this.pieds, m, pas)) {
         const essai = this.pieds.clone().addScaledVector(m, pas);
         const s = this._sol(essai);
@@ -243,6 +266,19 @@ export class Visite {
     const s = this._sol(this.pieds);
     if (s !== null) this.pieds.y += (s - this.pieds.y) * Math.min(1, dt * 12);
     this._appliquer();
+    this._t = (this._t || 0) + dt; if (this._t > 0.4) { this._t = 0; this._ambiance(); }
+  }
+
+  /** Indique la pièce où se trouve le visiteur et allume les plafonniers des pièces proches. */
+  _ambiance() {
+    const oeil = this.v.camera.position;
+    const proches = this.pieces.map((p) => ({ p, d: Math.hypot(p.pos.x - oeil.x, p.pos.z - oeil.z) + Math.abs(p.pos.y - oeil.y) * 3 })).sort((a, b) => a.d - b.d);
+    const ici = proches[0];
+    this.hud.textContent = ici && ici.d < 6 ? `📍 ${ici.p.libelle} · ${NIVEAUX[ici.p.niveau] || ''}` : '📍 Extérieur';
+    if (!this.plafonniers) {
+      this.plafonniers = [0, 1, 2].map(() => { const l = new THREE.PointLight('#ffe9cc', 9, 9, 1.5); this.v.scene.add(l); return l; });
+    }
+    this.plafonniers.forEach((l, i) => { const q = proches[i]; l.visible = !!q && q.d < 9; if (q) l.position.set(q.p.pos.x, q.p.pos.y + 1.0, q.p.pos.z); });
   }
 
   _appliquer() {
