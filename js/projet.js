@@ -29,7 +29,12 @@ async function demarrer() {
       }
     } else v.afficherProjet(p.modele);
     charg.hidden = true;
-    if (Visite.disponible(v.modele)) document.querySelector('.bouton-visite').hidden = false;
+    if (Visite.disponible(v.modele)) {
+      document.querySelector('.bouton-visite').hidden = false;
+      const go = document.createElement('button'); go.className = 'visite-depart'; go.textContent = '▶ Entrer dans la maison';
+      go.addEventListener('click', () => document.querySelector('.bouton-visite').click());
+      document.getElementById('scene').appendChild(go);
+    }
   };
   afficher3D();
   let visite = null;

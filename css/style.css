@@ -340,3 +340,11 @@ fieldset.prive { border-color: var(--or-fonce); }
 .visite-pad [data-k=avant] { grid-area: avant; } .visite-pad [data-k=arriere] { grid-area: arriere; } .visite-pad [data-k=gauche] { grid-area: gauche; } .visite-pad [data-k=droite] { grid-area: droite; }
 .scene.en-visite .aide-3d { display: none; }
 .scene.en-visite canvas { touch-action: none; }
+.visite-joystick { position: absolute; left: 18px; bottom: 70px; z-index: 6; width: 120px; height: 120px; border-radius: 50%; touch-action: none;
+  background: radial-gradient(circle, rgba(255, 255, 255, .10), rgba(15, 17, 20, .55)); border: 2px solid rgba(255, 255, 255, .35); display: grid; place-items: center; }
+.visite-manette { width: 52px; height: 52px; border-radius: 50%; background: var(--or); box-shadow: 0 4px 14px rgba(0, 0, 0, .45); pointer-events: none; transition: transform .05s; }
+.visite-hud { position: absolute; right: 14px; top: 14px; z-index: 6; background: rgba(15, 17, 20, .82); color: #fff; padding: .45em .9em; border-radius: 999px; font: 600 .82rem var(--corps); }
+.visite-depart { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 4; border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--or); color: #17130c; font: 800 1.05rem var(--corps); padding: 1em 1.8em; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); animation: pastille 2s infinite; }
+.scene.en-visite .visite-depart { display: none; }
+@media (max-width: 640px) { .visite-hud { top: auto; bottom: 200px; right: 12px; } .visite-panneau { font-size: .72rem; } }
