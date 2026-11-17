@@ -171,11 +171,11 @@ export class Visite {
   _lumiere(interieur) {
     const v = this.v;
     if (interieur && !this._sauve) {
-      this._sauve = { hemi: v.hemi.intensity, soleil: v.soleil.intensity, ombre: v.soleil.castShadow, fog: v.scene.fog };
-      v.hemi.intensity = Math.max(1.1, v.hemi.intensity * 2); v.soleil.castShadow = false; v.scene.fog = null;
-      this.lampe = new THREE.PointLight('#fff3df', 6, 14, 1.4); v.camera.add(this.lampe); if (!v.camera.parent) v.scene.add(v.camera);
+      this._sauve = { hemi: v.hemi.intensity, soleil: v.soleil.intensity, ombre: v.soleil.castShadow, fog: v.scene.fog, expo: v.renderer.toneMappingExposure };
+      v.soleil.castShadow = false; v.scene.fog = null; v.renderer.toneMappingExposure = Math.min(0.8, this._sauve.expo);
+      this.lampe = new THREE.PointLight('#fff3df', 2.5, 9, 1.6); v.camera.add(this.lampe); if (!v.camera.parent) v.scene.add(v.camera);
     } else if (!interieur && this._sauve) {
-      v.hemi.intensity = this._sauve.hemi; v.soleil.castShadow = this._sauve.ombre; v.scene.fog = this._sauve.fog;
+      v.hemi.intensity = this._sauve.hemi; v.soleil.castShadow = this._sauve.ombre; v.scene.fog = this._sauve.fog; v.renderer.toneMappingExposure = this._sauve.expo;
       v.camera.remove(this.lampe); this.lampe.dispose?.(); this.lampe = null; this._sauve = null;
       v.camera.rotation.set(0, 0, 0);
     }
