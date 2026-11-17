@@ -319,3 +319,24 @@ fieldset.prive { border-color: var(--or-fonce); }
 .confidentialite p { margin: 0; font-size: .86rem; color: #cfd8d2; line-height: 1.55; }
 .confidentialite b { color: var(--ok); }
 .confidentialite a { color: var(--or); text-decoration: underline; }
+
+/* ---------- Visite intérieure (js/visite.js) ---------- */
+.barre-3d .bouton-visite { background: var(--or); color: #17130c; font-weight: 700; }
+.barre-3d .bouton-visite.actif { background: #fff; }
+.visite-calque { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+.visite-pastille { position: absolute; transform: translate(-50%, -50%); pointer-events: auto; display: inline-flex; align-items: center; gap: .45em;
+  background: rgba(15, 17, 20, .82); color: #fff; border: 2px solid var(--or); border-radius: 999px; padding: .35em .8em .35em .4em;
+  font: 600 .78rem var(--corps); cursor: pointer; white-space: nowrap; box-shadow: 0 0 0 0 rgba(212, 167, 92, .7); animation: pastille 2s infinite; }
+.visite-pastille span { display: grid; place-items: center; width: 1.6em; height: 1.6em; border-radius: 50%; background: var(--or); color: #17130c; }
+.visite-pastille:hover { background: var(--or); color: #17130c; }
+@keyframes pastille { 0% { box-shadow: 0 0 0 0 rgba(212, 167, 92, .6); } 70% { box-shadow: 0 0 0 12px rgba(212, 167, 92, 0); } 100% { box-shadow: 0 0 0 0 rgba(212, 167, 92, 0); } }
+.visite-panneau { position: absolute; top: 12px; left: 12px; z-index: 6; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; max-width: calc(100% - 24px);
+  background: rgba(15, 17, 20, .85); color: #fff; border-radius: 14px; padding: 8px 10px; backdrop-filter: blur(6px); font: .8rem var(--corps); }
+.visite-panneau select, .visite-panneau button { font: 500 .8rem var(--corps); border-radius: 999px; border: 1px solid rgba(255, 255, 255, .2); background: #1d2026; color: #fff; padding: .35em .8em; cursor: pointer; }
+.visite-panneau .visite-sortir { background: var(--or); color: #17130c; border: 0; font-weight: 700; }
+.visite-aide { flex-basis: 100%; color: #b9bcc4; font-size: .72rem; }
+.visite-pad { position: absolute; right: 14px; bottom: 64px; z-index: 6; display: grid; grid-template-areas: ". avant ." "gauche . droite" ". arriere ."; gap: 4px; }
+.visite-pad button { width: 46px; height: 46px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, .2); background: rgba(15, 17, 20, .8); color: #fff; font-size: 1.1rem; touch-action: none; user-select: none; }
+.visite-pad [data-k=avant] { grid-area: avant; } .visite-pad [data-k=arriere] { grid-area: arriere; } .visite-pad [data-k=gauche] { grid-area: gauche; } .visite-pad [data-k=droite] { grid-area: droite; }
+.scene.en-visite .aide-3d { display: none; }
+.scene.en-visite canvas { touch-action: none; }

@@ -58,10 +58,14 @@ export class Visionneuse {
     this.redimensionner();
 
     this._actif = true;
+    this.surBoucle = null;   // tâche optionnelle appelée à chaque image (visite intérieure)
+    let avant = performance.now();
     const boucle = () => {
       if (!this._actif) return;
       this._raf = requestAnimationFrame(boucle);
-      this.controls.update();
+      const t = performance.now(), dt = (t - avant) / 1000; avant = t;
+      if (this.controls.enabled) this.controls.update();
+      this.surBoucle?.(dt);
       this._animerEclatement();
       this.renderer.render(this.scene, this.camera);
     };

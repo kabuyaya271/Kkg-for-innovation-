@@ -2,6 +2,7 @@ import { CONFIG } from './config.js';
 import { getProjets, formatPrix, prixLicence, ajouterAuPanier, getPanier } from './store.js';
 import { initialiserPage, esc, carteProjet, toast, LIBELLES_TYPE, estReference, lienWhatsApp } from './ui.js';
 import { Visionneuse, vignette } from './viewer.js';
+import { Visite } from './visite.js';
 
 initialiserPage();
 
@@ -28,8 +29,10 @@ async function demarrer() {
       }
     } else v.afficherProjet(p.modele);
     charg.hidden = true;
+    if (Visite.disponible(v.modele)) document.querySelector('.bouton-visite').hidden = false;
   };
   afficher3D();
+  let visite = null;
 
   const scene = document.getElementById('scene');
   const etat = { rotation: false, nuit: false, filaire: false };
@@ -38,6 +41,12 @@ async function demarrer() {
     if (!b) return;
     const a = b.dataset.action;
     if (a in etat) { etat[a] = !etat[a]; b.classList.toggle('actif', etat[a]); }
+    if (a === 'visite') {
+      visite ||= new Visite(v, scene); window.__visite = visite;
+      visite.onSortie = () => scene.querySelector('.bouton-visite').classList.remove('actif');
+      if (visite.actif) visite.desactiver(); else { v.controls.autoRotate = false; visite.activer(); b.classList.add('actif'); }
+      return;
+    }
     if (a === 'rotation') v.controls.autoRotate = etat.rotation;
     if (a === 'nuit') v.definirNuit(etat.nuit);
     if (a === 'filaire') v.definirFilaire(etat.filaire);
