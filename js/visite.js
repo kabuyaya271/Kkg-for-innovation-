@@ -255,12 +255,19 @@ export class Visite {
     }
     if (m.lengthSq() > 0) {
       m.normalize(); const pas = VITESSE * (this._course || 1) * dt;
-      if (!this._bloque(this.pieds, m, pas)) {
-        const essai = this.pieds.clone().addScaledVector(m, pas);
+      // essai direct, puis glissement le long de l'obstacle (comme dans un jeu vidéo)
+      const essais = [m, new THREE.Vector3(m.x, 0, 0), new THREE.Vector3(0, 0, m.z),
+        m.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), 0.7), m.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), -0.7)];
+      let bouge = false;
+      for (const d of essais) {
+        if (d.lengthSq() < 0.04) continue;
+        const u = d.clone().normalize(), l = pas * (d === m ? 1 : Math.max(0.5, d.length()));
+        if (this._bloque(this.pieds, u, l)) continue;
+        const essai = this.pieds.clone().addScaledVector(u, l);
         const s = this._sol(essai);
-        if (s !== null && s - this.pieds.y <= MARCHE_MAX) { this.pieds.x = essai.x; this.pieds.z = essai.z; }
-        else this.cible = null;
-      } else this.cible = null;
+        if (s !== null && s - this.pieds.y <= MARCHE_MAX) { this.pieds.x = essai.x; this.pieds.z = essai.z; bouge = true; break; }
+      }
+      if (!bouge) this.cible = null;
     }
     // suivre le sol (descente douce, jamais dans le vide)
     const s = this._sol(this.pieds);
