@@ -1,0 +1,5 @@
+# montage : sources lourdes et dépendances
+montage/node_modules/
+montage/inspiration/*.mp4
+montage/rendus/
+montage/*.mp4

@@ -1,6 +1,7 @@
 # OpenCode (agent de code libre, https://opencode.ai) : écrivez /oc ou /opencode dans un commentaire
 # d'issue ou de pull request pour lui confier une tâche. Il travaille dans GitHub Actions et ouvre une PR.
-# Prérequis : secret de dépôt ANTHROPIC_API_KEY (Settings → Secrets and variables → Actions).
+# Modèle GRATUIT d'OpenCode (aucun compte, aucune clé API nécessaire). Autres modèles gratuits :
+#   opencode/deepseek-v4.1-flash-free, opencode/big-pickle
 name: opencode
 
 on:
@@ -31,8 +32,7 @@ jobs:
       - name: Lancer OpenCode
         uses: anomalyco/opencode/github@github-v1.2.28
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          model: anthropic/claude-sonnet-5-5
+          model: opencode/glm-5.3-flash-free
           use_github_token: true
