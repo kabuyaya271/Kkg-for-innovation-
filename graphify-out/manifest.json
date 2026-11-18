@@ -1,0 +1,740 @@
+{
+  ".claude/settings.json": {
+    "mtime": 1794997220.5937884,
+    "seen": 1794997229.5167325,
+    "ast_hash": "b2bf0730953b4a23e012cb21907f7888",
+    "semantic_hash": ""
+  },
+  ".github/workflows/opencode.yml": {
+    "mtime": 1794994944.2969666,
+    "seen": 1794997229.5167415,
+    "ast_hash": "10461d727c573609836b4e676a2638a3",
+    "semantic_hash": ""
+  },
+  ".mcp.json": {
+    "mtime": 1794881785.4978235,
+    "seen": 1794997229.5167449,
+    "ast_hash": "c64d5a1fa3beb9b73d105fd449714406",
+    "semantic_hash": ""
+  },
+  ".specify/init-options.json": {
+    "mtime": 1794880968.155056,
+    "seen": 1794997229.5167468,
+    "ast_hash": "f70faef283cb01ada775d057361808c8",
+    "semantic_hash": ""
+  },
+  ".specify/integration.json": {
+    "mtime": 1794880968.12774,
+    "seen": 1794997229.516748,
+    "ast_hash": "08e5156201078a7bafa5ca8e401083c6",
+    "semantic_hash": ""
+  },
+  ".specify/integrations/claude.manifest.json": {
+    "mtime": 1794880968.125019,
+    "seen": 1794997229.5167491,
+    "ast_hash": "ece455667c38d903a5f3c65c2b4562b5",
+    "semantic_hash": ""
+  },
+  ".specify/integrations/speckit.manifest.json": {
+    "mtime": 1794880968.1411562,
+    "seen": 1794997229.5167506,
+    "ast_hash": "4035d873726567067e022537b781b113",
+    "semantic_hash": ""
+  },
+  ".specify/memory/.constitution-template.json": {
+    "mtime": 1794880968.1565893,
+    "seen": 1794997229.5167513,
+    "ast_hash": "7e3332a78cec1722b4351c6bf52dfc51",
+    "semantic_hash": ""
+  },
+  ".specify/scripts/bash/check-prerequisites.sh": {
+    "mtime": 1794880968.136937,
+    "seen": 1794997229.516753,
+    "ast_hash": "1e3da665a8cb076af9d7c862dbd84fd5",
+    "semantic_hash": ""
+  },
+  ".specify/scripts/bash/common.sh": {
+    "mtime": 1794880968.1361544,
+    "seen": 1794997229.516754,
+    "ast_hash": "da4d4e4c1b6c52769be18f528c22f362",
+    "semantic_hash": ""
+  },
+  ".specify/scripts/bash/create-new-feature.sh": {
+    "mtime": 1794880968.1377265,
+    "seen": 1794997229.5167549,
+    "ast_hash": "69c82567b65126104915a2a9f6b7fab5",
+    "semantic_hash": ""
+  },
+  ".specify/scripts/bash/resolve-template.sh": {
+    "mtime": 1794880968.135401,
+    "seen": 1794997229.5167563,
+    "ast_hash": "8e3dfe574895c76bb9cd555fea0ce54d",
+    "semantic_hash": ""
+  },
+  ".specify/scripts/bash/setup-plan.sh": {
+    "mtime": 1794880968.1346347,
+    "seen": 1794997229.5167572,
+    "ast_hash": "0a509dca68e823ab579ad941bb15691b",
+    "semantic_hash": ""
+  },
+  ".specify/scripts/bash/setup-tasks.sh": {
+    "mtime": 1794880968.1338785,
+    "seen": 1794997229.5167582,
+    "ast_hash": "30ec558a29cb7cee770f6a1238a6e68b",
+    "semantic_hash": ""
+  },
+  ".specify/workflows/speckit/workflow.yml": {
+    "mtime": 1794880957.386879,
+    "seen": 1794997229.5167594,
+    "ast_hash": "7286e2a3660b3c71fdcbfd2f751f2bce",
+    "semantic_hash": ""
+  },
+  ".specify/workflows/workflow-registry.json": {
+    "mtime": 1794880968.1542745,
+    "seen": 1794997229.51676,
+    "ast_hash": "0a23ba6c9e5318ae03e5301e897fa95f",
+    "semantic_hash": ""
+  },
+  "agent-ia/package.json": {
+    "mtime": 1794767374.5771651,
+    "seen": 1794997229.5167613,
+    "ast_hash": "c53dd038819a37a662b8832009ebef4e",
+    "semantic_hash": ""
+  },
+  "agent-ia/src/connaissances.js": {
+    "mtime": 1794852099.4330983,
+    "seen": 1794997229.5167623,
+    "ast_hash": "6592bca82574b76432f0f1715cdca75b",
+    "semantic_hash": ""
+  },
+  "agent-ia/src/index.js": {
+    "mtime": 1794830976.0094051,
+    "seen": 1794997229.5167634,
+    "ast_hash": "d414f57a04c1031cd866dd02c9c24aa3",
+    "semantic_hash": ""
+  },
+  "agent-ia/src/studio.js": {
+    "mtime": 1794770503.459785,
+    "seen": 1794997229.5167644,
+    "ast_hash": "fac15c76f6492a7d6b626f14d5db5c4c",
+    "semantic_hash": ""
+  },
+  "data/projets.json": {
+    "mtime": 1794916285.2218792,
+    "seen": 1794997229.5167656,
+    "ast_hash": "ae308bd818244cf99f6d7038425e161b",
+    "semantic_hash": ""
+  },
+  "js/accueil.js": {
+    "mtime": 1794851865.5412683,
+    "seen": 1794997229.5167668,
+    "ast_hash": "94c7c5cef017e54f667e6ffdcc3e077e",
+    "semantic_hash": ""
+  },
+  "js/admin.js": {
+    "mtime": 1794831251.5812292,
+    "seen": 1794997229.5167677,
+    "ast_hash": "b14361ccff8e8e685398c7394d592e61",
+    "semantic_hash": ""
+  },
+  "js/assistant.js": {
+    "mtime": 1794767855.4538803,
+    "seen": 1794997229.5167687,
+    "ast_hash": "49d04bc4672931265214c54686941459",
+    "semantic_hash": ""
+  },
+  "js/builder3d.js": {
+    "mtime": 1794684267.6266446,
+    "seen": 1794997229.5167701,
+    "ast_hash": "43373e8d408b1b134c19ab39f2d9fcfd",
+    "semantic_hash": ""
+  },
+  "js/conditions.js": {
+    "mtime": 1794767315.4085202,
+    "seen": 1794997229.5167708,
+    "ast_hash": "feea5736b10285ab08b6bb3aa876854e",
+    "semantic_hash": ""
+  },
+  "js/config.js": {
+    "mtime": 1794852099.4302428,
+    "seen": 1794997229.516772,
+    "ast_hash": "43b8a4bf978b8104aeed866e4af64bb9",
+    "semantic_hash": ""
+  },
+  "js/historique.js": {
+    "mtime": 1794768915.069699,
+    "seen": 1794997229.5167727,
+    "ast_hash": "cfbb67422cf25baf7ba908333f159acc",
+    "semantic_hash": ""
+  },
+  "js/journal.js": {
+    "mtime": 1794770994.9086154,
+    "seen": 1794997229.5167742,
+    "ast_hash": "e7457a930f000b5d3fc8fcb22001b314",
+    "semantic_hash": ""
+  },
+  "js/panier.js": {
+    "mtime": 1794830961.004006,
+    "seen": 1794997229.516775,
+    "ast_hash": "9cde4e7ba7b5dd297ad95948c29977d8",
+    "semantic_hash": ""
+  },
+  "js/projet.js": {
+    "mtime": 1794888977.4351616,
+    "seen": 1794997229.5167758,
+    "ast_hash": "a35d93a7c3b7c703c217893f3becc017",
+    "semantic_hash": ""
+  },
+  "js/store.js": {
+    "mtime": 1794767185.8245125,
+    "seen": 1794997229.516777,
+    "ast_hash": "e5060c5752fe2c662236d4decb08a4b9",
+    "semantic_hash": ""
+  },
+  "js/studio/app.js": {
+    "mtime": 1794771158.0679724,
+    "seen": 1794997229.516778,
+    "ast_hash": "2af82df872b89827f9d2ea073811386c",
+    "semantic_hash": ""
+  },
+  "js/studio/editeur.js": {
+    "mtime": 1794771268.9323857,
+    "seen": 1794997229.516779,
+    "ast_hash": "09a7a9aed1626fb3311a2739239e7917",
+    "semantic_hash": ""
+  },
+  "js/studio/exports.js": {
+    "mtime": 1794771268.9329555,
+    "seen": 1794997229.5167801,
+    "ast_hash": "4de9eeccf09ff2dd5ed5088593301e77",
+    "semantic_hash": ""
+  },
+  "js/studio/modele.js": {
+    "mtime": 1794770546.6637876,
+    "seen": 1794997229.516781,
+    "ast_hash": "88203ae7ab76711c289faa42dc30a34d",
+    "semantic_hash": ""
+  },
+  "js/studio/vue3d.js": {
+    "mtime": 1794770714.7037976,
+    "seen": 1794997229.516782,
+    "ast_hash": "f12683987b8858c60d6d299458bd2d62",
+    "semantic_hash": ""
+  },
+  "js/sur-mesure.js": {
+    "mtime": 1794769427.4543014,
+    "seen": 1794997229.5167828,
+    "ast_hash": "4ddd4619cae1a11e9e007effe3125af7",
+    "semantic_hash": ""
+  },
+  "js/ui.js": {
+    "mtime": 1794830976.0078454,
+    "seen": 1794997229.516784,
+    "ast_hash": "29d3b10de58ba5e15d2cae438b5bd02b",
+    "semantic_hash": ""
+  },
+  "js/viewer.js": {
+    "mtime": 1794883675.7233448,
+    "seen": 1794997229.516785,
+    "ast_hash": "0108ccaf48cab8dceb27f2be2fe6ce60",
+    "semantic_hash": ""
+  },
+  "js/visite.js": {
+    "mtime": 1794889160.5005434,
+    "seen": 1794997229.5167859,
+    "ast_hash": "c5aaecefb709a441604f751ab9ca030c",
+    "semantic_hash": ""
+  },
+  ".claude/skills/reverse-engineer-anything/SKILL.md": {
+    "mtime": 1794881785.7423806,
+    "seen": 1794997229.516787,
+    "ast_hash": "9caa12afa6a950b4cbb61574a7a2af3f",
+    "semantic_hash": ""
+  },
+  ".claude/skills/reverse-engineer-anything/references/android-applications.md": {
+    "mtime": 1794881785.7419264,
+    "seen": 1794997229.516788,
+    "ast_hash": "58a55ad3bb04c877a334548f8ffce0e2",
+    "semantic_hash": ""
+  },
+  ".claude/skills/reverse-engineer-anything/references/connection-and-recovery.md": {
+    "mtime": 1794881785.5049367,
+    "seen": 1794997229.5167916,
+    "ast_hash": "c12b376a4c25d888d354bb26199d2225",
+    "semantic_hash": ""
+  },
+  ".claude/skills/reverse-engineer-anything/references/desktop-build.md": {
+    "mtime": 1794881785.742321,
+    "seen": 1794997229.5167925,
+    "ast_hash": "2ce6c906625818acb529ac7391cd7c0b",
+    "semantic_hash": ""
+  },
+  ".claude/skills/reverse-engineer-anything/references/environments.md": {
+    "mtime": 1794881785.7421715,
+    "seen": 1794997229.5167935,
+    "ast_hash": "f07930c79e4d30ba80b56d9f9bb59052",
+    "semantic_hash": ""
+  },
+  ".claude/skills/reverse-engineer-anything/references/evidence-workflows.md": {
+    "mtime": 1794881785.7420936,
+    "seen": 1794997229.5167944,
+    "ast_hash": "b340f386dbf965b088e80cab2235d318",
+    "semantic_hash": ""
+  },
+  ".claude/skills/reverse-engineer-anything/references/javascript-applications.md": {
+    "mtime": 1794881785.7378235,
+    "seen": 1794997229.5167954,
+    "ast_hash": "29199bca78710eb5423234a2ae3cc4c1",
+    "semantic_hash": ""
+  },
+  ".claude/skills/reverse-engineer-anything/references/native-and-artifacts.md": {
+    "mtime": 1794881785.5054839,
+    "seen": 1794997229.5167964,
+    "ast_hash": "a64c4f30c30092590642ce1feafc5bfc",
+    "semantic_hash": ""
+  },
+  ".claude/skills/reverse-engineer-anything/references/runtime-observation.md": {
+    "mtime": 1794881785.742012,
+    "seen": 1794997229.5167975,
+    "ast_hash": "bc1e08edaf8f10765ea32fad6b4d88d9",
+    "semantic_hash": ""
+  },
+  ".claude/skills/speckit-analyze/SKILL.md": {
+    "mtime": 1794880968.0984728,
+    "seen": 1794997229.5167985,
+    "ast_hash": "30d0f5fecd6045de4ba9d662f198b899",
+    "semantic_hash": ""
+  },
+  ".claude/skills/speckit-checklist/SKILL.md": {
+    "mtime": 1794880968.1174548,
+    "seen": 1794997229.5167994,
+    "ast_hash": "e5b258cdba43b58b4e8de62544b53bed",
+    "semantic_hash": ""
+  },
+  ".claude/skills/speckit-clarify/SKILL.md": {
+    "mtime": 1794880968.1023,
+    "seen": 1794997229.5168002,
+    "ast_hash": "4d30622d5a8d672178225c23b88ed210",
+    "semantic_hash": ""
+  },
+  ".claude/skills/speckit-constitution/SKILL.md": {
+    "mtime": 1794880968.1048038,
+    "seen": 1794997229.5168014,
+    "ast_hash": "0cadc4d21de0c37700311e30d937c8f7",
+    "semantic_hash": ""
+  },
+  ".claude/skills/speckit-converge/SKILL.md": {
+    "mtime": 1794880968.110047,
+    "seen": 1794997229.516802,
+    "ast_hash": "2df36953a5d137702318605f99a9f4f3",
+    "semantic_hash": ""
+  },
+  ".claude/skills/speckit-implement/SKILL.md": {
+    "mtime": 1794880968.1073968,
+    "seen": 1794997229.5168033,
+    "ast_hash": "86a6833728df75303a72cf5de048a281",
+    "semantic_hash": ""
+  },
+  ".claude/skills/speckit-plan/SKILL.md": {
+    "mtime": 1794880968.1124496,
+    "seen": 1794997229.516804,
+    "ast_hash": "5816d3428b6db3a579c01eef0d02a74f",
+    "semantic_hash": ""
+  },
+  ".claude/skills/speckit-specify/SKILL.md": {
+    "mtime": 1794880968.1214113,
+    "seen": 1794997229.5168052,
+    "ast_hash": "d03b28ac4f73de70176c92e863937077",
+    "semantic_hash": ""
+  },
+  ".claude/skills/speckit-tasks/SKILL.md": {
+    "mtime": 1794880968.1243083,
+    "seen": 1794997229.5168064,
+    "ast_hash": "3fea9c8a678fdd7344b30e1cc71fbb67",
+    "semantic_hash": ""
+  },
+  ".specify/memory/constitution.md": {
+    "mtime": 1794880968.15621,
+    "seen": 1794997229.5168073,
+    "ast_hash": "dcefb6b60e7cb3db2e966977b6f02f18",
+    "semantic_hash": ""
+  },
+  ".specify/templates/checklist-template.md": {
+    "mtime": 1794880968.13973,
+    "seen": 1794997229.5168345,
+    "ast_hash": "5af23404f7e1314e93fab2bcfcfa5c23",
+    "semantic_hash": ""
+  },
+  ".specify/templates/constitution-template.md": {
+    "mtime": 1794880968.1388032,
+    "seen": 1794997229.5168426,
+    "ast_hash": "dcefb6b60e7cb3db2e966977b6f02f18",
+    "semantic_hash": ""
+  },
+  ".specify/templates/plan-template.md": {
+    "mtime": 1794880968.1402268,
+    "seen": 1794997229.5168462,
+    "ast_hash": "311db0670c3d19d2f5b781de97529b79",
+    "semantic_hash": ""
+  },
+  ".specify/templates/spec-template.md": {
+    "mtime": 1794880968.1392932,
+    "seen": 1794997229.5168486,
+    "ast_hash": "45ac8538bc1220324c9f0d610145b53f",
+    "semantic_hash": ""
+  },
+  ".specify/templates/tasks-template.md": {
+    "mtime": 1794880968.138331,
+    "seen": 1794997229.5168505,
+    "ast_hash": "f8b4f62d384defa0a559bdbbaacb0540",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1794997206.420838,
+    "seen": 1794997229.516852,
+    "ast_hash": "e07b2d53cb11f0e2172d193a9388de46",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1794831265.0965185,
+    "seen": 1794997229.516854,
+    "ast_hash": "61bdd3b99a3bb9240a9c6c442d3ce81b",
+    "semantic_hash": ""
+  },
+  "admin.html": {
+    "mtime": 1794831251.5819688,
+    "seen": 1794997229.5168555,
+    "ast_hash": "eeabcff3854d648286c90a335d8da307",
+    "semantic_hash": ""
+  },
+  "agent-ia/README.md": {
+    "mtime": 1794833669.36942,
+    "seen": 1794997229.5168567,
+    "ast_hash": "bf8493851840acd8c775bc75d9592245",
+    "semantic_hash": ""
+  },
+  "conditions.html": {
+    "mtime": 1794768915.0703423,
+    "seen": 1794997229.5168576,
+    "ast_hash": "0f21676df915de45ead9ce03a93f84f9",
+    "semantic_hash": ""
+  },
+  "index.html": {
+    "mtime": 1794830989.9366584,
+    "seen": 1794997229.5168588,
+    "ast_hash": "5568f6598092e8a0a35a1b9772b432db",
+    "semantic_hash": ""
+  },
+  "montage/METHODE-MONTAGE.md": {
+    "mtime": 1794994970.9853926,
+    "seen": 1794997229.5168605,
+    "ast_hash": "c4a502c5e112af76e4b55629d4c4187f",
+    "semantic_hash": ""
+  },
+  "montage/README.md": {
+    "mtime": 1794994970.9868739,
+    "seen": 1794997229.5168614,
+    "ast_hash": "a723045837c0350a51f53783faee8356",
+    "semantic_hash": ""
+  },
+  "panier.html": {
+    "mtime": 1794769427.4529953,
+    "seen": 1794997229.5168624,
+    "ast_hash": "6be5282d4ea4e00738dd17a3869ae534",
+    "semantic_hash": ""
+  },
+  "projet.html": {
+    "mtime": 1794888952.9197762,
+    "seen": 1794997229.5168638,
+    "ast_hash": "271ff1eea55d5aa8f8c9f0fa9b25109d",
+    "semantic_hash": ""
+  },
+  "publicite/script-voix-off.md": {
+    "mtime": 1794851834.649986,
+    "seen": 1794997229.5168648,
+    "ast_hash": "1ce74bcc88038c46452b4e0eecb13374",
+    "semantic_hash": ""
+  },
+  "publicite/textes-reseaux-sociaux.md": {
+    "mtime": 1794872855.1131241,
+    "seen": 1794997229.5168657,
+    "ast_hash": "5cbfb321b5d798d2d8074435452b3d02",
+    "semantic_hash": ""
+  },
+  "specs/001-module-dao-cao/checklists/requirements.md": {
+    "mtime": 1794881898.3405647,
+    "seen": 1794997229.5168672,
+    "ast_hash": "e4d4a7eb8c460db74720bbf48fae5b30",
+    "semantic_hash": ""
+  },
+  "specs/001-module-dao-cao/spec.md": {
+    "mtime": 1794881889.0378296,
+    "seen": 1794997229.5168684,
+    "ast_hash": "c7bdf276575e34e53a3579e823bc05a4",
+    "semantic_hash": ""
+  },
+  "specs/002-visite-interieure/plan.md": {
+    "mtime": 1794883584.5828643,
+    "seen": 1794997229.5168695,
+    "ast_hash": "115aa18dd30550b60455a38207af175d",
+    "semantic_hash": ""
+  },
+  "specs/002-visite-interieure/spec.md": {
+    "mtime": 1794883584.5812128,
+    "seen": 1794997229.5168705,
+    "ast_hash": "513247459d45e7e5d4bf251ccae7f881",
+    "semantic_hash": ""
+  },
+  "specs/002-visite-interieure/tasks.md": {
+    "mtime": 1794889319.0724685,
+    "seen": 1794997229.5168717,
+    "ast_hash": "e8a8e78fc81f0b6a1c60f52066e79eba",
+    "semantic_hash": ""
+  },
+  "studio.html": {
+    "mtime": 1794770926.3878102,
+    "seen": 1794997229.5168726,
+    "ast_hash": "a3c771b530291da67d8edcdc30629f42",
+    "semantic_hash": ""
+  },
+  "sur-mesure.html": {
+    "mtime": 1794769427.4540775,
+    "seen": 1794997229.5168738,
+    "ast_hash": "35d7ea08220c1af7883fd080e3d2c1e1",
+    "semantic_hash": ""
+  },
+  "images/residence-rwenzori-aerienne.jpg": {
+    "mtime": 1794885909.8702075,
+    "seen": 1794997229.5168748,
+    "ast_hash": "df698136aacf0017cd6c9211bddd41db",
+    "semantic_hash": ""
+  },
+  "images/residence-rwenzori-escalier.jpg": {
+    "mtime": 1794885910.1262076,
+    "seen": 1794997229.516876,
+    "ast_hash": "5ad03ac7e1cf9c78f255303aa329bb98",
+    "semantic_hash": ""
+  },
+  "images/residence-rwenzori-facade.jpg": {
+    "mtime": 1794885909.8342075,
+    "seen": 1794997229.5168786,
+    "ast_hash": "d59a6a2883bdccf89cfe5b6a78d4740f",
+    "semantic_hash": ""
+  },
+  "images/residence-rwenzori-parking.jpg": {
+    "mtime": 1794885909.9662075,
+    "seen": 1794997229.5168796,
+    "ast_hash": "f819576fb3e1e667acfccc606022242a",
+    "semantic_hash": ""
+  },
+  "images/residence-rwenzori-portails.jpg": {
+    "mtime": 1794885909.9182076,
+    "seen": 1794997229.5168808,
+    "ast_hash": "cfbb43f8e8e72be2c66aa647f2320d88",
+    "semantic_hash": ""
+  },
+  "images/residence-rwenzori-rue.jpg": {
+    "mtime": 1794885909.7862077,
+    "seen": 1794997229.5168817,
+    "ast_hash": "1c20066a1450c5177edf226410a00604",
+    "semantic_hash": ""
+  },
+  "images/residence-rwenzori-salle-a-manger.jpg": {
+    "mtime": 1794885910.0502076,
+    "seen": 1794997229.5168827,
+    "ast_hash": "f5d48cb0a16b025c7593b993dcbe02a2",
+    "semantic_hash": ""
+  },
+  "images/residence-rwenzori-salon.jpg": {
+    "mtime": 1794885910.0102077,
+    "seen": 1794997229.5168836,
+    "ast_hash": "cc195f96ca29a8f1e53f1262ec51e0a9",
+    "semantic_hash": ""
+  },
+  "images/residence-rwenzori-suite.jpg": {
+    "mtime": 1794885910.0942075,
+    "seen": 1794997229.5168848,
+    "ast_hash": "83450572cf916939ea67ff6d080de932",
+    "semantic_hash": ""
+  },
+  "images/villa-onyx-aerienne.jpg": {
+    "mtime": 1794851850.0630848,
+    "seen": 1794997229.5168858,
+    "ast_hash": "680e89c6a55be953d6d19fd46a77176c",
+    "semantic_hash": ""
+  },
+  "images/villa-onyx-cuisine.jpg": {
+    "mtime": 1794851850.0787354,
+    "seen": 1794997229.5168867,
+    "ast_hash": "24869e6c1d6346baa2642940c76bc3f5",
+    "semantic_hash": ""
+  },
+  "images/villa-onyx-entree.jpg": {
+    "mtime": 1794851850.0550852,
+    "seen": 1794997229.5168881,
+    "ast_hash": "4241276c47d3f7e53b033df81bb96fe5",
+    "semantic_hash": ""
+  },
+  "images/villa-onyx-facade.jpg": {
+    "mtime": 1794851850.0390742,
+    "seen": 1794997229.516889,
+    "ast_hash": "05804970095e01fd9b986cf0a4aa833c",
+    "semantic_hash": ""
+  },
+  "images/villa-onyx-hall.jpg": {
+    "mtime": 1794851850.0669396,
+    "seen": 1794997229.51689,
+    "ast_hash": "c60bdebd2510cd9fa49e7ef26e7c9508",
+    "semantic_hash": ""
+  },
+  "images/villa-onyx-piscine.jpg": {
+    "mtime": 1794851850.0857599,
+    "seen": 1794997229.5168912,
+    "ast_hash": "2f712d448e866961aff41862542e1c2f",
+    "semantic_hash": ""
+  },
+  "images/villa-onyx-sejour.jpg": {
+    "mtime": 1794851850.0709872,
+    "seen": 1794997229.5168924,
+    "ast_hash": "42eaa39528a9edf526f353b37864b56a",
+    "semantic_hash": ""
+  },
+  "images/villa-onyx-suite.jpg": {
+    "mtime": 1794851850.0828226,
+    "seen": 1794997229.5168931,
+    "ast_hash": "94c6e8e95ebc41c45a86ec65f03a0248",
+    "semantic_hash": ""
+  },
+  "images/villa-royale-aerienne.jpg": {
+    "mtime": 1794872839.2771232,
+    "seen": 1794997229.516894,
+    "ast_hash": "1a7ffd89ca387fd8bcfcadce7acc2177",
+    "semantic_hash": ""
+  },
+  "images/villa-royale-facade.jpg": {
+    "mtime": 1794872839.2371233,
+    "seen": 1794997229.5168953,
+    "ast_hash": "483b9027d77899e77ff130ad1d67c74b",
+    "semantic_hash": ""
+  },
+  "images/villa-royale-hall.jpg": {
+    "mtime": 1794872839.3651233,
+    "seen": 1794997229.5168962,
+    "ast_hash": "268756bd2880b8e00a8d43689e2df5a1",
+    "semantic_hash": ""
+  },
+  "images/villa-royale-majlis.jpg": {
+    "mtime": 1794872839.4171233,
+    "seen": 1794997229.5168974,
+    "ast_hash": "62e260de62ba7e2c7db96f4a1c235890",
+    "semantic_hash": ""
+  },
+  "images/villa-royale-piscine.jpg": {
+    "mtime": 1794872839.6171234,
+    "seen": 1794997229.5168986,
+    "ast_hash": "00b5bfc34d6b7849ed3fe55ca021f91d",
+    "semantic_hash": ""
+  },
+  "images/villa-royale-rue.jpg": {
+    "mtime": 1794872839.3211231,
+    "seen": 1794997229.5168996,
+    "ast_hash": "ae44fd43b3f380d8dce20845322d6ff0",
+    "semantic_hash": ""
+  },
+  "images/villa-royale-salle-a-manger.jpg": {
+    "mtime": 1794872839.5211232,
+    "seen": 1794997229.5169008,
+    "ast_hash": "deedac77ee075be2965ffafcc3ee0802",
+    "semantic_hash": ""
+  },
+  "images/villa-royale-salon-ovale.jpg": {
+    "mtime": 1794872839.4691231,
+    "seen": 1794997229.516902,
+    "ast_hash": "ed35008c939965812c09a46253c4579a",
+    "semantic_hash": ""
+  },
+  "images/villa-royale-suite.jpg": {
+    "mtime": 1794872839.5731232,
+    "seen": 1794997229.5169027,
+    "ast_hash": "ed5a3469a1da778b3ed62f7d2ddfaa80",
+    "semantic_hash": ""
+  },
+  "publicite/couverture-plan-interieur.jpg": {
+    "mtime": 1794851833.9288914,
+    "seen": 1794997229.5169039,
+    "ast_hash": "04e15da1ff2d99f4350376d6c8f6c65a",
+    "semantic_hash": ""
+  },
+  "publicite/couverture.jpg": {
+    "mtime": 1794851833.9328916,
+    "seen": 1794997229.5169046,
+    "ast_hash": "6e8ff4ecdc5acb5e15d722099d3cc15c",
+    "semantic_hash": ""
+  },
+  "publicite/villa-onyx-couverture.jpg": {
+    "mtime": 1794854071.6850245,
+    "seen": 1794997229.516906,
+    "ast_hash": "9904f4c1b8462cdc7aa79cf6a48486a9",
+    "semantic_hash": ""
+  },
+  "publicite/villa-royale-couverture.jpg": {
+    "mtime": 1794872839.7044778,
+    "seen": 1794997229.516907,
+    "ast_hash": "a00a01183a24050e53ace2997c57c8ae",
+    "semantic_hash": ""
+  },
+  "publicite/kkg-pub-avec-musique.mp4": {
+    "mtime": 1794851834.0968916,
+    "seen": 1794997229.516908,
+    "ast_hash": "771b75100a5cf36bdbdaf35c448dd601",
+    "semantic_hash": ""
+  },
+  "publicite/kkg-pub-plan-interieur-sans-voix.mp4": {
+    "mtime": 1794851834.4248915,
+    "seen": 1794997229.5169091,
+    "ast_hash": "1cbf6977d73da00501b95c7b7beac549",
+    "semantic_hash": ""
+  },
+  "publicite/kkg-pub-plan-interieur.mp4": {
+    "mtime": 1794851834.5688915,
+    "seen": 1794997229.51691,
+    "ast_hash": "45f05d7fcbaaf052aa4a0de01e74d15d",
+    "semantic_hash": ""
+  },
+  "publicite/kkg-pub-sans-musique.mp4": {
+    "mtime": 1794851834.6488917,
+    "seen": 1794997229.516911,
+    "ast_hash": "c44ceea9f6a780e46336f13016cae3be",
+    "semantic_hash": ""
+  },
+  "publicite/villa-onyx-pub-instrumental.mp4": {
+    "mtime": 1794854071.6650245,
+    "seen": 1794997229.5169122,
+    "ast_hash": "6231f7cac016e129c3b200f97f517d15",
+    "semantic_hash": ""
+  },
+  "publicite/villa-onyx-pub.mp4": {
+    "mtime": 1794854012.461021,
+    "seen": 1794997229.5169132,
+    "ast_hash": "bc8d03429d78c0b978e32838cecd05e6",
+    "semantic_hash": ""
+  },
+  "publicite/villa-royale-pub-instrumental.mp4": {
+    "mtime": 1794872830.6291227,
+    "seen": 1794997229.5169148,
+    "ast_hash": "1a00fbb7ab0487854135694c7eb773ea",
+    "semantic_hash": ""
+  },
+  "publicite/villa-royale-pub.mp4": {
+    "mtime": 1794872826.4771225,
+    "seen": 1794997229.516916,
+    "ast_hash": "3c2d1d112e53bfd0a43ed4c3d4cbe36d",
+    "semantic_hash": ""
+  },
+  "agent-ia/package-lock.json": {
+    "mtime": 1794767611.4565377,
+    "seen": 1794997229.516917,
+    "ast_hash": "811c70c9fa2db73d03626a8a07248585",
+    "semantic_hash": ""
+  }
+}
