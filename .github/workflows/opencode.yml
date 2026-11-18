@@ -1,0 +1,38 @@
+# OpenCode (agent de code libre, https://opencode.ai) : écrivez /oc ou /opencode dans un commentaire
+# d'issue ou de pull request pour lui confier une tâche. Il travaille dans GitHub Actions et ouvre une PR.
+# Prérequis : secret de dépôt ANTHROPIC_API_KEY (Settings → Secrets and variables → Actions).
+name: opencode
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  opencode:
+    # seuls le propriétaire et les collaborateurs du dépôt peuvent déclencher l'agent (protège vos crédits API)
+    if: |
+      (contains(github.event.comment.body, '/oc') || contains(github.event.comment.body, '/opencode')) &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Lancer OpenCode
+        uses: anomalyco/opencode/github@github-v1.2.28
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          model: anthropic/claude-sonnet-5-5
+          use_github_token: true
