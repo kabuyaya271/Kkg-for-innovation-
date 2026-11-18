@@ -3,3 +3,6 @@ montage/node_modules/
 montage/inspiration/*.mp4
 montage/rendus/
 montage/*.mp4
+
+# graphify : cache local
+graphify-out/cache/
