@@ -3,7 +3,19 @@
     "rea": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "rea-agents@6.9.0", "mcp"],
+      "args": [
+        "-y",
+        "rea-agents@6.9.0",
+        "mcp"
+      ],
+      "env": {}
+    },
+    "craft-anything": {
+      "type": "stdio",
+      "command": "craft-anything-cli",
+      "args": [
+        "mcp"
+      ],
       "env": {}
     }
   }
