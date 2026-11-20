@@ -58,3 +58,20 @@ Portique à colonnes corinthiennes, hall en double hauteur avec escalier hélico
 #VillaRoyale #Architecture #Néoclassique #Villa #Kinshasa #RDC #PlanDeMaison #Luxe #KKGforInnovation
 
 Vidéos : `villa-royale-pub.mp4` (voix + musique) · `villa-royale-pub-instrumental.mp4` (musique seule, pour CapCut) · couverture : `villa-royale-couverture.jpg`
+
+---
+
+## Résidence Rwenzori — texte de publication
+
+🏢 **RÉSIDENCE RWENZORI** — l'élégance moderne au cœur de Butembo, par **KKG for Innovation**.
+
+R+3 à toiture cachée · façades de verre et plaquage haut de gamme · parking couvert avec portail d'entrée et portail de sortie · 5 chambres · salon vitré · suite parentale.
+🚶 **Visitez-la à pied en 3D** sur notre site, comme dans un jeu vidéo.
+
+📐 Plan disponible — ou adapté à votre terrain.
+🌐 kabuyaya271.github.io/Kkg-for-innovation-
+📲 WhatsApp : +243 975 465 965
+
+#Butembo #NordKivu #RDC #Maison #Architecture #Plan3D #KKGforInnovation
+
+Vidéos : `residence-rwenzori-pub.mp4` (voix + musique, 32 s) · `residence-rwenzori-pub-instrumental.mp4` · couverture : `residence-rwenzori-couverture.jpg`
