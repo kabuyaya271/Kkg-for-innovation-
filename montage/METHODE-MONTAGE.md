@@ -23,6 +23,8 @@ Ce fichier guide l'IA (OpenCode, Claude…) à chaque montage. Donne-le-lui avec
 
 Règles :
 - **Sous-titres** en français sur toutes les paroles, centrés en bas (au-dessus du bandeau).
+- **Nom de l'entreprise** : « KKG for Innovation » se prononce toujours **en anglais** (voix anglaise pour le nom, le reste en français).
+- **Texte = voix** : chaque texte affiché à l'écran est lu par la voix, mot pour mot.
 - **Zooms** : un léger zoom ou panoramique sur chaque image fixe ; jamais d'image totalement immobile.
 - **B-roll** : rendus 3D du projet (`images/`), captures de la visite à pied, plans (sans cotes privées).
 - **Motion design** : titre de pièce en doré à l'apparition, compteur de surface (m²), flèche « Entrée / Sortie » pour les parkings.
