@@ -23,6 +23,7 @@ export class Visite {
     this.v = viewer; this.sceneEl = scene;
     this.actif = false; this.interieur = false;
     this.yaw = 0; this.pitch = 0; this.pieds = new THREE.Vector3();
+    this.tp = true; this.cap = 0; this.pasPhase = 0;   // tp : personnage guidé à la 3e personne (style GTA)
     this.touches = new Set(); this.cible = null; this.anim = null;
     this.ray = new THREE.Raycaster();
     this._lire();
@@ -75,16 +76,20 @@ export class Visite {
       <select class="visite-choix-entree" aria-label="Se rendre à une entrée"><option value="">Aller à une entrée…</option>${this.entrees.map((e, i) => `<option value="${i}">${esc(e.libelle)}</option>`).join('')}</select>
       <select class="visite-choix-piece" aria-label="Aller à une pièce"><option value="">Aller à une pièce…</option>${Object.keys(parNiveau).sort((a, b) => a - b).map((n) =>
         `<optgroup label="${esc(NIVEAUX[n] || `Niveau ${n}`)}">${parNiveau[n].map(([i, p]) => `<option value="${i}">${esc(p.libelle)}</option>`).join('')}</optgroup>`).join('')}</select>
+      <button class="visite-mode">👁 Vue subjective</button>
       <button class="visite-rue">↺ Revenir dans la rue</button>
       <button class="visite-entrees">🏠 Vue d'ensemble</button>
       <button class="visite-sortir">✕ Quitter</button>
-      <small class="visite-aide">Joystick ou flèches / ZQSD pour marcher · glissez pour regarder · touchez le sol pour y aller · les portes sont ouvertes</small>`;
+      <small class="visite-aide">Guidez le personnage : joystick ou flèches / ZQSD · glissez pour tourner la caméra · touchez le sol pour l'y envoyer</small>`;
     this.sceneEl.appendChild(panneau); this.panneau = panneau;
     panneau.querySelector('.visite-choix-piece').addEventListener('change', (ev) => { if (ev.target.value !== '') this.aller(+ev.target.value); ev.target.value = ''; });
     panneau.querySelector('.visite-choix-entree').addEventListener('change', (ev) => { if (ev.target.value !== '') this.entrer(+ev.target.value); ev.target.value = ''; });
     panneau.querySelector('.visite-sortir').addEventListener('click', () => this.desactiver());
     panneau.querySelector('.visite-entrees').addEventListener('click', () => this.dehors());
     panneau.querySelector('.visite-rue').addEventListener('click', () => this.demarrer());
+    panneau.querySelector('.visite-mode').addEventListener('click', (ev) => {
+      this.tp = !this.tp; ev.target.textContent = this.tp ? '👁 Vue subjective' : '🧍 Personnage'; this._appliquer();
+    });
     if (!this.depart) panneau.querySelector('.visite-rue').hidden = true;
     const hud = document.createElement('div'); hud.className = 'visite-hud'; hud.hidden = true; this.sceneEl.appendChild(hud); this.hud = hud;
 
@@ -148,6 +153,7 @@ export class Visite {
   /** Vue extérieure avec les pastilles d'entrée. */
   dehors() {
     this._lumiere(false); this.interieur = false; this.pad.hidden = true; this.hud.hidden = true; this.calque.hidden = false;
+    if (this.perso) this.perso.visible = false;
     this.v.controls.enabled = true; this.v.cadrer();
   }
 
@@ -179,7 +185,7 @@ export class Visite {
 
   _placer(oeil, yaw, pitch) {
     this.interieur = true; this.pad.hidden = false; this.hud.hidden = false; this.cible = null;
-    this.yaw = yaw; this.pitch = pitch;
+    this.yaw = yaw; this.pitch = pitch; this.cap = yaw;
     this.pieds.copy(oeil).y -= YEUX;
     const s = this._sol(this.pieds, 1.0, 4.0); if (s !== null) this.pieds.y = s;
     this._appliquer();
@@ -268,7 +274,11 @@ export class Visite {
         if (s !== null && s - this.pieds.y <= MARCHE_MAX) { this.pieds.x = essai.x; this.pieds.z = essai.z; bouge = true; break; }
       }
       if (!bouge) this.cible = null;
-    }
+      if (bouge) {
+        let dc = Math.atan2(-m.x, -m.z) - this.cap; dc = Math.atan2(Math.sin(dc), Math.cos(dc)); this.cap += dc * Math.min(1, dt * 10);
+        this.pasPhase += dt * 9 * (this._course || 1);
+      }
+    } else this.pasPhase *= 0.8;
     // suivre le sol (descente douce, jamais dans le vide)
     const s = this._sol(this.pieds);
     if (s !== null) this.pieds.y += (s - this.pieds.y) * Math.min(1, dt * 12);
@@ -278,7 +288,7 @@ export class Visite {
 
   /** Indique la pièce où se trouve le visiteur et allume les plafonniers des pièces proches. */
   _ambiance() {
-    const oeil = this.v.camera.position;
+    const oeil = this.pieds.clone().add(new THREE.Vector3(0, YEUX, 0));
     const proches = this.pieces.map((p) => ({ p, d: Math.hypot(p.pos.x - oeil.x, p.pos.z - oeil.z) + Math.abs(p.pos.y - oeil.y) * 3 })).sort((a, b) => a.d - b.d);
     const ici = proches[0];
     this.hud.textContent = ici && ici.d < 6 ? `📍 ${ici.p.libelle} · ${NIVEAUX[ici.p.niveau] || ''}` : '📍 Extérieur';
@@ -290,8 +300,43 @@ export class Visite {
 
   _appliquer() {
     const c = this.v.camera; c.rotation.order = 'YXZ';
-    c.position.set(this.pieds.x, this.pieds.y + YEUX, this.pieds.z);
-    c.rotation.set(-this.pitch, this.yaw, 0);
+    const perso = this._avatar(); perso.visible = this.tp && this.interieur;
+    if (!this.tp) {
+      c.position.set(this.pieds.x, this.pieds.y + YEUX, this.pieds.z);
+      c.rotation.set(-this.pitch, this.yaw, 0); return;
+    }
+    perso.position.copy(this.pieds); perso.rotation.y = this.cap;
+    const balance = Math.sin(this.pasPhase) * 0.6;
+    perso.userData.jambes.forEach((j, i) => { j.rotation.x = i ? balance : -balance; });
+    perso.userData.bras.forEach((b, i) => { b.rotation.x = i ? -balance * 0.8 : balance * 0.8; });
+    // caméra derrière l'épaule, rapprochée si un mur ou un plafond est entre elle et le personnage
+    const tete = this.pieds.clone().add(new THREE.Vector3(0, 1.55, 0));
+    const elev = THREE.MathUtils.clamp(0.3 + this.pitch, -0.2, 1.3);
+    const dir = new THREE.Vector3(Math.sin(this.yaw) * Math.cos(elev), Math.sin(elev), Math.cos(this.yaw) * Math.cos(elev));
+    let D = 3.2;
+    const proches = this.obstacles.filter(({ s }) => s.center.distanceTo(tete) < s.radius + D + 1).map(({ o }) => o);
+    this.ray.set(tete, dir); this.ray.far = D;
+    const h = this.ray.intersectObjects(proches, false)[0];
+    if (h) D = Math.max(0.35, h.distance - 0.25);
+    c.position.copy(tete).addScaledVector(dir, D);
+    c.lookAt(tete);
+  }
+
+  /** Personnage du visiteur (aux couleurs de KKG for Innovation). */
+  _avatar() {
+    if (this.perso) return this.perso;
+    const m = (c, r = 0.6) => new THREE.MeshStandardMaterial({ color: c, roughness: r });
+    const peau = m('#6b4227'), chemise = m('#d4a75c', 0.5), pantalon = m('#1d2430'), cheveux = m('#141414', 0.9);
+    const g = new THREE.Group(); g.name = 'visiteur';
+    const corps = new THREE.Mesh(new THREE.CapsuleGeometry(0.2, 0.42, 6, 12), chemise); corps.position.y = 1.18; g.add(corps);
+    const tete = new THREE.Mesh(new THREE.SphereGeometry(0.13, 20, 16), peau); tete.position.y = 1.62; g.add(tete);
+    const coiffe = new THREE.Mesh(new THREE.SphereGeometry(0.135, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), cheveux); coiffe.position.y = 1.64; g.add(coiffe);
+    const membre = (x, y, r, l, mat) => { const pivot = new THREE.Group(); pivot.position.set(x, y, 0);
+      const os = new THREE.Mesh(new THREE.CapsuleGeometry(r, l, 4, 8), mat); os.position.y = -l / 2 - r; pivot.add(os); g.add(pivot); return pivot; };
+    g.userData.jambes = [membre(-0.1, 0.86, 0.075, 0.62, pantalon), membre(0.1, 0.86, 0.075, 0.62, pantalon)];
+    g.userData.bras = [membre(-0.27, 1.42, 0.06, 0.45, chemise), membre(0.27, 1.42, 0.06, 0.45, chemise)];
+    g.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+    this.v.scene.add(g); this.perso = g; return g;
   }
 
   _pastilles() {
