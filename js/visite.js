@@ -7,6 +7,9 @@ const YEUX = 1.6;            // hauteur des yeux au-dessus du sol (m)
 const MARCHE_MAX = 0.4;      // hauteur de marche franchissable (m)
 const RAYON = 0.3;           // distance mini aux obstacles (m)
 const VITESSE = 1.7;         // m/s
+// caméras de la visite : [identifiant, libellé, distance, élévation de base]
+const CAMERAS = [['epaule', 'Épaule', 3.2, 0.3], ['large', 'Large', 6.5, 0.7], ['dessus', 'Plan (dessus)', 9, 1.45],
+  ['face', 'Face', 2.6, 0.15], ['subjectif', 'Subjective', 0, 0]];
 const NIVEAUX = ['Rez-de-chaussée', '1er étage', '2e étage', '3e étage', '4e étage', '5e étage'];
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -23,7 +26,7 @@ export class Visite {
     this.v = viewer; this.sceneEl = scene;
     this.actif = false; this.interieur = false;
     this.yaw = 0; this.pitch = 0; this.pieds = new THREE.Vector3();
-    this.tp = true; this.cap = 0; this.pasPhase = 0;   // tp : personnage guidé à la 3e personne (style GTA)
+    this.cam = 0; this.cap = 0; this.pasPhase = 0;   // caméra courante (CAMERAS) ; personnage guidé comme dans GTA
     this.touches = new Set(); this.cible = null; this.anim = null;
     this.ray = new THREE.Raycaster();
     this._lire();
@@ -76,20 +79,18 @@ export class Visite {
       <select class="visite-choix-entree" aria-label="Se rendre à une entrée"><option value="">Aller à une entrée…</option>${this.entrees.map((e, i) => `<option value="${i}">${esc(e.libelle)}</option>`).join('')}</select>
       <select class="visite-choix-piece" aria-label="Aller à une pièce"><option value="">Aller à une pièce…</option>${Object.keys(parNiveau).sort((a, b) => a - b).map((n) =>
         `<optgroup label="${esc(NIVEAUX[n] || `Niveau ${n}`)}">${parNiveau[n].map(([i, p]) => `<option value="${i}">${esc(p.libelle)}</option>`).join('')}</optgroup>`).join('')}</select>
-      <button class="visite-mode">👁 Vue subjective</button>
+      <button class="visite-mode">🎥 Caméra : Épaule</button>
       <button class="visite-rue">↺ Revenir dans la rue</button>
       <button class="visite-entrees">🏠 Vue d'ensemble</button>
       <button class="visite-sortir">✕ Quitter</button>
-      <small class="visite-aide">Guidez le personnage : joystick ou flèches / ZQSD · glissez pour tourner la caméra · touchez le sol pour l'y envoyer</small>`;
+      <small class="visite-aide">Guidez le personnage : joystick ou flèches / ZQSD · glissez pour tourner la caméra · 🎥 ou touche C pour changer d'angle</small>`;
     this.sceneEl.appendChild(panneau); this.panneau = panneau;
     panneau.querySelector('.visite-choix-piece').addEventListener('change', (ev) => { if (ev.target.value !== '') this.aller(+ev.target.value); ev.target.value = ''; });
     panneau.querySelector('.visite-choix-entree').addEventListener('change', (ev) => { if (ev.target.value !== '') this.entrer(+ev.target.value); ev.target.value = ''; });
     panneau.querySelector('.visite-sortir').addEventListener('click', () => this.desactiver());
     panneau.querySelector('.visite-entrees').addEventListener('click', () => this.dehors());
     panneau.querySelector('.visite-rue').addEventListener('click', () => this.demarrer());
-    panneau.querySelector('.visite-mode').addEventListener('click', (ev) => {
-      this.tp = !this.tp; ev.target.textContent = this.tp ? '👁 Vue subjective' : '🧍 Personnage'; this._appliquer();
-    });
+    panneau.querySelector('.visite-mode').addEventListener('click', () => this.changerCamera());
     if (!this.depart) panneau.querySelector('.visite-rue').hidden = true;
     const hud = document.createElement('div'); hud.className = 'visite-hud'; hud.hidden = true; this.sceneEl.appendChild(hud); this.hud = hud;
 
@@ -121,6 +122,7 @@ export class Visite {
     c.addEventListener('pointerup', (e) => { if (!this.interieur || !this._glisse) return; if (this._glisse.d < 6) this._toucher(e); this._glisse = null; });
     this._clavier = (e) => {
       if (!this.interieur || /input|select|textarea/i.test(e.target.tagName)) return;
+      if (e.type === 'keydown' && e.key.toLowerCase() === 'c') { this.changerCamera(); return; }
       const k = { ArrowUp: 'avant', z: 'avant', w: 'avant', ArrowDown: 'arriere', s: 'arriere', ArrowLeft: 'gauche', ArrowRight: 'droite', q: 'pasg', a: 'pasg', d: 'pasd' }[e.key.length === 1 ? e.key.toLowerCase() : e.key];
       if (!k) return; e.preventDefault();
       e.type === 'keydown' ? this.touches.add(k) : this.touches.delete(k); this.cible = null;
@@ -300,8 +302,10 @@ export class Visite {
 
   _appliquer() {
     const c = this.v.camera; c.rotation.order = 'YXZ';
-    const perso = this._avatar(); perso.visible = this.tp && this.interieur;
-    if (!this.tp) {
+    const [mode, , D0, elev0] = CAMERAS[this.cam];
+    const perso = this._avatar(); perso.visible = mode !== 'subjectif' && this.interieur;
+    if (c.near !== 0.1 && mode !== 'dessus') { c.near = 0.1; c.updateProjectionMatrix(); }
+    if (mode === 'subjectif') {
       c.position.set(this.pieds.x, this.pieds.y + YEUX, this.pieds.z);
       c.rotation.set(-this.pitch, this.yaw, 0); return;
     }
@@ -311,15 +315,28 @@ export class Visite {
     perso.userData.bras.forEach((b, i) => { b.rotation.x = i ? -balance * 0.8 : balance * 0.8; });
     // caméra derrière l'épaule, rapprochée si un mur ou un plafond est entre elle et le personnage
     const tete = this.pieds.clone().add(new THREE.Vector3(0, 1.55, 0));
-    const elev = THREE.MathUtils.clamp(0.3 + this.pitch, -0.2, 1.3);
-    const dir = new THREE.Vector3(Math.sin(this.yaw) * Math.cos(elev), Math.sin(elev), Math.cos(this.yaw) * Math.cos(elev));
-    let D = 3.2;
+    const elev = THREE.MathUtils.clamp(elev0 + this.pitch, -0.2, 1.52);
+    const az = this.yaw + (mode === 'face' ? Math.PI : 0);
+    const dir = new THREE.Vector3(Math.sin(az) * Math.cos(elev), Math.sin(elev), Math.cos(az) * Math.cos(elev));
+    let D = D0;
+    if (mode === 'dessus') {
+      // vue en plan : les plafonds plus proches que le personnage sont coupés (maison de poupée)
+      c.near = Math.max(0.1, D - 1.0); c.updateProjectionMatrix();
+      c.position.copy(tete).addScaledVector(dir, D); c.lookAt(tete); return;
+    }
     const proches = this.obstacles.filter(({ s }) => s.center.distanceTo(tete) < s.radius + D + 1).map(({ o }) => o);
     this.ray.set(tete, dir); this.ray.far = D;
     const h = this.ray.intersectObjects(proches, false)[0];
     if (h) D = Math.max(0.35, h.distance - 0.25);
     c.position.copy(tete).addScaledVector(dir, D);
     c.lookAt(tete);
+  }
+
+  /** Passe à la caméra suivante (bouton 🎥 ou touche C). */
+  changerCamera() {
+    this.cam = (this.cam + 1) % CAMERAS.length; this.pitch = 0;
+    this.panneau.querySelector('.visite-mode').textContent = `🎥 Caméra : ${CAMERAS[this.cam][1]}`;
+    this._appliquer();
   }
 
   /** Personnage du visiteur (aux couleurs de KKG for Innovation). */

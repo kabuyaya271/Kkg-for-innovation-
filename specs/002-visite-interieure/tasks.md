@@ -11,3 +11,4 @@
 - [x] T009 Mode « jeu vidéo » : départ dans la rue (`visite-depart`), joystick tactile, glissement le long des obstacles, indication de la pièce courante, plafonniers dynamiques
 - [x] T010 Maquette : porte du hall et portillon franchissables, aménagement complet de toutes les pièces
 - [x] T011 Test à pied : rue → portail → parking → hall → escalier → 1er étage → salon (sans téléportation)
+- [x] T012 Visite façon GTA : personnage guidé + 5 caméras (épaule, large, plan en maison de poupée, face, subjective), bouton 🎥 ou touche C
