@@ -1,7 +1,7 @@
 # Graph Report - Kkg-for-innovation-  (2026-11-22)
 
 ## Corpus Check
-- 81 files · ~114,658 words
+- 81 files · ~114,721 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 15 file(s) not represented in the graph (top: (none) 7, .glb 3, .css 2)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1bb4746b`
+- Built from commit: `5ec028cb`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -85,10 +85,10 @@
   specs/002-visite-interieure/plan.md → js/visite.js
 - `Personnaliser l'assistant` --references--> `instructions()`  [INFERRED]
   agent-ia/README.md → agent-ia/src/index.js
-- `etatIntegrite()` --indirect_call--> `esc()`  [INFERRED]
-  js/historique.js → js/ui.js
 - `empreinteMdp()` --calls--> `sha256()`  [EXTRACTED]
   js/admin.js → js/journal.js
+- `etatIntegrite()` --indirect_call--> `esc()`  [INFERRED]
+  js/historique.js → js/ui.js
 - `rendre()` --indirect_call--> `formatPrix()`  [INFERRED]
   js/accueil.js → js/store.js
 

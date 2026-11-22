@@ -127,6 +127,7 @@ export class Visite {
       const dx = e.clientX - this._glisse.x, dy = e.clientY - this._glisse.y;
       this._glisse.x = e.clientX; this._glisse.y = e.clientY; this._glisse.d += Math.abs(dx) + Math.abs(dy);
       this.yaw += dx * 0.005; this.pitch = THREE.MathUtils.clamp(this.pitch + dy * 0.004, -1.2, 1.2); this.cible = null;
+      this._manuel = performance.now();
     });
     c.addEventListener('pointerup', (e) => { if (!this.interieur || !this._glisse) return; if (this._glisse.d < 6) this._toucher(e); this._glisse = null; });
     this._clavier = (e) => {
@@ -290,6 +291,10 @@ export class Visite {
       if (bouge) {
         let dc = Math.atan2(-m.x, -m.z) - this.cap; dc = Math.atan2(Math.sin(dc), Math.cos(dc)); this.cap += dc * Math.min(1, dt * 10);
         this.pasPhase += dt * 9 * (this._course || 1);
+        // caméra qui suit : se replace derrière le personnage (sauf vue subjective, marche arrière ou geste récent)
+        const dy = Math.atan2(Math.sin(this.cap - this.yaw), Math.cos(this.cap - this.yaw));
+        if (CAMERAS[this.cam][0] !== 'subjectif' && Math.abs(dy) < 1.8 && performance.now() - (this._manuel || 0) > 2000)
+          this.yaw += dy * Math.min(1, dt * 2.6);
       }
     } else this.pasPhase *= 0.8;
     // suivre le sol (descente douce, jamais dans le vide)
@@ -325,7 +330,7 @@ export class Visite {
     perso.userData.jambes.forEach((j, i) => { j.rotation.x = i ? balance : -balance; });
     perso.userData.bras.forEach((b, i) => { b.rotation.x = i ? -balance * 0.8 : balance * 0.8; });
     // caméra derrière l'épaule, rapprochée si un mur ou un plafond est entre elle et le personnage
-    const tete = this.pieds.clone().add(new THREE.Vector3(0, 1.55, 0));
+    const tete = this.pieds.clone().add(new THREE.Vector3(0, 1.25, 0));   // point visé : le buste, centré à l'écran
     const elev = THREE.MathUtils.clamp(elev0 + this.pitch, -0.2, 1.52);
     const az = this.yaw + (mode === 'face' ? Math.PI : 0);
     const dir = new THREE.Vector3(Math.sin(az) * Math.cos(elev), Math.sin(elev), Math.cos(az) * Math.cos(elev));

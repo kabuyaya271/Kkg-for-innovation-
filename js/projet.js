@@ -2,7 +2,7 @@ import { CONFIG } from './config.js';
 import { getProjets, formatPrix, prixLicence, ajouterAuPanier, getPanier } from './store.js';
 import { initialiserPage, esc, carteProjet, toast, LIBELLES_TYPE, estReference, lienWhatsApp } from './ui.js';
 import { Visionneuse, vignette } from './viewer.js';
-import { Visite } from './visite.js?v=4';
+import { Visite } from './visite.js?v=5';
 
 initialiserPage();
 
