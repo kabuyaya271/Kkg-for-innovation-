@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "js/visite.js": {
-    "mtime": 1795320154.027183,
-    "seen": 1795320268.6417572,
-    "ast_hash": "b7642e0e9c1ebb7cb0b459b091de029d",
+    "mtime": 1795320383.563243,
+    "seen": 1795320564.6855557,
+    "ast_hash": "8740bd0e9eab93e6e03cfe57f406680a",
     "semantic_hash": ""
   },
   ".claude/skills/reverse-engineer-anything/SKILL.md": {
@@ -486,9 +486,9 @@
     "semantic_hash": ""
   },
   "specs/002-visite-interieure/tasks.md": {
-    "mtime": 1794889319.0724685,
-    "seen": 1794997229.5168717,
-    "ast_hash": "e8a8e78fc81f0b6a1c60f52066e79eba",
+    "mtime": 1795320563.2495885,
+    "seen": 1795320564.6856096,
+    "ast_hash": "1b1d3e2f35f5fb7a52f5785ca7cba2d8",
     "semantic_hash": ""
   },
   "studio.html": {
