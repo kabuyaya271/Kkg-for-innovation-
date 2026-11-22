@@ -4,7 +4,7 @@ import {
   enregistrerCommande, genererReference, transmettre,
 } from './store.js';
 import { initialiserPage, esc, toast, lienWhatsApp, blocConfidentialite, PHRASE_CONFIDENTIALITE } from './ui.js';
-import { vignette } from './viewer.js';
+import { vignette } from './viewer.js?v=7';
 
 initialiserPage('panier');
 

@@ -1,7 +1,7 @@
 import { CONFIG } from './config.js';
 import { getProjets, formatPrix, transmettre, genererRefRequete } from './store.js';
 import { initialiserPage, carteProjet, esc, LIBELLES_TYPE, toast, blocContacts, lienWhatsApp, blocConfidentialite } from './ui.js';
-import { Visionneuse, vignette } from './viewer.js';
+import { Visionneuse, vignette } from './viewer.js?v=7';
 
 initialiserPage('catalogue');
 

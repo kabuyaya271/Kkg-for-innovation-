@@ -1,7 +1,7 @@
 import { CONFIG } from './config.js';
 import { getProjets, formatPrix, prixLicence, ajouterAuPanier, getPanier } from './store.js';
 import { initialiserPage, esc, carteProjet, toast, LIBELLES_TYPE, estReference, lienWhatsApp } from './ui.js';
-import { Visionneuse, vignette } from './viewer.js';
+import { Visionneuse, vignette } from './viewer.js?v=7';
 import { Visite } from './visite.js?v=6';
 
 initialiserPage();
@@ -24,8 +24,10 @@ async function demarrer() {
   const afficher3D = async () => {
     if (p.modeleGLB) {
       try { await v.chargerGLB(p.modeleGLB); } catch (e) {
-        console.warn('GLB introuvable, maquette générée utilisée', e);
-        v.afficherProjet(p.modele);
+        // pas de maquette de remplacement : elle montrerait une autre maison que celle des photos
+        console.warn('Maquette 3D non chargée', e);
+        charg.textContent = 'La maquette 3D n’a pas pu se charger. Rechargez la page (ou videz le cache du navigateur).';
+        return;
       }
     } else v.afficherProjet(p.modele);
     charg.hidden = true;
