@@ -1,5 +1,5 @@
 {
-  "0": "store.js",
+  "0": "esc",
   "1": "app.js",
   "2": "admin.js",
   "3": "index.js",
@@ -28,7 +28,7 @@
   "26": "Monter vos vidéos avec l'IA, gratuitement (OpenCode)",
   "27": "Implementation Plan: [FEATURE]",
   "28": "speckit-checklist/SKILL.md",
-  "29": "builder3d.js",
+  "29": "Visionneuse",
   "30": "Textes pour accompagner la vidéo",
   "31": "REA",
   "32": "speckit-clarify/SKILL.md",
@@ -41,5 +41,12 @@
   "39": "[CHECKLIST TYPE] Checklist: [FEATURE NAME]",
   "40": "rea",
   "41": "Vidéo « Du plan à l'intérieur » — texte de la voix off",
-  "42": "tasks.md"
+  "42": "tasks.md",
+  "43": "historique.js",
+  "44": "panier.js",
+  "45": "store.js",
+  "46": "OmniRoute — ne plus dépendre d'une seule IA",
+  "47": "Craft Anything branché sur Claude Code",
+  "48": "opencode.json",
+  "49": "installer-mac-linux.sh"
 }

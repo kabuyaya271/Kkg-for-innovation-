@@ -1,8 +1,8 @@
 {
   ".claude/settings.json": {
-    "mtime": 1794997220.5937884,
-    "seen": 1794997229.5167325,
-    "ast_hash": "b2bf0730953b4a23e012cb21907f7888",
+    "mtime": 1795157295.5465908,
+    "seen": 1795320268.6416936,
+    "ast_hash": "134ae3dc26d982037278b1d36025b881",
     "semantic_hash": ""
   },
   ".github/workflows/opencode.yml": {
@@ -12,9 +12,9 @@
     "semantic_hash": ""
   },
   ".mcp.json": {
-    "mtime": 1794881785.4978235,
-    "seen": 1794997229.5167449,
-    "ast_hash": "c64d5a1fa3beb9b73d105fd449714406",
+    "mtime": 1795121654.6545095,
+    "seen": 1795320268.6417074,
+    "ast_hash": "108404ee42349b620594899668b47400",
     "semantic_hash": ""
   },
   ".specify/init-options.json": {
@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "js/visite.js": {
-    "mtime": 1794889160.5005434,
-    "seen": 1794997229.5167859,
-    "ast_hash": "c5aaecefb709a441604f751ab9ca030c",
+    "mtime": 1795320154.027183,
+    "seen": 1795320268.6417572,
+    "ast_hash": "b7642e0e9c1ebb7cb0b459b091de029d",
     "semantic_hash": ""
   },
   ".claude/skills/reverse-engineer-anything/SKILL.md": {
@@ -390,9 +390,9 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1794997206.420838,
-    "seen": 1794997229.516852,
-    "ast_hash": "e07b2d53cb11f0e2172d193a9388de46",
+    "mtime": 1794997246.7598097,
+    "seen": 1795320268.6418235,
+    "ast_hash": "61cf7ef47214d2d28d69c48807215760",
     "semantic_hash": ""
   },
   "README.md": {
@@ -426,9 +426,9 @@
     "semantic_hash": ""
   },
   "montage/METHODE-MONTAGE.md": {
-    "mtime": 1794994970.9853926,
-    "seen": 1794997229.5168605,
-    "ast_hash": "c4a502c5e112af76e4b55629d4c4187f",
+    "mtime": 1795193510.5929585,
+    "seen": 1795320268.641836,
+    "ast_hash": "85242a151f31054d646cb8bfa672c6cb",
     "semantic_hash": ""
   },
   "montage/README.md": {
@@ -456,9 +456,9 @@
     "semantic_hash": ""
   },
   "publicite/textes-reseaux-sociaux.md": {
-    "mtime": 1794872855.1131241,
-    "seen": 1794997229.5168657,
-    "ast_hash": "5cbfb321b5d798d2d8074435452b3d02",
+    "mtime": 1795195842.8383152,
+    "seen": 1795320268.6418471,
+    "ast_hash": "907a0556b692a0f47f42b858af9e0f57",
     "semantic_hash": ""
   },
   "specs/001-module-dao-cao/checklists/requirements.md": {
@@ -729,6 +729,48 @@
     "mtime": 1794872826.4771225,
     "seen": 1794997229.516916,
     "ast_hash": "3c2d1d112e53bfd0a43ed4c3d4cbe36d",
+    "semantic_hash": ""
+  },
+  "opencode.json": {
+    "mtime": 1794997246.690243,
+    "seen": 1795320268.641759,
+    "ast_hash": "28edd303e15c0f20a66e0efcd2917e9d",
+    "semantic_hash": ""
+  },
+  "outils/omniroute/installer-mac-linux.sh": {
+    "mtime": 1795082482.7965238,
+    "seen": 1795320268.6417603,
+    "ast_hash": "40cfae137aaadc35af8c34bb6a09e2d8",
+    "semantic_hash": ""
+  },
+  "outils/craft-anything/README.md": {
+    "mtime": 1795121654.6633701,
+    "seen": 1795320268.64184,
+    "ast_hash": "ab0fa88afa961d15b08b6600c08306e0",
+    "semantic_hash": ""
+  },
+  "outils/omniroute/README.md": {
+    "mtime": 1795082482.7940085,
+    "seen": 1795320268.6418417,
+    "ast_hash": "e5a26c53d5aaf9f62ddc6f57bc67c580",
+    "semantic_hash": ""
+  },
+  "publicite/residence-rwenzori-couverture.jpg": {
+    "mtime": 1795195706.2022085,
+    "seen": 1795320268.6418874,
+    "ast_hash": "dff0c971c28063999998a648450596f9",
+    "semantic_hash": ""
+  },
+  "publicite/residence-rwenzori-pub-instrumental.mp4": {
+    "mtime": 1795195834.250315,
+    "seen": 1795320268.6418962,
+    "ast_hash": "8fe745d94bd1ed9917acf7491f91fdf4",
+    "semantic_hash": ""
+  },
+  "publicite/residence-rwenzori-pub.mp4": {
+    "mtime": 1795195831.6103146,
+    "seen": 1795320268.6418974,
+    "ast_hash": "4c8c2c7dc5579f4c83cbc4f7cb47c703",
     "semantic_hash": ""
   },
   "agent-ia/package-lock.json": {
