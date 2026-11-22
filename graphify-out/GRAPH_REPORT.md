@@ -1,17 +1,17 @@
 # Graph Report - Kkg-for-innovation-  (2026-11-22)
 
 ## Corpus Check
-- 81 files · ~114,528 words
+- 81 files · ~114,658 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 15 file(s) not represented in the graph (top: (none) 7, .glb 3, .css 2)
 
 ## Summary
-- 878 nodes · 1597 edges · 52 communities (46 shown, 6 thin omitted)
+- 879 nodes · 1598 edges · 51 communities (46 shown, 5 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 30 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `92196468`
+- Built from commit: `1bb4746b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -23,7 +23,6 @@
 - Native, managed, and packaged artifacts
 - common.sh
 - steps
-- Editeur
 - Visite
 - Tasks: [FEATURE NAME]
 - speckit-analyze/SKILL.md
@@ -76,10 +75,10 @@
 4. `Visite` - 29 edges
 5. `Visionneuse` - 25 edges
 6. `demarrer()` - 24 edges
-7. `exporter()` - 17 edges
-8. `formatPrix()` - 17 edges
-9. `fmt()` - 17 edges
-10. `fetch()` - 15 edges
+7. `fmt()` - 17 edges
+8. `exporter()` - 17 edges
+9. `formatPrix()` - 17 edges
+10. `longueur()` - 15 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Structure` --references--> `Visite`  [INFERRED]
@@ -96,15 +95,15 @@
 ## Import Cycles
 - None detected.
 
-## Communities (52 total, 6 thin omitted)
+## Communities (51 total, 5 thin omitted)
 
 ### Community 0 - "esc"
-Cohesion: 0.19
-Nodes (18): montrerCode(), formater(), historique, initialiserAssistant(), envoyer(), lireHistorique(), sauver(), confirmer() (+10 more)
+Cohesion: 0.25
+Nodes (10): montrerCode(), confirmer(), demarrer(), LIBELLES, majType(), params, resumeTexte(), typeChoisi() (+2 more)
 
 ### Community 1 - "app.js"
-Cohesion: 0.09
-Nodes (68): afficherAgent(), afficherMetre(), afficherProprietes(), AGENTS, annuler(), API, api(), brouillon() (+60 more)
+Cohesion: 0.06
+Nodes (73): afficherAgent(), afficherMetre(), afficherProprietes(), AGENTS, annuler(), API, api(), brouillon() (+65 more)
 
 ### Community 2 - "admin.js"
 Cohesion: 0.08
@@ -126,9 +125,9 @@ Nodes (30): check-prerequisites.sh script, check_dir(), check_file(), find_speci
 Cohesion: 0.05
 Nodes (37): args, inputs, integration, spec, speckit_review_plan_verdict, speckit_review_spec_verdict, default, prompt (+29 more)
 
-### Community 7 - "Editeur"
-Cohesion: 0.18
-Nodes (5): e(), Editeur, n2(), arrondi(), projeterSurSegment()
+### Community 8 - "Visite"
+Cohesion: 0.14
+Nodes (5): CAMERAS, esc(), ICONES, NIVEAUX, Visite
 
 ### Community 9 - "Tasks: [FEATURE NAME]"
 Cohesion: 0.07
@@ -207,7 +206,7 @@ Cohesion: 0.25
 Nodes (7): Anti-Examples: What NOT To Do, Checklist Purpose: "Unit Tests for English", Example Checklist Types & Sample Items, Execution Steps, Post-Execution Checks, Pre-Execution Checks, User Input
 
 ### Community 29 - "Visionneuse"
-Cohesion: 0.25
+Cohesion: 0.23
 Nodes (3): demarrer(), demarrer(), Visionneuse
 
 ### Community 30 - "Textes pour accompagner la vidéo"
@@ -259,8 +258,8 @@ Cohesion: 0.22
 Nodes (25): afficher(), charger(), complet, dateFr(), documentHtml(), etatIntegrite(), exporter(), filtrer() (+17 more)
 
 ### Community 44 - "panier.js"
-Cohesion: 0.29
-Nodes (12): bonDeCommande(), confirmer(), detail, lieuTexte(), lireClient(), messageWhatsApp(), methodesDisponibles(), rendre() (+4 more)
+Cohesion: 0.27
+Nodes (13): bonDeCommande(), confirmer(), detail, lieuTexte(), lireClient(), messageWhatsApp(), methodesDisponibles(), rendre() (+5 more)
 
 ### Community 45 - "store.js"
 Cohesion: 0.18
@@ -275,32 +274,32 @@ Cohesion: 0.33
 Nodes (5): 1. Installer (version vérifiée : 0.6.1), 2. Vérifier dans Claude Code, 3. Utiliser, Craft Anything branché sur Claude Code, Règles d'usage
 
 ### Community 50 - "accueil.js"
-Cohesion: 0.23
-Nodes (15): etat, imageDe(), rendre(), vignettes, valeurs, CONFIG, id, blocConfidentialite() (+7 more)
+Cohesion: 0.19
+Nodes (22): etat, imageDe(), rendre(), vignettes, formater(), historique, initialiserAssistant(), envoyer() (+14 more)
 
 ### Community 51 - "viewer.js"
-Cohesion: 0.18
-Nodes (13): arbre(), box(), construireProjet(), fenetres(), liberer(), MODELE_DEFAUT, rng(), std() (+5 more)
+Cohesion: 0.27
+Nodes (10): arbre(), box(), construireProjet(), fenetres(), liberer(), MODELE_DEFAUT, rng(), std() (+2 more)
 
 ## Knowledge Gaps
 - **2 isolated node(s):** `craft-anything-cli`, `npx`
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 423 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 424 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Visite` connect `Visite` to `accueil.js`, `viewer.js`, `Visionneuse`, `Implementation Plan: Visite intérieure 3D`?**
+- **Why does `Visite` connect `Visite` to `accueil.js`, `Visionneuse`, `Implementation Plan: Visite intérieure 3D`?**
   _High betweenness centrality (0.034) - this node is a cross-community bridge._
 - **What connects `craft-anything-cli`, `npx` to the rest of the system?**
   _2 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `app.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.08540540540540541 - nodes in this community are weakly interconnected._
-- **Why does `Editeur` connect `Editeur` to `app.js`?**
-  _High betweenness centrality (0.016) - this node is a cross-community bridge._
-- **Should `admin.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.08403361344537816 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.062385321100917435 - nodes in this community are weakly interconnected._
 - **Why does `Visionneuse` connect `Visionneuse` to `app.js`, `accueil.js`, `admin.js`, `viewer.js`?**
   _High betweenness centrality (0.015) - this node is a cross-community bridge._
+- **Should `admin.js` be split into smaller, more focused modules?**
+  _Cohesion score 0.08403361344537816 - nodes in this community are weakly interconnected._
 - **Should `index.js` be split into smaller, more focused modules?**
   _Cohesion score 0.06578947368421052 - nodes in this community are weakly interconnected._
+- **Should `Native, managed, and packaged artifacts` be split into smaller, more focused modules?**
+  _Cohesion score 0.044444444444444446 - nodes in this community are weakly interconnected._

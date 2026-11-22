@@ -10,6 +10,7 @@ const VITESSE = 1.7;         // m/s
 // caméras de la visite : [identifiant, libellé, distance, élévation de base]
 const CAMERAS = [['epaule', 'Épaule', 3.2, 0.3], ['large', 'Large', 6.5, 0.7], ['dessus', 'Plan (dessus)', 9, 1.45],
   ['face', 'Face', 2.6, 0.15], ['subjectif', 'Subjective', 0, 0]];
+const ICONES = { epaule: '🧍', large: '🔭', dessus: '🗺️', face: '🙂', subjectif: '👁️' };
 const NIVEAUX = ['Rez-de-chaussée', '1er étage', '2e étage', '3e étage', '4e étage', '5e étage'];
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -75,22 +76,30 @@ export class Visite {
     for (const [i, p] of this.pieces.entries()) (parNiveau[p.niveau] ||= []).push([i, p]);
     const panneau = document.createElement('div'); panneau.className = 'visite-panneau'; panneau.hidden = true;
     panneau.innerHTML = `
-      <strong>🚶 Visite</strong>
+      <button class="visite-sortir">✕ Quitter</button>
+      <button class="visite-menu-btn" aria-expanded="false">☰ Menu</button>
+      <div class="visite-menu" hidden>
       <select class="visite-choix-entree" aria-label="Se rendre à une entrée"><option value="">Aller à une entrée…</option>${this.entrees.map((e, i) => `<option value="${i}">${esc(e.libelle)}</option>`).join('')}</select>
       <select class="visite-choix-piece" aria-label="Aller à une pièce"><option value="">Aller à une pièce…</option>${Object.keys(parNiveau).sort((a, b) => a - b).map((n) =>
         `<optgroup label="${esc(NIVEAUX[n] || `Niveau ${n}`)}">${parNiveau[n].map(([i, p]) => `<option value="${i}">${esc(p.libelle)}</option>`).join('')}</optgroup>`).join('')}</select>
-      <button class="visite-mode">🎥 Caméra : Épaule</button>
       <button class="visite-rue">↺ Revenir dans la rue</button>
       <button class="visite-entrees">🏠 Vue d'ensemble</button>
-      <button class="visite-sortir">✕ Quitter</button>
-      <small class="visite-aide">Guidez le personnage : joystick ou flèches / ZQSD · glissez pour tourner la caméra · 🎥 ou touche C pour changer d'angle</small>`;
+      <small class="visite-aide">Guidez le personnage avec le joystick (ou flèches / ZQSD) · glissez pour tourner la caméra · boutons à droite (ou touche C) pour changer d'angle</small>
+      </div>`;
     this.sceneEl.appendChild(panneau); this.panneau = panneau;
     panneau.querySelector('.visite-choix-piece').addEventListener('change', (ev) => { if (ev.target.value !== '') this.aller(+ev.target.value); ev.target.value = ''; });
     panneau.querySelector('.visite-choix-entree').addEventListener('change', (ev) => { if (ev.target.value !== '') this.entrer(+ev.target.value); ev.target.value = ''; });
     panneau.querySelector('.visite-sortir').addEventListener('click', () => this.desactiver());
     panneau.querySelector('.visite-entrees').addEventListener('click', () => this.dehors());
     panneau.querySelector('.visite-rue').addEventListener('click', () => this.demarrer());
-    panneau.querySelector('.visite-mode').addEventListener('click', () => this.changerCamera());
+    const menu = panneau.querySelector('.visite-menu'), bMenu = panneau.querySelector('.visite-menu-btn');
+    bMenu.addEventListener('click', () => { menu.hidden = !menu.hidden; bMenu.setAttribute('aria-expanded', String(!menu.hidden)); });
+    panneau.addEventListener('change', () => { menu.hidden = true; });
+    // barre des caméras, toujours visible à droite de l'écran
+    const cams = document.createElement('div'); cams.className = 'visite-cameras'; cams.hidden = true;
+    cams.innerHTML = CAMERAS.map(([id, nom], i) => `<button data-c="${i}" class="${i === this.cam ? 'actif' : ''}" aria-label="Caméra ${nom}"><span>${ICONES[id]}</span>${nom.split(' ')[0]}</button>`).join('');
+    cams.addEventListener('click', (ev) => { const b = ev.target.closest('button[data-c]'); if (b) this.changerCamera(+b.dataset.c); });
+    this.sceneEl.appendChild(cams); this.cams = cams;
     if (!this.depart) panneau.querySelector('.visite-rue').hidden = true;
     const hud = document.createElement('div'); hud.className = 'visite-hud'; hud.hidden = true; this.sceneEl.appendChild(hud); this.hud = hud;
 
@@ -142,7 +151,8 @@ export class Visite {
   activer() {
     this.actif = true; this.calque.hidden = false; this.panneau.hidden = false;
     this.v.surBoucle = (dt) => this.tick(dt);
-    this.sceneEl.classList.add('en-visite');
+    this.sceneEl.classList.add('en-visite'); document.body.classList.add('visite-active');
+    this.sceneEl.requestFullscreen?.().catch(() => {});
     if (this.depart) this.demarrer(); else this.dehors();
   }
 
@@ -154,14 +164,15 @@ export class Visite {
 
   /** Vue extérieure avec les pastilles d'entrée. */
   dehors() {
-    this._lumiere(false); this.interieur = false; this.pad.hidden = true; this.hud.hidden = true; this.calque.hidden = false;
+    this._lumiere(false); this.interieur = false; this.pad.hidden = true; this.hud.hidden = true; this.cams.hidden = true; this.calque.hidden = false;
     if (this.perso) this.perso.visible = false;
     this.v.controls.enabled = true; this.v.cadrer();
   }
 
   desactiver() {
     this.dehors(); this.actif = false; this.calque.hidden = true; this.panneau.hidden = true;
-    this.v.surBoucle = null; this.sceneEl.classList.remove('en-visite');
+    this.v.surBoucle = null; this.sceneEl.classList.remove('en-visite'); document.body.classList.remove('visite-active');
+    if (document.fullscreenElement === this.sceneEl) document.exitFullscreen?.().catch(() => {});
     this.onSortie?.();
   }
 
@@ -186,7 +197,7 @@ export class Visite {
   }
 
   _placer(oeil, yaw, pitch) {
-    this.interieur = true; this.pad.hidden = false; this.hud.hidden = false; this.cible = null;
+    this.interieur = true; this.pad.hidden = false; this.hud.hidden = false; this.cams.hidden = false; this.cible = null;
     this.yaw = yaw; this.pitch = pitch; this.cap = yaw;
     this.pieds.copy(oeil).y -= YEUX;
     const s = this._sol(this.pieds, 1.0, 4.0); if (s !== null) this.pieds.y = s;
@@ -318,7 +329,7 @@ export class Visite {
     const elev = THREE.MathUtils.clamp(elev0 + this.pitch, -0.2, 1.52);
     const az = this.yaw + (mode === 'face' ? Math.PI : 0);
     const dir = new THREE.Vector3(Math.sin(az) * Math.cos(elev), Math.sin(elev), Math.cos(az) * Math.cos(elev));
-    let D = D0;
+    let D = D0 * (this.v.camera.aspect < 1 ? 1.7 : 1);   // téléphone en portrait : caméra plus reculée
     if (mode === 'dessus') {
       // vue en plan : les plafonds plus proches que le personnage sont coupés (maison de poupée)
       c.near = Math.max(0.1, D - 1.0); c.updateProjectionMatrix();
@@ -333,9 +344,9 @@ export class Visite {
   }
 
   /** Passe à la caméra suivante (bouton 🎥 ou touche C). */
-  changerCamera() {
-    this.cam = (this.cam + 1) % CAMERAS.length; this.pitch = 0;
-    this.panneau.querySelector('.visite-mode').textContent = `🎥 Caméra : ${CAMERAS[this.cam][1]}`;
+  changerCamera(i) {
+    this.cam = i ?? (this.cam + 1) % CAMERAS.length; this.pitch = 0;
+    this.cams.querySelectorAll('button').forEach((b) => b.classList.toggle('actif', +b.dataset.c === this.cam));
     this._appliquer();
   }
 
