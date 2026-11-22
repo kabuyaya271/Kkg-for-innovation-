@@ -2,7 +2,7 @@
 import { CONFIG } from '../config.js';
 import { getProjets, enregistrerProjetsLocaux } from '../store.js';
 import { journaliser } from '../journal.js';
-import { Visionneuse } from '../viewer.js';
+import { Visionneuse } from '../viewer.js?v=7';
 import {
   nouvelleEtude, nouveauNiveau, uid, longueur, aire, metreEtude, resumePourAgents, niveauDepuisProposition,
   fmt, PRIX_DEFAUT, ouvertureValide,

@@ -4,7 +4,7 @@ import {
   getCommandes, majCommande, formatPrix, prixLicence, getRequetesLocales,
 } from './store.js';
 import { initialiserPage, esc, toast } from './ui.js';
-import { Visionneuse } from './viewer.js';
+import { Visionneuse } from './viewer.js?v=7';
 import { MODELE_DEFAUT } from './builder3d.js';
 import { journaliser, sha256 } from './journal.js';
 import { initialiserHistorique } from './historique.js';
