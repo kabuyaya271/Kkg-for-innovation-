@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { construireProjet, liberer } from './builder3d.js';
 
@@ -106,7 +107,7 @@ export class Visionneuse {
   /** Charge un modèle .glb / .gltf exporté depuis SketchUp, Revit, Blender, ArchiCAD… */
   chargerGLB(url) {
     return new Promise((ok, ko) => {
-      new GLTFLoader().load(url, (gltf) => {
+      new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(url, (gltf) => {
         const obj = gltf.scene;
         const b = new THREE.Box3().setFromObject(obj);
         const taille = b.getSize(new THREE.Vector3());

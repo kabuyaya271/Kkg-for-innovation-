@@ -195,6 +195,7 @@ export class Visite {
     const p = this.pieces[i]; if (!p) return;
     if (!this.interieur) { this.v.controls.enabled = false; this.calque.hidden = true; this._lumiere(true); }
     this._placer(p.pos, this.interieur ? this.yaw : 0, 0);
+    this._ambiance?.();
   }
 
   _placer(oeil, yaw, pitch) {
