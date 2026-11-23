@@ -52,7 +52,12 @@
       "arbres": true
     },
     "modeleGLB": "modeles/complexe-du-lac.glb",
-    "images": [],
+    "images": [
+      "images/complexe-du-lac-lac.jpg",
+      "images/complexe-du-lac-terrasse.jpg",
+      "images/complexe-du-lac-ponton.jpg",
+      "images/complexe-du-lac-aerien.jpg"
+    ],
     "lienPaiement": ""
   },
   {
