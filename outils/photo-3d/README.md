@@ -31,7 +31,9 @@ Sans carte graphique : compter 1 à 3 h par terrain. Avec une carte NVIDIA : que
 
 ## Publier sur le site
 1. Copier `sortie/decor.ply` dans `decors/<nom>.ply` (fichier lourd : viser moins de 30 Mo).
-2. Créer `decors/<nom>.json` : titre, `rotation` (le « haut » de COLMAP est souvent inversé : essayer `[1,0,0,0]`), position de la caméra et, si besoin, la maquette à poser (`maquette.url`, `position`, `rotY`, `echelle`).
+2. Dans `decors/` : `python3 ../outils/photo-3d/orienter.py sortie/cameras.json <nom> "<titre>"` écrit `<nom>.json` avec le décor déjà redressé et centré.
+   Ajouter si besoin la maquette à poser : `"maquette": {"url": "modeles/x.glb", "position": [0,0,0], "rotY": 0, "echelle": 1}`
+   (l'échelle du décor est arbitraire : régler `echelle` du décor avec une longueur connue, ex. la largeur du portail).
 3. Lien : `decor-3d.html?d=<nom>`.
 
 Les vidéos des clients sont des données privées : ne publier un décor qu'avec l'accord du client.

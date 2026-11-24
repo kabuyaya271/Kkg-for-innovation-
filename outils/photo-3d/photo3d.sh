@@ -21,5 +21,5 @@ colmap mapper --database_path "$DB" --image_path "$OUT/images" --output_path "$O
 [ -f "$OUT/sparse/0/images.bin" ] || { echo "COLMAP n'a pas retrouvé les caméras : photos floues ou trop peu de recouvrement."; exit 1; }
 # Plusieurs blocs possibles si le parcours est coupé : on garde le plus grand (sparse/0 est en général le bon).
 # Densifier souvent : sur processeur on fait peu d'itérations, il faut quand même assez de détails.
-"$OPENSPLAT" "$OUT" -n "$N" --downscale-factor "${DOWNSCALE:-2}" --refine-every 100 --densify-from 200 --loss-thresh 0.05 -o "$OUT/decor.ply"
+"$OPENSPLAT" "$OUT" -n "$N" --downscale-factor "${DOWNSCALE:-2}" --refine-every 100 --densify-from 200 --loss-thresh 0.05 --output-cameras "$OUT/cameras.json" -o "$OUT/decor.ply"
 echo "Décor prêt : $OUT/decor.ply"
