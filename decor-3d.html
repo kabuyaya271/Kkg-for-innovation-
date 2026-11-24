@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Décor 3D — KKG Innovation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=7">
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+      "gaussian-splats-3d": "https://cdn.jsdelivr.net/npm/@mkkellogg/gaussian-splats-3d@0.4.7/build/gaussian-splats-3d.module.js"
+    } }
+  </script>
+</head>
+<body>
+  <header data-header></header>
+  <main class="wrap" id="contenu">
+    <div class="fil"><a href="index.html">Accueil</a> / <span id="filTitre">Décor 3D</span></div>
+    <h1 id="titre">Décor 3D</h1>
+    <p id="intro">Scène reconstruite à partir de photos réelles du terrain.</p>
+    <div class="scene" id="scene" style="height:70vh">
+      <div class="scene-cible" id="cible3d"></div>
+      <div class="chargement" id="chargement">Chargement du décor 3D…</div>
+      <span class="aide-3d">Glisser : tourner · Molette : zoom · Clic droit : déplacer</span>
+    </div>
+  </main>
+  <footer data-footer></footer>
+  <script type="module" src="js/decor3d.js"></script>
+</body>
+</html>
