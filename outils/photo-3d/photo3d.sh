@@ -11,8 +11,13 @@ else ffmpeg -loglevel error -i "$SRC" -vf "fps=2,scale='min(1280,iw)':-2" -q:v 2
 echo "$(ls "$OUT/images" | wc -l) images"
 [ "$(ls "$OUT/images" | wc -l)" -ge 20 ] || { echo "Il faut au moins 20 photos (idéal : 60 à 150)."; exit 1; }
 GPU=0; command -v nvidia-smi >/dev/null && GPU=1
-colmap automatic_reconstructor --workspace_path "$OUT" --image_path "$OUT/images" \
-  --data_type "$([ -d "$SRC" ] && echo individual || echo video)" --quality medium --single_camera 1 --dense 0 --use_gpu $GPU
+DB="$OUT/database.db"; rm -f "$DB"; rm -rf "$OUT/sparse"; mkdir -p "$OUT/sparse"
+colmap feature_extractor --database_path "$DB" --image_path "$OUT/images" --ImageReader.single_camera 1 --SiftExtraction.use_gpu $GPU
+if [ -d "$SRC" ]; then colmap exhaustive_matcher --database_path "$DB" --SiftMatching.use_gpu $GPU
+else colmap sequential_matcher --database_path "$DB" --SiftMatching.use_gpu $GPU --SequentialMatching.overlap 15; fi
+# Seuils assouplis : sinon les murs lisses (enduit, ciel) coupent la scène en plusieurs morceaux.
+colmap mapper --database_path "$DB" --image_path "$OUT/images" --output_path "$OUT/sparse" \
+  --Mapper.min_num_matches 10 --Mapper.init_min_num_inliers 40 --Mapper.abs_pose_min_num_inliers 12 --Mapper.abs_pose_min_inlier_ratio 0.1
 [ -f "$OUT/sparse/0/images.bin" ] || { echo "COLMAP n'a pas retrouvé les caméras : photos floues ou trop peu de recouvrement."; exit 1; }
 # Plusieurs blocs possibles si le parcours est coupé : on garde le plus grand (sparse/0 est en général le bon).
 "$OPENSPLAT" "$OUT" -n "$N" --downscale-factor 2 -o "$OUT/decor.ply"
