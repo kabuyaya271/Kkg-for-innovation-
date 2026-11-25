@@ -16,10 +16,14 @@ function makeProfile(poste, archId, base) {
 function load(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
 function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* stockage indisponible */ } }
 let profile = load('fp-profile'); if (!profile || validateProfile(profile).length) profile = makeProfile('ATT', 'renard');
-const settings = Object.assign({ diff: 'normal', dur: 300, cam: 'tv', auto: false, mute: false, shadows: true }, load('fp-settings') || {});
+const settings = Object.assign({ diff: 'normal', dur: 300, cam: 'tv', auto: false, mute: false, shadows: true, qualite: 'haute', vol: 80, volFoule: 100, volFx: 100, btn: 'm', gaucher: false, vib: true }, load('fp-settings') || {});
 if (!DURS.some(d => d.s === settings.dur)) settings.dur = 300;
 
-function show(id) { $$('.screen').forEach(s => s.classList.toggle('on', s.id === id)); window.scrollTo(0, 0); }
+function show(id) {
+  $$('.screen').forEach(s => s.classList.toggle('on', s.id === id)); window.scrollTo(0, 0);
+  document.body.classList.toggle('en-match', id === 'game');
+  if (id !== 'game') { renderHub(); demarrerVitrine(); }
+}
 
 /* ---------- écran de création ---------- */
 function renderCreate() {
@@ -68,6 +72,16 @@ $('#f-attrs').addEventListener('pointerdown', e => {
 });
 ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => $('#f-attrs').addEventListener(t, () => { clearTimeout(holdT); holdT = null; }));
 $('#go-create').onclick = () => { renderCreate(); show('create'); };
+$('#c-back').onclick = () => show('home');
+$('#go-quick').onclick = () => { if (validateProfile(profile).length) { renderCreate(); show('create'); return; } audioInit(); startMatch(); };
+$('#go-reglages').onclick = () => ouvrirReglages();
+$('#go-aide').onclick = () => $('#aide').classList.add('on');
+$('#a-close').onclick = $('#a-ok').onclick = () => $('#aide').classList.remove('on');
+function renderHub() {
+  const ok = !validateProfile(profile).length;
+  $('#h-profil').textContent = ok ? `${profile.name || 'Toi'} · n°${profile.numero} · ${POSTES[profile.poste].label}` : 'Poste, archétype et 100 points à répartir';
+  $('#h-quick').textContent = ok ? `Coup d'envoi avec ${profile.name || 'ton joueur'} : toi + 10 robots contre 11 robots.` : "Crée d'abord ton joueur, puis coup d'envoi.";
+}
 $('#go-play').onclick = () => { if (validateProfile(profile).length) return; audioInit(); startMatch(); };
 
 /* ---------- configuration du match ---------- */
@@ -95,19 +109,19 @@ function audioInit() {
   if (SND.ctx) return;
   try {
     const A = window.AudioContext || window.webkitAudioContext, c = new A(); SND.ctx = c;
-    SND.master = c.createGain(); SND.master.gain.value = settings.mute ? 0 : 0.8; SND.master.connect(c.destination);
+    SND.master = c.createGain(); SND.master.connect(c.destination); SND.fx = c.createGain(); SND.fx.connect(SND.master); appliquerSon();
     const n = c.sampleRate * 2, buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; SND.noise = buf;
     const src = c.createBufferSource(); src.buffer = buf; src.loop = true; const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 650; bp.Q.value = 0.5;
     const g = c.createGain(); g.gain.value = 0; src.connect(bp); bp.connect(g); g.connect(SND.master); src.start(); SND.crowd = g;
   } catch (e) { SND.ctx = null; }
 }
-function crowd(level, tc) { if (!SND.ctx) return; const t = SND.ctx.currentTime; SND.crowd.gain.cancelScheduledValues(t); SND.crowd.gain.setTargetAtTime(level, t, tc || 0.4); }
+function crowd(level, tc) { if (!SND.ctx) return; const t = SND.ctx.currentTime; SND.crowd.gain.cancelScheduledValues(t); SND.crowd.gain.setTargetAtTime(level * settings.volFoule / 100, t, tc || 0.4); }
 function kickSnd(strong) {
   if (!SND.ctx) return; const c = SND.ctx, t = c.currentTime;
   const o = c.createOscillator(), g = c.createGain(); o.frequency.setValueAtTime(strong ? 150 : 120, t); o.frequency.exponentialRampToValueAtTime(45, t + 0.12);
-  g.gain.setValueAtTime(strong ? 0.9 : 0.45, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.14); o.connect(g); g.connect(SND.master); o.start(t); o.stop(t + 0.16);
+  g.gain.setValueAtTime(strong ? 0.9 : 0.45, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.14); o.connect(g); g.connect(SND.fx); o.start(t); o.stop(t + 0.16);
   const s = c.createBufferSource(); s.buffer = SND.noise; const f = c.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 1500; const g2 = c.createGain();
-  g2.gain.setValueAtTime(strong ? 0.25 : 0.12, t); g2.gain.exponentialRampToValueAtTime(0.001, t + 0.05); s.connect(f); f.connect(g2); g2.connect(SND.master); s.start(t, Math.random()); s.stop(t + 0.06);
+  g2.gain.setValueAtTime(strong ? 0.25 : 0.12, t); g2.gain.exponentialRampToValueAtTime(0.001, t + 0.05); s.connect(f); f.connect(g2); g2.connect(SND.fx); s.start(t, Math.random()); s.stop(t + 0.06);
 }
 function whistle(times) {
   if (!SND.ctx) return; const c = SND.ctx; let t = c.currentTime;
@@ -115,16 +129,18 @@ function whistle(times) {
     const d = times > 1 && i === times - 1 ? 0.9 : 0.3, o = c.createOscillator(), lfo = c.createOscillator(), lg = c.createGain(), g = c.createGain();
     o.frequency.value = 2900; lfo.frequency.value = 30; lg.gain.value = 200; lfo.connect(lg); lg.connect(o.frequency);
     g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.13, t + 0.02); g.gain.setValueAtTime(0.13, t + d - 0.05); g.gain.linearRampToValueAtTime(0, t + d);
-    o.connect(g); g.connect(SND.master); o.start(t); lfo.start(t); o.stop(t + d + 0.05); lfo.stop(t + d + 0.05); t += d + 0.15;
+    o.connect(g); g.connect(SND.fx); o.start(t); lfo.start(t); o.stop(t + d + 0.05); lfo.stop(t + d + 0.05); t += d + 0.15;
   }
 }
-function setMute(m) { settings.mute = m; save('fp-settings', settings); $('#b-snd').textContent = m ? '🔇' : '🔊'; if (SND.master) SND.master.gain.value = m ? 0 : 0.8; }
+function appliquerSon() { if (!SND.ctx) return; SND.master.gain.value = settings.mute ? 0 : settings.vol / 100; SND.fx.gain.value = settings.volFx / 100; }
+function setMute(m) { settings.mute = m; save('fp-settings', settings); $('#b-snd').textContent = m ? '🔇' : '🔊'; appliquerSon(); }
+function vib(ms) { if (settings.vib && navigator.vibrate) try { navigator.vibrate(ms); } catch (e) { /* non pris en charge */ } }
 
 /* ---------- rendu 3D ---------- */
 let rendu = null;
 function ensureRendu() {
   if (rendu) return true;
-  try { rendu = new Rendu3D($('#scene')); rendu.setShadows(settings.shadows); return true; }
+  try { rendu = new Rendu3D($('#scene')); rendu.setShadows(settings.shadows); rendu.setQualite(settings.qualite); return true; }
   catch (e) { console.error(e); $('#nogl').style.display = 'flex'; return false; }
 }
 
@@ -208,7 +224,7 @@ addEventListener('keydown', e => {
 addEventListener('keyup', e => { keys.delete(e.code); if (KEYBTN[e.code]) btnUp(KEYBTN[e.code]); });
 addEventListener('blur', () => keys.clear());
 const zone = $('#stick-zone'), base = $('#stick-base'), knob = $('#knob');
-function knobReset() { base.style.left = '42%'; base.style.top = '58%'; knob.style.left = '50%'; knob.style.top = '50%'; base.style.opacity = ''; }
+function knobReset() { base.style.left = base.style.top = ''; knob.style.left = '50%'; knob.style.top = '50%'; base.style.opacity = ''; }
 zone.addEventListener('pointerdown', e => {
   e.preventDefault(); zone.setPointerCapture(e.pointerId); const r = zone.getBoundingClientRect();
   joy.id = e.pointerId; joy.active = true; joy.cx = e.clientX; joy.cy = e.clientY; joy.x = joy.y = 0;
@@ -247,10 +263,9 @@ function togglePause() { if (!G || G.match.over) return; G.paused = !G.paused; $
 $('#b-pause').onclick = () => { if (G && G.mode === 'replay') { G.speed = 60; return; } togglePause(); };
 $('#b-snd').onclick = () => { audioInit(); setMute(!settings.mute); }; setMute(settings.mute);
 $('#b-cam').onclick = () => { settings.cam = settings.cam === 'tv' ? 'tac' : 'tv'; save('fp-settings', settings); info(settings.cam === 'tv' ? 'Caméra TV' : 'Vue tactique (tout le terrain)', 1500); };
-const shBtn = $('#p-shadows'); shBtn.textContent = settings.shadows ? 'ON' : 'OFF';
-shBtn.onclick = () => { settings.shadows = !settings.shadows; save('fp-settings', settings); shBtn.textContent = settings.shadows ? 'ON' : 'OFF'; if (rendu) rendu.setShadows(settings.shadows); };
+$('#p-reglages').onclick = () => ouvrirReglages();
 $('#p-resume').onclick = togglePause;
-$('#p-quit').onclick = () => { $('#pause').classList.remove('on'); G = null; crowd(0); show('create'); renderCreate(); };
+$('#p-quit').onclick = () => { $('#pause').classList.remove('on'); G = null; crowd(0); show('home'); };
 $$('.replaybar [data-speed]').forEach(b => b.onclick = () => { G.speed = +b.dataset.speed; $$('.replaybar [data-speed]').forEach(x => x.classList.toggle('on', x === b)); });
 $('#rp-quit').onclick = () => { if (G && !G.match.over) G.speed = 60; };
 function showEnd() {
@@ -271,6 +286,7 @@ function showEnd() {
 }
 $('#e-replay-btn').onclick = () => { if (G) startReplay(); };
 $('#e-again').onclick = () => startMatch();
+$('#e-menu').onclick = () => { $('#end').classList.remove('on'); G = null; crowd(0); show('home'); };
 $('#e-edit').onclick = () => { $('#end').classList.remove('on'); G = null; crowd(0); renderCreate(); show('create'); };
 
 /* ---------- événements : messages, sons, animations ---------- */
@@ -282,15 +298,15 @@ function handleEvents() {
   const m = G.match;
   while (G.evIdx < m.events.length) {
     const e = m.events[G.evIdx++];
-    if (e.type === 'pass') { kickSnd(false); rendu.kick(e.by); }
+    if (e.type === 'pass') { kickSnd(false); rendu.kick(e.by); if (e.by === G.humanId) vib(20); }
     else if (e.type === 'shot') { kickSnd(true); rendu.kick(e.by); crowd(0.3, 0.1); setTimeout(() => crowd(0.1, 0.6), 900); if (e.header) info('Tête !', 900); }
     else if (e.type === 'goal') {
       const sc = e.scorer >= 0 ? m.players[e.scorer] : null;
       toast('BUT !', (sc ? pname(sc) : '') + (e.own ? ' (contre son camp)' : '') + ' · ' + m.cfg.teams[e.team].name);
-      crowd(0.75, 0.05); setTimeout(() => crowd(0.1, 1.2), 2800); whistle(1); rendu.celebrate();
+      crowd(0.75, 0.05); setTimeout(() => crowd(0.1, 1.2), 2800); whistle(1); rendu.celebrate(); vib([80, 60, 160]);
     }
     else if (e.type === 'save') { info('Arrêt de ' + pname(m.players[e.by]) + ' !', 1300); crowd(0.35, 0.08); setTimeout(() => crowd(0.1, 0.8), 700); }
-    else if (e.type === 'tackle' && e.ok) { kickSnd(false); if (e.by === G.humanId) info('Tacle réussi', 1000); else if (e.on === G.humanId) info('Ballon perdu', 1000); }
+    else if (e.type === 'tackle' && e.ok) { kickSnd(false); if (e.by === G.humanId) info('Tacle réussi', 1000); else if (e.on === G.humanId) { info('Ballon perdu', 1000); vib(60); } }
     else if (e.type === 'throw') info('Touche · ' + m.cfg.teams[e.team].name, 1300);
     else if (e.type === 'corner') { info('Corner · ' + m.cfg.teams[e.team].name, 1500); whistle(1); }
     else if (e.type === 'goalkick') info('Sortie de but', 1200);
@@ -327,5 +343,66 @@ function drawMini(m, me) {
   mctx.fillStyle = '#ffd23f'; mctx.beginPath(); mctx.arc(X(me.x), Y(me.y), 3.6, 0, 7); mctx.fill();
   mctx.fillStyle = '#fff'; mctx.beginPath(); mctx.arc(X(m.ball.x), Y(m.ball.y), 2, 0, 7); mctx.fill();
 }
+/* ---------- paramètres ---------- */
+const OUI_NON = [[true, 'Oui'], [false, 'Non']];
+const REGLAGES = {
+  jeu: [
+    { k: 'cam', t: 'Caméra', o: [['tv', 'TV (suit le ballon)'], ['tac', 'Tactique']] },
+    { k: 'auto', t: 'Auto-pressing', d: 'Joystick lâché : ton joueur presse ou se replace seul', o: OUI_NON },
+    { k: 'diff', t: 'Niveau des robots adverses', o: DIFFS.map(d => [d.id, d.label]) },
+    { k: 'dur', t: 'Durée du match', o: DURS.map(d => [d.s, d.label]) }
+  ],
+  graph: [
+    { k: 'qualite', t: "Qualité d'image", d: 'Baisse-la si le jeu saccade', o: [['basse', 'Basse'], ['moyenne', 'Moyenne'], ['haute', 'Haute']] },
+    { k: 'shadows', t: 'Ombres', o: OUI_NON }
+  ],
+  son: [
+    { k: 'mute', t: 'Son', o: [[false, 'Activé'], [true, 'Coupé']] },
+    { k: 'vol', t: 'Volume général', r: true },
+    { k: 'volFoule', t: 'Ambiance du stade', r: true },
+    { k: 'volFx', t: 'Frappes et sifflet', r: true }
+  ],
+  cmd: [
+    { k: 'btn', t: 'Taille des boutons', o: [['s', 'Petite'], ['m', 'Normale'], ['l', 'Grande']] },
+    { k: 'gaucher', t: 'Main', d: 'Gaucher : joystick à droite, boutons à gauche', o: [[false, 'Droitier'], [true, 'Gaucher']] },
+    { k: 'vib', t: 'Vibrations', d: 'Passes, ballons perdus et buts', o: OUI_NON }
+  ]
+};
+let onglet = 'jeu';
+function renderReglages() {
+  $$('#r-tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === onglet));
+  $('#r-body').innerHTML = REGLAGES[onglet].map(r => `<div class="reg"><span>${r.t}${r.d ? `<small><br>${r.d}</small>` : ''}</span>` +
+    (r.r ? `<input type="range" min="0" max="100" step="5" value="${settings[r.k]}" data-k="${r.k}" aria-label="${r.t}">`
+      : `<div class="seg">${r.o.map(([v, l], i) => `<button data-k="${r.k}" data-i="${i}" class="${settings[r.k] === v ? 'on' : ''}">${l}</button>`).join('')}</div>`) + '</div>').join('');
+}
+function appliquerReglages() {
+  save('fp-settings', settings); setMute(settings.mute); renderAuto();
+  if (rendu) { rendu.setShadows(settings.shadows); rendu.setQualite(settings.qualite); }
+  document.body.classList.toggle('btn-s', settings.btn === 's'); document.body.classList.toggle('btn-l', settings.btn === 'l');
+  document.body.classList.toggle('gaucher', settings.gaucher);
+}
+function ouvrirReglages() { renderReglages(); $('#reglages').classList.add('on'); }
+function fermerReglages() { $('#reglages').classList.remove('on'); if ($('#create').classList.contains('on')) renderCreate(); }
+$('#r-tabs').onclick = e => { const b = e.target.closest('[data-tab]'); if (b) { onglet = b.dataset.tab; renderReglages(); } };
+$('#r-body').addEventListener('click', e => {
+  const b = e.target.closest('[data-k][data-i]'); if (!b) return;
+  const r = REGLAGES[onglet].find(x => x.k === b.dataset.k); settings[r.k] = r.o[+b.dataset.i][0]; appliquerReglages(); renderReglages();
+});
+$('#r-body').addEventListener('input', e => { if (e.target.dataset.k) { settings[e.target.dataset.k] = +e.target.value; appliquerReglages(); } });
+$('#r-close').onclick = $('#r-ok').onclick = fermerReglages;
+appliquerReglages();
+
+/* ---------- stade en fond des menus ---------- */
+let vitrineOn = false, vitrineT = 0;
+function demarrerVitrine() {
+  if (vitrineOn || !ensureRendu()) return; vitrineOn = true; vitrineT = performance.now();
+  const tour = t => {
+    if ($('#game').classList.contains('on')) { vitrineOn = false; return; }
+    rendu.vitrine(Math.min(0.1, (t - vitrineT) / 1000)); vitrineT = t; requestAnimationFrame(tour);
+  };
+  requestAnimationFrame(tour);
+}
+show('home');
+
 /* Accès de test (console du navigateur) */
 window.jeu = { etat: () => G, rendu: () => rendu, settings };

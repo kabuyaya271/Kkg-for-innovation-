@@ -27,7 +27,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .brand .ball{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#cfd8d3 60%,#8fa197);box-shadow:0 0 0 3px #0a1310,0 0 0 5px var(--acc)}
 .brand h1{margin:0;font-size:30px;font-weight:800;text-transform:uppercase}
 .brand small{display:block;color:var(--mut);font-family:Barlow;font-size:13px;letter-spacing:0;text-transform:none;font-weight:500}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
+.card{background:rgba(18,32,26,.84);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
 .mode{display:flex;gap:12px;align-items:flex-start}
 .mode .ic{flex:0 0 42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--card2);font-size:20px}
 .mode h3{margin:0 0 4px;font-size:20px}
@@ -66,8 +66,11 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .err{color:var(--acc2);font-size:13px;margin-top:6px;min-height:18px}
 .note{color:var(--mut);font-size:13px;line-height:1.45}
 /* --- jeu --- */
-#game{position:fixed;inset:0;background:#0d2a1b;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
-#scene{position:absolute;inset:0}
+#game{position:fixed;inset:0;background:transparent;z-index:1;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+#scene{position:fixed;inset:0;z-index:0}
+#voile{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 50% 30%,rgba(6,14,10,.35),rgba(6,14,10,.9) 75%)}
+body.en-match #voile{display:none}
+.screen{position:relative;z-index:1}
 #scene canvas{display:block}
 #mini{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;width:150px;height:96px;pointer-events:none}
 @media (orientation:portrait){#mini{bottom:208px;width:132px;height:85px}}
@@ -135,39 +138,63 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .replay-ok{text-align:center;font-size:13px;color:var(--acc);margin-top:8px;min-height:16px}
 .help-list{margin:8px 0 0;padding:0;list-style:none;font-size:14px;line-height:1.5;color:var(--mut)}
 .help-list b{color:var(--txt)}
+/* --- menu principal (superposé au stade) --- */
+.hub{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+@media (max-width:520px){.tile h3{font-size:18px}.tile.big h3{font-size:30px}.tile{padding:13px}}
+.tile{position:relative;text-align:left;padding:16px;border-radius:18px;background:rgba(18,32,26,.84);border:1px solid var(--line);min-height:112px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:transform .12s,border-color .12s}
+.tile:active{transform:scale(.97)} .tile:hover{border-color:var(--acc)}
+.tile.big{grid-column:1/-1;min-height:140px;background:linear-gradient(135deg,rgba(61,220,132,.95),rgba(24,140,80,.95));color:#05200f;border-color:#8ff0b9}
+.tile .ic{font-size:26px;line-height:1}
+.tile h3{margin:8px 0 2px;font-size:24px;text-transform:uppercase;font-weight:800}
+.tile.big h3{font-size:34px}
+.tile p{margin:0;font-size:13px;opacity:.85;line-height:1.35}
+.tile.off{opacity:.55;pointer-events:none}
+.back{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:12px;background:rgba(18,32,26,.84);border:1px solid var(--line);font-weight:700;font-size:14px;margin-bottom:4px}
+/* --- paramètres et aide : panneaux au-dessus de tout (menus et match) --- */
+.overlay.top{position:fixed;z-index:20}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:4px 0 12px}
+.tabs button{padding:10px 2px;border-radius:12px;background:var(--card2);border:1px solid var(--line);font-weight:700;font-size:13px}
+.tabs button.on{background:var(--acc);color:#05200f;border-color:var(--acc)}
+.reg{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-bottom:1px solid var(--line)}
+.reg:last-child{border-bottom:0}
+.reg>span{font-weight:700;font-size:15px}
+.reg small{color:var(--mut);font-size:12px;font-weight:500}
+.reg .seg{grid-template-columns:repeat(auto-fit,minmax(0,1fr))}
+.reg input[type=range]{width:100%;accent-color:var(--acc);height:28px}
+.panel-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.panel-h h2{margin:0}
+.x{width:36px;height:36px;border-radius:10px;background:var(--card2);font-size:18px}
+/* réglages des commandes */
+body.btn-s .btns{grid-template-columns:repeat(2,58px);grid-template-rows:repeat(2,58px)}
+body.btn-l .btns{grid-template-columns:repeat(2,84px);grid-template-rows:repeat(2,84px)}
+body.btn-l .btns button{font-size:17px}
+body.gaucher .controls{flex-direction:row-reverse}
+body.gaucher .right{align-items:flex-start;padding:0 0 10px 14px}
+body.gaucher .stick-base{left:58%}
 </style>
 </head>
 <body>
+<div id="scene"></div><div id="voile"></div>
 
 <!-- ============ ACCUEIL ============ -->
 <section id="home" class="screen on">
   <div class="wrap">
-    <div class="brand"><div class="ball"></div><h1>Foot Profils<small>Prototype jouable — 11 contre 11 en 3D</small></h1></div>
-    <div class="card mode">
-      <div class="ic">🎮</div>
-      <div><h3>Toi + 10 robots contre 11 robots</h3><p>Tu crées ton joueur et tu ne contrôles que lui, sur un vrai terrain de 100 m, en 4-4-2, avec touches, corners et sorties de but.</p></div>
+    <div class="brand"><div class="ball"></div><h1>Foot Profils<small>Football 11 contre 11 en 3D · ton joueur, 100 points</small></h1></div>
+    <div class="hub">
+      <button class="tile big" id="go-quick"><span class="ic">⚽</span><h3>Jouer</h3><p id="h-quick">Coup d'envoi avec ton joueur : toi + 10 robots contre 11 robots.</p></button>
+      <button class="tile" id="go-create"><span class="ic">👤</span><h3>Mon joueur</h3><p id="h-profil">Poste, archétype et 100 points à répartir</p></button>
+      <button class="tile" id="go-reglages"><span class="ic">⚙️</span><h3>Paramètres</h3><p>Jeu, graphismes, son, commandes</p></button>
+      <button class="tile" id="go-aide"><span class="ic">🎮</span><h3>Commandes</h3><p>Boutons, clavier et astuces</p></button>
+      <div class="tile off"><span class="ic">🌐</span><h3>En ligne <span class="tag">Bientôt</span></h3><p>Matchs entre humains, chacun son joueur</p></div>
     </div>
-    <div class="card mode off">
-      <div class="ic">🌐</div>
-      <div><h3>Plusieurs humains en ligne <span class="tag">Bientôt</span></h3><p>Le moteur est déjà prêt : chacun des 22 postes peut être tenu par un humain ou par un robot. Il restera à brancher le serveur.</p></div>
-    </div>
-    <div class="card">
-      <h3 style="margin:0 0 4px">Les commandes</h3>
-      <ul class="help-list">
-        <li><b>Joystick</b> : déplacer ton joueur</li>
-        <li><b>Avec le ballon</b> : PASSE, TIR (maintiens pour doser la puissance), PROFONDEUR (passe lobée ou centre)</li>
-        <li><b>Sans le ballon</b> : PRESSING (maintiens, ton joueur fonce seul sur le ballon), TACLE, AIDE (un coéquipier vient presser avec toi)</li>
-        <li><b>AUTO-PRESSING</b> : lâche le joystick, ton joueur presse ou se replace tout seul</li>
-      </ul>
-      <p class="note" style="margin:10px 0 0">Tiens ton téléphone à l'horizontale pour la meilleure vue.</p>
-    </div>
-    <button class="cta" id="go-create">Créer mon joueur</button>
+    <p class="note" style="margin-top:14px;text-align:center">Tiens ton téléphone à l'horizontale pour la meilleure vue.</p>
   </div>
 </section>
 
 <!-- ============ CRÉATION DU PROFIL ============ -->
 <section id="create" class="screen">
   <div class="wrap">
+    <button class="back" id="c-back">← Menu</button>
     <div class="brand"><div class="ball"></div><h1>Mon joueur<small>100 points à répartir, de 3 à 30 par qualité</small></h1></div>
     <div class="lbl">Identité</div>
     <div class="row">
@@ -195,7 +222,6 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 
 <!-- ============ MATCH ============ -->
 <section id="game" class="screen">
-  <div id="scene"></div>
   <canvas id="mini"></canvas>
   <div id="label"></div>
   <div id="nogl">Ton appareil ou ton navigateur ne permet pas l'affichage 3D (WebGL).<br>Essaie avec Chrome à jour.</div>
@@ -243,7 +269,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
     <div class="panel">
       <h2 style="margin:0 0 6px;text-align:center">Pause</h2>
       <button class="cta" id="p-resume">Reprendre</button>
-      <div class="opt"><span>Ombres (désactive si le jeu rame)</span><button id="p-shadows">ON</button></div>
+      <button class="cta ghost" id="p-reglages">Paramètres</button>
       <button class="cta ghost" id="p-quit">Abandonner le match</button>
     </div>
   </div>
@@ -258,9 +284,36 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
       <button class="cta" id="e-replay-btn">Revoir le match</button>
       <button class="cta ghost" id="e-again">Rejouer</button>
       <button class="cta ghost" id="e-edit">Modifier mon joueur</button>
+      <button class="cta ghost" id="e-menu">Menu principal</button>
     </div>
   </div>
 </section>
+
+<!-- ============ PARAMÈTRES (depuis le menu ou la pause) ============ -->
+<div class="overlay top" id="reglages" role="dialog" aria-label="Paramètres">
+  <div class="panel">
+    <div class="panel-h"><h2>Paramètres</h2><button class="x" id="r-close" aria-label="Fermer">✕</button></div>
+    <div class="tabs" id="r-tabs"><button data-tab="jeu" class="on">Jeu</button><button data-tab="graph">Graphismes</button><button data-tab="son">Son</button><button data-tab="cmd">Commandes</button></div>
+    <div id="r-body"></div>
+    <button class="cta" id="r-ok">Valider</button>
+  </div>
+</div>
+
+<!-- ============ COMMANDES ============ -->
+<div class="overlay top" id="aide" role="dialog" aria-label="Commandes">
+  <div class="panel">
+    <div class="panel-h"><h2>Commandes</h2><button class="x" id="a-close" aria-label="Fermer">✕</button></div>
+    <ul class="help-list">
+      <li><b>Joystick</b> : déplacer ton joueur</li>
+      <li><b>Avec le ballon</b> : PASSE, TIR (maintiens pour doser la puissance), PROFONDEUR (passe lobée ou centre)</li>
+      <li><b>Sans le ballon</b> : PRESSING (maintiens, ton joueur fonce seul sur le ballon), TACLE, AIDE (un coéquipier vient presser avec toi)</li>
+      <li><b>AUTO-PRESSING</b> : lâche le joystick, ton joueur presse ou se replace tout seul</li>
+      <li><b>Clavier</b> : flèches ou ZQSD/WASD, Maj (sprint), J ou Espace (passe / pressing), K (tir maintenu / tacle), L (profondeur / aide), O (auto-pressing), P (pause)</li>
+    </ul>
+    <p class="note">Gaucher ? Inverse le joystick et les boutons dans Paramètres → Commandes.</p>
+    <button class="cta" id="a-ok">Compris</button>
+  </div>
+</div>
 
 <script type="module" src="js/app.js"></script>
 </body>

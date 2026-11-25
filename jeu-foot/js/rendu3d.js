@@ -280,10 +280,20 @@ export class Rendu3D {
   }
   setMatch(match, humanId) {
     for (const pl of this.players) this.scene.remove(pl.root);
-    this.match = match; this.humanId = humanId; this.camInit = false;
+    this.match = match; this.humanId = humanId; this.camInit = false; this.ring.visible = this.arrow.visible = true;
     this.players = match.players.map(p => { const o = makePlayer(p); this.scene.add(o.root); return o; });
   }
   setShadows(on) { this.sun.castShadow = on; }
+  /* qualité : 'basse' | 'moyenne' | 'haute' (finesse de l'image ; les ombres ont leur propre réglage) */
+  setQualite(q) { const dpr = window.devicePixelRatio || 1; this.renderer.setPixelRatio(q === 'basse' ? Math.min(1, dpr) : q === 'moyenne' ? Math.min(1.25, dpr) : Math.min(1.75, dpr)); this.w = 0; this.resize(); }
+  /* menus : le stade tourne lentement derrière les pages */
+  vitrine(dt) {
+    this.resize(); this.tv = (this.tv || 0) + dt * 0.06;
+    this.ring.visible = this.arrow.visible = false;
+    this.camera.up.set(0, 1, 0); this.camera.fov = 40; this.camera.updateProjectionMatrix();
+    this.camera.position.set(Math.cos(this.tv) * 70, 24, Math.sin(this.tv) * 52); this.camera.lookAt(0, 2, 0);
+    this.renderer.render(this.scene, this.camera);
+  }
   kick(id) { if (this.players[id]) this.players[id].kick = performance.now(); }
   celebrate() { this.celebrateUntil = performance.now() + 3500; }
   resize() {

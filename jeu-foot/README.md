@@ -11,6 +11,12 @@ Page publiée par GitHub Pages : `https://kabuyaya271.github.io/Kkg-for-innovati
 - **Rendu 3D (Three.js 0.160)** : stade avec tribunes et public, panneaux, buts avec filets, joueurs articulés et animés, ombres, caméra TV qui suit le ballon, vue tactique.
 - **Commandes selon la situation** : passe, tir à puissance dosée, passe en profondeur ; pressing, tacle, appel d'un coéquipier ; **auto-pressing** (joystick lâché : le joueur presse ou se replace seul).
 - **Replay** exact du match (moteur déterministe).
+- **Menus superposés au stade** : le stade 3D tourne lentement derrière le menu principal (Jouer, Mon joueur, Paramètres, Commandes, En ligne bientôt).
+- **Paramètres** (depuis le menu ou la pause), enregistrés sur l'appareil :
+  - Jeu : caméra, auto-pressing, niveau des robots, durée ;
+  - Graphismes : qualité d'image (basse, moyenne, haute), ombres ;
+  - Son : activé ou coupé, volume général, ambiance du stade, frappes et sifflet ;
+  - Commandes : taille des boutons, droitier ou gaucher, vibrations.
 
 Pas encore : fautes, hors-jeu, multijoueur en ligne.
 
