@@ -34,3 +34,12 @@ cd jeu-foot && node tests/simulation.js
 ```
 
 Commandes clavier : flèches ou ZQSD/WASD, Maj (sprint), J ou Espace (passe / pressing), K (tir maintenu / tacle), L (profondeur / aide), O (auto-pressing), P (pause).
+
+## Ressources graphiques (toutes CC0 : usage commercial libre, sans attribution obligatoire)
+
+| Fichier | Source |
+|---|---|
+| `assets/ciel.hdr` | Poly Haven — *Kloofendal 48d Partly Cloudy (Pure Sky)*, 1K : ciel et éclairage d'ambiance |
+| `assets/pelouse.jpg`, `assets/pelouse_n.jpg` | ambientCG — *Grass004* (couleur et relief), réduits en 512 px |
+
+Ces fichiers sont chargés après le démarrage : sans eux (réseau lent), le match s'affiche avec la pelouse et le ciel dessinés.

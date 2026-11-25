@@ -19,13 +19,23 @@ function canvasTex(w, h, draw, srgb = true) {
 }
 
 /* ---------- pelouse et lignes, dessinées sur une texture ---------- */
-function pitchTexture() {
+/* herbe : photo d'herbe CC0 (ambientCG Grass004) en motif + bandes de tonte claires/foncées, puis les lignes */
+function pitchTexture(herbe) {
   const px = 20, M = 4, cw = (W + 2 * M) * px, ch = (H + 2 * M) * px;
   return canvasTex(cw, ch, (g) => {
     const X = x => (x + M) * px, Y = y => (y + M) * px;
-    for (let i = 0; i < (W + 2 * M) / 5; i++) { g.fillStyle = i % 2 ? '#2f9a55' : '#288b4b'; g.fillRect(i * 5 * px, 0, 5 * px + 1, ch); }
-    for (let i = 0; i < 9000; i++) { g.fillStyle = Math.random() < 0.5 ? 'rgba(0,0,0,.05)' : 'rgba(255,255,255,.035)'; g.fillRect(Math.random() * cw, Math.random() * ch, 2, 6); }
-    g.strokeStyle = 'rgba(255,255,255,.93)'; g.fillStyle = 'rgba(255,255,255,.93)'; g.lineWidth = 0.12 * px;
+    if (herbe) {
+      const tuile = document.createElement('canvas'); tuile.width = tuile.height = 3 * px; tuile.getContext('2d').drawImage(herbe, 0, 0, 3 * px, 3 * px);
+      g.fillStyle = g.createPattern(tuile, 'repeat'); g.fillRect(0, 0, cw, ch);
+      g.globalCompositeOperation = 'multiply'; g.fillStyle = '#6fb85a'; g.fillRect(0, 0, cw, ch); g.globalCompositeOperation = 'source-over';   // herbe de stade plus verte et dense
+      for (let i = 0; i < (W + 2 * M) / 5; i++) { g.fillStyle = i % 2 ? 'rgba(255,255,230,.07)' : 'rgba(0,25,0,.10)'; g.fillRect(i * 5 * px, 0, 5 * px + 1, ch); }
+      const usure = g.createRadialGradient(X(W / 2), Y(H / 2), 0, X(W / 2), Y(H / 2), 12 * px);         // rond central un peu usé
+      usure.addColorStop(0, 'rgba(120,110,60,.10)'); usure.addColorStop(1, 'rgba(120,110,60,0)'); g.fillStyle = usure; g.fillRect(0, 0, cw, ch);
+      for (const gx of [0, W]) { const u = g.createRadialGradient(X(gx), Y(H / 2), 0, X(gx), Y(H / 2), 7 * px); u.addColorStop(0, 'rgba(110,95,55,.28)'); u.addColorStop(1, 'rgba(110,95,55,0)'); g.fillStyle = u; g.fillRect(0, 0, cw, ch); }
+    } else {
+      for (let i = 0; i < (W + 2 * M) / 5; i++) { g.fillStyle = i % 2 ? '#2f9a55' : '#288b4b'; g.fillRect(i * 5 * px, 0, 5 * px + 1, ch); }
+    }
+    g.strokeStyle = 'rgba(255,255,255,.9)'; g.fillStyle = 'rgba(255,255,255,.9)'; g.lineWidth = 0.12 * px;
     const line = (pts, close) => { g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(X(x), Y(y)) : g.moveTo(X(x), Y(y)))); if (close) g.closePath(); g.stroke(); };
     const arc = (x, y, r, a0, a1) => { g.beginPath(); g.arc(X(x), Y(y), r * px, a0, a1); g.stroke(); };
     const dot = (x, y, r) => { g.beginPath(); g.arc(X(x), Y(y), r * px, 0, 7); g.fill(); };
@@ -70,7 +80,7 @@ function numberTexture(n, color) {
 /* ---------- tribunes avec public ---------- */
 function buildStand(len, rows, palette, withRoof) {
   const grp = new THREE.Group(), stepH = 0.55, stepD = 0.9;
-  const concrete = new THREE.MeshLambertMaterial({ color: 0x4a515c }), seat = new THREE.MeshLambertMaterial({ color: 0x2b3a55 });
+  const concrete = new THREE.MeshLambertMaterial({ color: 0x7d848e }), seat = new THREE.MeshLambertMaterial({ color: 0x34507a });
   for (let r = 0; r < rows; r++) {
     const h = (r + 1) * stepH, m = new THREE.Mesh(new THREE.BoxGeometry(len, h, stepD), r % 2 ? concrete : seat);
     m.position.set(0, h / 2, -r * stepD); grp.add(m);
@@ -81,18 +91,47 @@ function buildStand(len, rows, palette, withRoof) {
     roof.position.set(0, rows * stepH + 5, -rows * stepD / 2 + 1); grp.add(roof);
     for (let x = -len / 2; x <= len / 2; x += len / 6) { const c = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, rows * stepH + 5), concrete); c.position.set(x, (rows * stepH + 5) / 2, -rows * stepD + 0.5); grp.add(c); }
   }
-  const per = Math.floor(len / 0.72), count = rows * per;
-  const fan = new THREE.InstancedMesh(new THREE.BoxGeometry(0.42, 0.72, 0.32), new THREE.MeshLambertMaterial(), count);
-  const mtx = new THREE.Matrix4(), col = new THREE.Color(), base = [];
-  let i = 0;
-  for (let r = 0; r < rows; r++) for (let k = 0; k < per; k++) {
-    const x = -len / 2 + 0.36 + k * 0.72 + (Math.random() - 0.5) * 0.12, y = (r + 1) * stepH + 0.36, z = -r * stepD - 0.05;
-    const empty = Math.random() < 0.12;
-    mtx.makeTranslation(x, empty ? -50 : y, z); fan.setMatrixAt(i, mtx); base.push([x, empty ? -50 : y, z, Math.random() * 6]);
-    col.set(palette[(Math.random() * palette.length) | 0]); fan.setColorAt(i, col); i++;
+  /* spectateurs : silhouettes peintes (tête, cheveux, maillot, bras) sur des panneaux, une famille d'instances par dessin */
+  const atlas = fanAtlas(palette), fans = [], places = [];
+  for (let r = 0; r < rows; r++) for (let k = 0; k < Math.floor(len / 0.62); k++) {
+    if (Math.random() < 0.1) continue;                                                     // quelques sièges vides
+    places.push([-len / 2 + 0.31 + k * 0.62 + (Math.random() - 0.5) * 0.14, (r + 1) * stepH + 0.42 + (Math.random() - 0.5) * 0.06, -r * stepD - 0.1, Math.random() * 6]);
   }
-  fan.instanceMatrix.setUsage(THREE.DynamicDrawUsage); grp.add(fan);
-  return { grp, fan, base };
+  const parVariante = Array.from({ length: FAN_N }, () => []);
+  for (const pl of places) parVariante[(Math.random() * FAN_N) | 0].push(pl);
+  const base = [], mtx = new THREE.Matrix4();
+  parVariante.forEach((lot, v) => {
+    const geo = new THREE.PlaneGeometry(0.6, 0.9), uv = geo.attributes.uv, cx = v % FAN_COLS, cy = (v / FAN_COLS) | 0;
+    for (let i = 0; i < uv.count; i++) uv.setXY(i, (cx + uv.getX(i)) / FAN_COLS, 1 - (cy + 1 - uv.getY(i)) / FAN_COLS);
+    const fan = new THREE.InstancedMesh(geo, atlas, lot.length);
+    lot.forEach(([x, y, z, ph], i) => { mtx.makeTranslation(x, y, z); fan.setMatrixAt(i, mtx); base.push([fan, i, x, y, z, ph]); });
+    fan.instanceMatrix.setUsage(THREE.DynamicDrawUsage); grp.add(fan); fans.push(fan);
+  });
+  return { grp, fans, base };
+}
+
+const FAN_COLS = 6, FAN_N = FAN_COLS * FAN_COLS;
+let FAN_MAT = null;
+function fanAtlas(palette) {
+  if (FAN_MAT) return FAN_MAT;
+  const cell = 96, tex = canvasTex(cell * FAN_COLS, cell * FAN_COLS, (g) => {
+    for (let v = 0; v < FAN_N; v++) {
+      const ox = (v % FAN_COLS) * cell, oy = ((v / FAN_COLS) | 0) * cell, c = cell / 2;
+      const skin = '#' + SKINS[(Math.random() * SKINS.length) | 0].toString(16).padStart(6, '0');
+      const hair = '#' + HAIRS[(Math.random() * HAIRS.length) | 0].toString(16).padStart(6, '0');
+      const shirt = palette[(Math.random() * palette.length) | 0], bras = Math.random() < 0.25;
+      g.fillStyle = shirt;                                                                // buste et épaules
+      g.beginPath(); g.ellipse(ox + c, oy + cell * 0.86, cell * 0.3, cell * 0.33, 0, Math.PI, 0); g.lineTo(ox + c + cell * 0.3, oy + cell); g.lineTo(ox + c - cell * 0.3, oy + cell); g.fill();
+      if (bras) { g.strokeStyle = shirt; g.lineWidth = cell * 0.1; g.lineCap = 'round'; g.beginPath(); g.moveTo(ox + c - cell * 0.24, oy + cell * 0.62); g.lineTo(ox + c - cell * 0.34, oy + cell * 0.22); g.moveTo(ox + c + cell * 0.24, oy + cell * 0.62); g.lineTo(ox + c + cell * 0.34, oy + cell * 0.22); g.stroke();
+        g.fillStyle = skin; for (const s of [-1, 1]) { g.beginPath(); g.arc(ox + c + s * cell * 0.34, oy + cell * 0.19, cell * 0.05, 0, 7); g.fill(); } }
+      g.fillStyle = skin; g.fillRect(ox + c - cell * 0.05, oy + cell * 0.44, cell * 0.1, cell * 0.1);   // cou
+      g.beginPath(); g.ellipse(ox + c, oy + cell * 0.36, cell * 0.12, cell * 0.145, 0, 0, 7); g.fill();  // tête
+      g.fillStyle = hair; g.beginPath(); g.ellipse(ox + c, oy + cell * 0.3, cell * 0.125, cell * 0.1, 0, Math.PI, 0); g.fill();
+      if (Math.random() < 0.15) { g.fillStyle = palette[(Math.random() * palette.length) | 0]; g.fillRect(ox + c - cell * 0.14, oy + cell * 0.22, cell * 0.28, cell * 0.07); } // casquette
+    }
+  });
+  FAN_MAT = new THREE.MeshLambertMaterial({ map: tex, alphaTest: 0.5, side: THREE.DoubleSide });
+  return FAN_MAT;
 }
 
 /* ---------- joueur 3D articulé (primitives, animation procédurale) ---------- */
@@ -166,15 +205,30 @@ export class Rendu3D {
     const s = this.scene;
     s.background = canvasTex(4, 256, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#5b9be0'); gr.addColorStop(0.6, '#b9d7f0'); gr.addColorStop(1, '#e9e3d2'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
     s.fog = new THREE.Fog(0xcfe0ee, 140, 320);
-    s.add(new THREE.HemisphereLight(0xcfe6ff, 0x2f5d32, 0.9));
+    this.hemi = new THREE.HemisphereLight(0xcfe6ff, 0x2f5d32, 0.9); s.add(this.hemi);
     const sun = new THREE.DirectionalLight(0xfff1dc, 2.2); sun.position.set(-35, 70, 30); sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, { left: -62, right: 62, top: 45, bottom: -45, near: 10, far: 200 });
     sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.02; s.add(sun); s.add(sun.target); this.sun = sun;
     /* sol autour du stade et pelouse */
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshLambertMaterial({ color: 0x3d4a3a })); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.05; s.add(ground);
     const apron = new THREE.Mesh(new THREE.PlaneGeometry(W + 24, H + 24), new THREE.MeshLambertMaterial({ color: 0x25803f })); apron.rotation.x = -Math.PI / 2; apron.position.y = -0.02; apron.receiveShadow = true; s.add(apron);
-    const pt = pitchTexture(); pt.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
-    const pitch = new THREE.Mesh(new THREE.PlaneGeometry(W + 8, H + 8), new THREE.MeshLambertMaterial({ map: pt })); pitch.rotation.x = -Math.PI / 2; pitch.receiveShadow = true; s.add(pitch);
+    const aniso = this.renderer.capabilities.getMaxAnisotropy(), pt = pitchTexture(); pt.anisotropy = aniso;
+    const pitchMat = new THREE.MeshStandardMaterial({ map: pt, roughness: 0.92, metalness: 0, envMapIntensity: 0.45 });
+    const pitch = new THREE.Mesh(new THREE.PlaneGeometry(W + 8, H + 8), pitchMat); pitch.rotation.x = -Math.PI / 2; pitch.receiveShadow = true; s.add(pitch);
+    /* éléments réalistes chargés ensuite (le jeu reste jouable pendant le chargement ou sans eux) */
+    const dossier = new URL('../assets/', import.meta.url).href, img = new Image();
+    img.onload = () => { const t = pitchTexture(img); t.anisotropy = aniso; pitchMat.map.dispose(); pitchMat.map = t; pitchMat.needsUpdate = true; };
+    img.src = dossier + 'pelouse.jpg';
+    new THREE.TextureLoader().load(dossier + 'pelouse_n.jpg', (n) => {
+      n.wrapS = n.wrapT = THREE.RepeatWrapping; n.repeat.set((W + 8) / 3, (H + 8) / 3); n.anisotropy = aniso;
+      pitchMat.normalMap = n; pitchMat.normalScale.set(0.6, 0.6); pitchMat.needsUpdate = true;
+    });
+    import('three/addons/loaders/RGBELoader.js').then(({ RGBELoader }) => new RGBELoader().load(dossier + 'ciel.hdr', (hdr) => {
+      hdr.mapping = THREE.EquirectangularReflectionMapping;                               // ciel photo CC0 (Poly Haven, Kloofendal)
+      const pm = new THREE.PMREMGenerator(this.renderer); s.environment = pm.fromEquirectangular(hdr).texture; pm.dispose();
+      s.background = hdr; s.backgroundIntensity = 0.85; this.hemi.intensity = 0.35;   // l'environnement remplace l'essentiel de la lumière d'ambiance
+      s.fog.color.set(0xc9d6e2);
+    })).catch(() => {});
     /* panneaux publicitaires */
     const bt = boardTexture(), boards = [[0, -H / 2 - 4, W + 14, 0], [0, H / 2 + 4, W + 14, Math.PI], [-W / 2 - 5, 0, H + 6, Math.PI / 2], [W / 2 + 5, 0, H + 6, -Math.PI / 2]];
     for (const [x, z, len, ry] of boards) {
@@ -276,8 +330,8 @@ export class Rendu3D {
     const cel = now < this.celebrateUntil, mtx = new THREE.Matrix4();
     for (const st of this.stands) {
       if (!cel && !st.dirty) continue;
-      st.base.forEach(([x, y, z, ph], i) => { mtx.makeTranslation(x, cel ? y + Math.max(0, Math.sin(now / 110 + ph)) * 0.35 : y, z); st.fan.setMatrixAt(i, mtx); });
-      st.fan.instanceMatrix.needsUpdate = true; st.dirty = cel;
+      for (const [fan, i, x, y, z, ph] of st.base) { mtx.makeTranslation(x, cel ? y + Math.max(0, Math.sin(now / 110 + ph)) * 0.35 : y, z); fan.setMatrixAt(i, mtx); }
+      for (const fan of st.fans) fan.instanceMatrix.needsUpdate = true; st.dirty = cel;
     }
     this.updateCamera(dt, opts.cam);
     this.renderer.render(this.scene, this.camera);
