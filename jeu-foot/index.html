@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Foot Profils — football 3D</title>
+<meta name="description" content="Prototype de jeu de football 11 contre 11 en 3D : crée ton joueur avec 100 points et joue-le.">
+<script type="importmap">
+  { "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a1310;--card:#12201a;--card2:#183025;--line:#24402f;--txt:#e9f3ed;--mut:#93ad9e;--acc:#3ddc84;--acc2:#ffd23f;--red:#ff5a5f;--blue:#1f6fff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:Barlow,system-ui,sans-serif;overscroll-behavior:none}
+h1,h2,h3{font-family:'Barlow Condensed',Barlow,sans-serif;letter-spacing:.02em}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.screen{display:none;min-height:100%}
+.screen.on{display:block}
+.wrap{max-width:540px;margin:0 auto;padding:22px 16px 40px}
+.brand{display:flex;align-items:center;gap:10px;margin:6px 0 18px}
+.brand .ball{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#cfd8d3 60%,#8fa197);box-shadow:0 0 0 3px #0a1310,0 0 0 5px var(--acc)}
+.brand h1{margin:0;font-size:30px;font-weight:800;text-transform:uppercase}
+.brand small{display:block;color:var(--mut);font-family:Barlow;font-size:13px;letter-spacing:0;text-transform:none;font-weight:500}
+.card{background:rgba(18,32,26,.84);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
+.mode{display:flex;gap:12px;align-items:flex-start}
+.mode .ic{flex:0 0 42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--card2);font-size:20px}
+.mode h3{margin:0 0 4px;font-size:20px}
+.mode p{margin:0;color:var(--mut);font-size:14px;line-height:1.4}
+.mode.off{opacity:.55}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--card2);color:var(--acc2);margin-left:6px;vertical-align:middle;font-family:Barlow;letter-spacing:.03em;text-transform:uppercase}
+.cta{display:block;width:100%;padding:15px;border-radius:14px;background:var(--acc);color:#05200f;font-family:'Barlow Condensed';font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.04em;margin-top:16px}
+.cta:disabled{background:#2a3f33;color:#6f8a7b;cursor:not-allowed}
+.cta.ghost{background:var(--card2);color:var(--txt)}
+.lbl{font-size:12px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;margin:18px 0 8px}
+.row{display:flex;gap:10px}
+.inp{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--txt);font:inherit;font-size:16px;min-width:0}
+.inp.num{flex:0 0 84px;text-align:center}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.seg.s3{grid-template-columns:repeat(3,1fr)}
+.seg button{padding:11px 4px;border-radius:12px;background:var(--card2);border:1px solid var(--line);font-weight:600;font-size:14px}
+.seg button.on{background:var(--acc);color:#05200f;border-color:var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 12px;border-radius:12px;background:var(--card2);border:1px solid var(--line);text-align:left}
+.chip b{display:block;font-size:14px}
+.chip small{color:var(--mut);font-size:12px}
+.chip.on{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
+.attr{display:grid;grid-template-columns:1fr 38px 40px 38px;align-items:center;gap:6px;padding:9px 0;border-bottom:1px solid var(--line)}
+.attr:last-child{border-bottom:0}
+.attr b{font-size:15px}
+.attr small{display:block;color:var(--mut);font-size:12px}
+.attr .bar{grid-column:1/-1;height:5px;background:#0c1712;border-radius:9px;overflow:hidden;margin-top:2px}
+.attr .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:9px;transition:width .12s}
+.pm{height:38px;border-radius:10px;background:var(--card2);border:1px solid var(--line);font-size:22px;font-weight:700;line-height:1;user-select:none;touch-action:manipulation}
+.pm:disabled{opacity:.3}
+.val{text-align:center;font-family:'Barlow Condensed';font-size:22px;font-weight:700}
+.total{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(10,19,16,0),var(--bg) 30%);padding:18px 0 4px;margin-top:4px}
+.tot{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.tot .n{font-family:'Barlow Condensed';font-size:28px;font-weight:800}
+.tot .n.ok{color:var(--acc)} .tot .n.ko{color:var(--acc2)}
+.err{color:var(--acc2);font-size:13px;margin-top:6px;min-height:18px}
+.note{color:var(--mut);font-size:13px;line-height:1.45}
+/* --- jeu --- */
+#game{position:fixed;inset:0;background:transparent;z-index:1;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+#scene{position:fixed;inset:0;z-index:0}
+#voile{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 50% 30%,rgba(6,14,10,.35),rgba(6,14,10,.9) 75%)}
+body.en-match #voile{display:none}
+.screen{position:relative;z-index:1}
+#scene canvas{display:block}
+#mini{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;width:150px;height:96px;pointer-events:none}
+@media (orientation:portrait){#mini{bottom:208px;width:132px;height:85px}}
+#label{position:absolute;left:0;top:0;font-family:'Barlow Condensed';font-weight:800;font-size:15px;color:#ffd23f;text-shadow:0 0 3px #000,0 1px 4px #000;white-space:nowrap;pointer-events:none;transform:translate(-50%,-100%)}
+#nogl{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:16px;line-height:1.5;background:#0a1310}
+.opt{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:10px 12px;background:var(--card2);border-radius:12px;font-weight:600}
+.opt button{padding:6px 12px;border-radius:9px;background:var(--acc);color:#05200f;font-weight:800}
+.hud{position:absolute;left:0;right:0;top:0;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,0));pointer-events:none}
+.sb{display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed';font-weight:800;font-size:22px}
+.sb .t{font-size:14px;font-weight:700;opacity:.95;max-width:84px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb .sq{width:10px;height:10px;border-radius:3px}
+.sb .sc{background:rgba(0,0,0,.5);padding:2px 10px;border-radius:8px;min-width:64px;text-align:center}
+.hud-r{display:flex;align-items:center;gap:6px;pointer-events:auto}
+.clock{font-family:'Barlow Condensed';font-weight:700;font-size:20px;background:rgba(0,0,0,.5);padding:2px 8px;border-radius:8px}
+.icon-btn{width:36px;height:36px;border-radius:10px;background:rgba(0,0,0,.5);font-size:15px}
+.stam{position:absolute;top:50px;left:10px;width:120px;pointer-events:none}
+.stam small{font-size:11px;font-weight:700;letter-spacing:.06em;opacity:.9;text-shadow:0 1px 3px #000}
+.stam .b{height:6px;background:rgba(0,0,0,.5);border-radius:9px;overflow:hidden;margin-top:2px}
+.stam .b i{display:block;height:100%;background:var(--acc);width:100%}
+#info{position:absolute;left:50%;top:58px;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:4px 12px;border-radius:99px;font-weight:700;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
+#info.on{opacity:1}
+.controls{position:absolute;left:0;right:0;bottom:0;height:200px;display:flex;background:linear-gradient(180deg,rgba(8,20,14,0),rgba(8,20,14,.92) 22%);padding-bottom:env(safe-area-inset-bottom)}
+@media (orientation:landscape){.controls{height:178px;background:none}}
+@media (max-width:520px){.sb .t{display:none}.icon-btn{width:32px;height:32px}}
+.stick-zone{position:relative;flex:1 1 50%;touch-action:none}
+.stick-base{position:absolute;width:110px;height:110px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.07);transform:translate(-50%,-50%);left:42%;top:58%;pointer-events:none}
+.knob{position:absolute;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.78);left:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.right{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;padding:0 14px 10px 0;gap:8px}
+.auto{padding:7px 12px;border-radius:99px;background:rgba(0,0,0,.55);border:2px solid rgba(255,255,255,.3);font-family:'Barlow Condensed';font-weight:800;font-size:14px;letter-spacing:.04em;touch-action:manipulation}
+.auto.on{background:var(--acc);color:#05200f;border-color:#8ff0b9;box-shadow:0 0 14px rgba(61,220,132,.6)}
+.btns{display:grid;grid-template-columns:repeat(2,70px);grid-template-rows:repeat(2,70px);gap:9px}
+.btns button{border-radius:50%;font-family:'Barlow Condensed';font-weight:800;font-size:15px;letter-spacing:.03em;background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.32);touch-action:none;line-height:1.05;padding:0 4px;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.btns button.sm{font-size:12px}
+.btns button.c-pass{background:rgba(61,220,132,.85);color:#05200f;border-color:#8ff0b9;text-shadow:none}
+.btns button.c-shoot{background:rgba(255,210,63,.9);color:#2a1f00;border-color:#ffe48a;text-shadow:none}
+.btns button.c-def{background:rgba(255,90,95,.85);color:#fff;border-color:#ffb0b3}
+.btns button.c-press{background:rgba(31,111,255,.85);color:#fff;border-color:#8fb4ff}
+.btns button.act{transform:scale(.9);filter:brightness(1.25)}
+.power{position:absolute;right:16px;bottom:212px;width:160px;display:none;pointer-events:none;text-align:right}
+@media (orientation:landscape){.power{bottom:190px}}
+.power span{font-size:11px;font-weight:800;letter-spacing:.08em;text-shadow:0 1px 3px #000}
+.power .pb{height:10px;background:rgba(0,0,0,.55);border-radius:9px;overflow:hidden;margin-top:3px;border:1px solid rgba(255,255,255,.3)}
+.power .pb i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3ddc84,#ffd23f 75%,#ff5a5f)}
+.kbd{position:absolute;right:12px;top:58px;font-size:11px;color:rgba(255,255,255,.7);text-align:right;line-height:1.5;pointer-events:none;display:none;text-shadow:0 1px 3px #000}
+@media (hover:hover) and (pointer:fine) and (orientation:landscape){.kbd{display:block}}
+#toast{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%) scale(.9);font-family:'Barlow Condensed';font-weight:800;font-size:44px;text-transform:uppercase;text-align:center;color:#fff;text-shadow:0 3px 18px rgba(0,0,0,.7);opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap}
+#toast.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#toast small{display:block;font-size:18px;font-weight:700;opacity:.95}
+.replaybar{position:absolute;left:0;right:0;bottom:0;height:64px;display:none;align-items:center;justify-content:center;gap:8px;background:rgba(0,0,0,.6);padding-bottom:env(safe-area-inset-bottom)}
+.replaybar .badge{font-family:'Barlow Condensed';font-weight:800;color:var(--red);margin-right:6px;letter-spacing:.08em}
+.replaybar button{padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.12);font-weight:700;font-size:14px}
+.replaybar button.on{background:var(--acc);color:#05200f}
+.overlay{position:absolute;inset:0;background:rgba(4,10,7,.82);display:none;align-items:center;justify-content:center;padding:16px;z-index:5}
+.overlay.on{display:flex}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;width:100%;max-width:420px;max-height:100%;overflow:auto}
+.final{display:flex;align-items:center;justify-content:center;gap:14px;font-family:'Barlow Condensed';font-weight:800;margin:4px 0 6px}
+.final .s{font-size:46px}
+.final .t{font-size:16px;color:var(--mut);max-width:110px;text-align:center}
+.verdict{text-align:center;font-family:'Barlow Condensed';font-weight:700;font-size:20px;margin-bottom:8px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.grid div{background:var(--card2);border-radius:12px;padding:10px 6px;text-align:center}
+.grid b{display:block;font-family:'Barlow Condensed';font-size:24px}
+.grid small{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.panel .cta{margin-top:10px;padding:12px;font-size:18px}
+.replay-ok{text-align:center;font-size:13px;color:var(--acc);margin-top:8px;min-height:16px}
+.help-list{margin:8px 0 0;padding:0;list-style:none;font-size:14px;line-height:1.5;color:var(--mut)}
+.help-list b{color:var(--txt)}
+/* --- menu principal (superposé au stade) --- */
+.hub{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+@media (max-width:520px){.tile h3{font-size:18px}.tile.big h3{font-size:30px}.tile{padding:13px}}
+.tile{position:relative;text-align:left;padding:16px;border-radius:18px;background:rgba(18,32,26,.84);border:1px solid var(--line);min-height:112px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:transform .12s,border-color .12s}
+.tile:active{transform:scale(.97)} .tile:hover{border-color:var(--acc)}
+.tile.big{grid-column:1/-1;min-height:140px;background:linear-gradient(135deg,rgba(61,220,132,.95),rgba(24,140,80,.95));color:#05200f;border-color:#8ff0b9}
+.tile .ic{font-size:26px;line-height:1}
+.tile h3{margin:8px 0 2px;font-size:24px;text-transform:uppercase;font-weight:800}
+.tile.big h3{font-size:34px}
+.tile p{margin:0;font-size:13px;opacity:.85;line-height:1.35}
+.tile.off{opacity:.55;pointer-events:none}
+.back{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:12px;background:rgba(18,32,26,.84);border:1px solid var(--line);font-weight:700;font-size:14px;margin-bottom:4px}
+/* --- paramètres et aide : panneaux au-dessus de tout (menus et match) --- */
+.overlay.top{position:fixed;z-index:20}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:4px 0 12px}
+.tabs button{padding:10px 2px;border-radius:12px;background:var(--card2);border:1px solid var(--line);font-weight:700;font-size:13px}
+.tabs button.on{background:var(--acc);color:#05200f;border-color:var(--acc)}
+.reg{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-bottom:1px solid var(--line)}
+.reg:last-child{border-bottom:0}
+.reg>span{font-weight:700;font-size:15px}
+.reg small{color:var(--mut);font-size:12px;font-weight:500}
+.reg .seg{grid-template-columns:repeat(auto-fit,minmax(0,1fr))}
+.reg input[type=range]{width:100%;accent-color:var(--acc);height:28px}
+.panel-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.panel-h h2{margin:0}
+.x{width:36px;height:36px;border-radius:10px;background:var(--card2);font-size:18px}
+/* réglages des commandes */
+body.btn-s .btns{grid-template-columns:repeat(2,58px);grid-template-rows:repeat(2,58px)}
+body.btn-l .btns{grid-template-columns:repeat(2,84px);grid-template-rows:repeat(2,84px)}
+body.btn-l .btns button{font-size:17px}
+body.gaucher .controls{flex-direction:row-reverse}
+body.gaucher .right{align-items:flex-start;padding:0 0 10px 14px}
+body.gaucher .stick-base{left:58%}
+</style>
+</head>
+<body>
+<div id="scene"></div><div id="voile"></div>
+
+<!-- ============ ACCUEIL ============ -->
+<section id="home" class="screen on">
+  <div class="wrap">
+    <div class="brand"><div class="ball"></div><h1>Foot Profils<small>Football 11 contre 11 en 3D · ton joueur, 100 points</small></h1></div>
+    <div class="hub">
+      <button class="tile big" id="go-quick"><span class="ic">⚽</span><h3>Jouer</h3><p id="h-quick">Coup d'envoi avec ton joueur : toi + 10 robots contre 11 robots.</p></button>
+      <button class="tile" id="go-create"><span class="ic">👤</span><h3>Mon joueur</h3><p id="h-profil">Poste, archétype et 100 points à répartir</p></button>
+      <button class="tile" id="go-reglages"><span class="ic">⚙️</span><h3>Paramètres</h3><p>Jeu, graphismes, son, commandes</p></button>
+      <button class="tile" id="go-aide"><span class="ic">🎮</span><h3>Commandes</h3><p>Boutons, clavier et astuces</p></button>
+      <div class="tile off"><span class="ic">🌐</span><h3>En ligne <span class="tag">Bientôt</span></h3><p>Matchs entre humains, chacun son joueur</p></div>
+    </div>
+    <p class="note" style="margin-top:14px;text-align:center">Tiens ton téléphone à l'horizontale pour la meilleure vue.</p>
+  </div>
+</section>
+
+<!-- ============ CRÉATION DU PROFIL ============ -->
+<section id="create" class="screen">
+  <div class="wrap">
+    <button class="back" id="c-back">← Menu</button>
+    <div class="brand"><div class="ball"></div><h1>Mon joueur<small>100 points à répartir, de 3 à 30 par qualité</small></h1></div>
+    <div class="lbl">Identité</div>
+    <div class="row">
+      <input id="f-name" class="inp" maxlength="16" placeholder="Nom du joueur" autocomplete="off">
+      <input id="f-num" class="inp num" type="number" min="1" max="99" inputmode="numeric" placeholder="N°">
+    </div>
+    <div class="lbl">Poste</div>
+    <div class="seg" id="f-poste"></div>
+    <div class="lbl">Archétype</div>
+    <div class="chips" id="f-arch"></div>
+    <div class="lbl">Qualités</div>
+    <div class="card" id="f-attrs" style="padding:4px 14px"></div>
+    <div class="lbl">Adversaire</div>
+    <div class="seg s3" id="f-diff"></div>
+    <div class="lbl">Durée du match</div>
+    <div class="seg s3" id="f-dur"></div>
+    <p class="note" id="compo"></p>
+    <div class="total">
+      <div class="tot"><span>Points répartis</span><span class="n" id="f-total">100 / 100</span></div>
+      <div class="err" id="f-err"></div>
+      <button class="cta" id="go-play" style="margin-top:6px">Jouer le match</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MATCH ============ -->
+<section id="game" class="screen">
+  <canvas id="mini"></canvas>
+  <div id="label"></div>
+  <div id="nogl">Ton appareil ou ton navigateur ne permet pas l'affichage 3D (WebGL).<br>Essaie avec Chrome à jour.</div>
+  <div class="hud">
+    <div class="sb">
+      <span class="sq" style="background:var(--blue)"></span><span class="t" id="h-ta">Ton équipe</span>
+      <span class="sc" id="h-score">0 – 0</span>
+      <span class="t" id="h-tb">Robots FC</span><span class="sq" style="background:var(--red)"></span>
+    </div>
+    <div class="hud-r">
+      <span class="clock" id="h-clock">0'</span>
+      <button class="icon-btn" id="b-snd" aria-label="Son">🔊</button>
+      <button class="icon-btn" id="b-cam" aria-label="Caméra">🎥</button>
+      <button class="icon-btn" id="b-pause" aria-label="Pause">❚❚</button>
+    </div>
+  </div>
+  <div class="stam" id="stam"><small>ÉNERGIE</small><div class="b"><i id="h-stam"></i></div></div>
+  <div id="info"></div>
+  <div class="kbd">Déplacement : flèches ou ZQSD/WASD · Sprint : Maj<br>J / Espace : passe ou pressing · K : tir (maintenir) ou tacle<br>L : profondeur ou aide · O : auto-pressing · P : pause</div>
+  <div id="toast"></div>
+  <div class="power" id="power"><span id="power-t">PUISSANCE</span><div class="pb"><i id="power-i"></i></div></div>
+
+  <div class="controls" id="controls">
+    <div class="stick-zone" id="stick-zone">
+      <div class="stick-base" id="stick-base"><div class="knob" id="knob"></div></div>
+    </div>
+    <div class="right">
+      <button class="auto" id="auto">AUTO-PRESSING : OFF</button>
+      <div class="btns">
+        <button id="b1">PASSE</button>
+        <button id="b2">TIR</button>
+        <button id="b3" class="sm">PROFON-<br>DEUR</button>
+        <button id="bs">SPRINT</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="replaybar" id="replaybar">
+    <span class="badge">● REPLAY</span>
+    <button data-speed="1" class="on">×1</button><button data-speed="2">×2</button><button data-speed="4">×4</button>
+    <button id="rp-quit">Terminer</button>
+  </div>
+
+  <div class="overlay" id="pause">
+    <div class="panel">
+      <h2 style="margin:0 0 6px;text-align:center">Pause</h2>
+      <button class="cta" id="p-resume">Reprendre</button>
+      <button class="cta ghost" id="p-reglages">Paramètres</button>
+      <button class="cta ghost" id="p-quit">Abandonner le match</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="end">
+    <div class="panel">
+      <div class="final"><span class="t" id="e-ta"></span><span class="s" id="e-score"></span><span class="t" id="e-tb"></span></div>
+      <div class="verdict" id="e-verdict"></div>
+      <div class="lbl" style="margin-top:6px">Ton match</div>
+      <div class="grid" id="e-stats"></div>
+      <div class="replay-ok" id="e-replay"></div>
+      <button class="cta" id="e-replay-btn">Revoir le match</button>
+      <button class="cta ghost" id="e-again">Rejouer</button>
+      <button class="cta ghost" id="e-edit">Modifier mon joueur</button>
+      <button class="cta ghost" id="e-menu">Menu principal</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PARAMÈTRES (depuis le menu ou la pause) ============ -->
+<div class="overlay top" id="reglages" role="dialog" aria-label="Paramètres">
+  <div class="panel">
+    <div class="panel-h"><h2>Paramètres</h2><button class="x" id="r-close" aria-label="Fermer">✕</button></div>
+    <div class="tabs" id="r-tabs"><button data-tab="jeu" class="on">Jeu</button><button data-tab="graph">Graphismes</button><button data-tab="son">Son</button><button data-tab="cmd">Commandes</button></div>
+    <div id="r-body"></div>
+    <button class="cta" id="r-ok">Valider</button>
+  </div>
+</div>
+
+<!-- ============ COMMANDES ============ -->
+<div class="overlay top" id="aide" role="dialog" aria-label="Commandes">
+  <div class="panel">
+    <div class="panel-h"><h2>Commandes</h2><button class="x" id="a-close" aria-label="Fermer">✕</button></div>
+    <ul class="help-list">
+      <li><b>Joystick</b> : déplacer ton joueur</li>
+      <li><b>Avec le ballon</b> : PASSE, TIR (maintiens pour doser la puissance), PROFONDEUR (passe lobée ou centre)</li>
+      <li><b>Sans le ballon</b> : PRESSING (maintiens, ton joueur fonce seul sur le ballon), TACLE, AIDE (un coéquipier vient presser avec toi)</li>
+      <li><b>AUTO-PRESSING</b> : lâche le joystick, ton joueur presse ou se replace tout seul</li>
+      <li><b>Clavier</b> : flèches ou ZQSD/WASD, Maj (sprint), J ou Espace (passe / pressing), K (tir maintenu / tacle), L (profondeur / aide), O (auto-pressing), P (pause)</li>
+    </ul>
+    <p class="note">Gaucher ? Inverse le joystick et les boutons dans Paramètres → Commandes.</p>
+    <button class="cta" id="a-ok">Compris</button>
+  </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "jeu-foot",
+  "private": true,
+  "type": "module",
+  "description": "Jeu de football 11 contre 11 (prototype) : moteur déterministe + rendu Three.js",
+  "scripts": {
+    "test": "node tests/simulation.js"
+  }
+}
